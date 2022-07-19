@@ -1,7 +1,10 @@
 import type { NextPage } from "next";
-import Head from "next/head";
+
 import { trpc } from "../utils/trpc";
+import Head from "next/head";
 import Link from "next/link";
+
+import BatchRenderer from "../components/BatchRenderer";
 
 const Dashboard: NextPage = () => {
   const batchFetch = trpc.useQuery(["article.batch-data"]);
@@ -31,37 +34,7 @@ const Dashboard: NextPage = () => {
         </div>
       </nav>
       <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
-        {batchFetch.data &&
-          batchFetch.data.map((articleBlock) => {
-            switch (articleBlock.type) {
-              case "paragraph":
-                return <p className="inline"> {articleBlock.data.text} </p>;
-              case "bold":
-                return (
-                  <b className="font-semibold">{articleBlock.data.text}</b>
-                );
-              case "italic":
-                return <i className="font-italic">{articleBlock.data.text}</i>;
-              case "code":
-                return (
-                  <code className="bg-slate-300 px-0.5 mx-0.5 inl  rounded font-mono font-thin ">
-                    {articleBlock.data.text}
-                  </code>
-                );
-              case "highlight":
-                return (
-                  <mark className="bg-yellow-300 rounded mx-0.5 px-0.5 text-black">
-                    {articleBlock.data.text}
-                  </mark>
-                );
-              case "link":
-                return (
-                  <Link href={articleBlock.data.href!}>
-                    <a className="underline">{articleBlock.data.text}</a>
-                  </Link>
-                );
-            }
-          })}
+        {batchFetch.data ? <BatchRenderer data={batchFetch.data} /> : null}
       </main>
     </>
   );
