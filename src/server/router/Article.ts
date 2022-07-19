@@ -64,6 +64,15 @@ export const ArticleRouter = createRouter()
       return [
         [
           {
+            type: "heading",
+            data: {
+              text: "This is a heading",
+              level: 1,
+            },
+          },
+        ],
+        [
+          {
             type: "paragraph",
             data: {
               text: "This is a paragraph",
@@ -125,9 +134,18 @@ export const ArticleRouter = createRouter()
                 ],
                 [{ type: "paragraph", data: { text: "This is a paragraph" } }],
               ],
+              isOrdered: false,
             },
           },
         ],
-      ];
+        [
+          {
+            type: "paragraph",
+            data: {
+              text: "This is the one liner paragraph block",
+            },
+          },
+        ],
+      ] as BatchElement[][];
     },
   });

@@ -58,7 +58,7 @@ export interface QuoteData {
 }
 export interface ListData {
   isOrdered: boolean;
-  items: BatchElement[];
+  items: ListBatchElement[][];
 }
 
 export interface HeadingData {
