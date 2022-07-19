@@ -7,23 +7,51 @@ export const ArticleRouter = createRouter().query("batch-data", {
     return [
       {
         type: "paragraph",
-        isEnding: false,
         data: {
           text: "This is a paragraph",
         },
       },
       {
         type: "bold",
-        isEnding: false,
         data: {
           text: "and a bold text",
         },
       },
       {
         type: "paragraph",
-        isEnding: true,
         data: {
           text: "This is a paragraph again",
+        },
+      },
+      {
+        type: "italic",
+        data: {
+          text: "with an italic text",
+        },
+      },
+      {
+        type: "paragraph",
+        data: {
+          text: "This is a more paragraph again",
+        },
+      },
+      {
+        type: "code",
+        data: {
+          text: "//with an inline code",
+        },
+      },
+      {
+        type: "highlight",
+        data: {
+          text: "with a highlight",
+        },
+      },
+      {
+        type: "link",
+        data: {
+          href: "https://www.google.com",
+          text: "and link to unknown website",
         },
       },
     ];
