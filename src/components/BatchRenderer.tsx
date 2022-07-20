@@ -1,12 +1,14 @@
 // imports GetServerSideProps from nextjs
 import { NextPage } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   BatchElement,
   BatchType,
   BoldData,
   CodeData,
   HighlightData,
+  ImageData,
   ItalicData,
   LinkData,
   ListBatchElement,
@@ -124,6 +126,30 @@ const BatchRenderer: NextPage<{ data: BatchElement[] }> = ({ data }) => {
           case BatchType.List:
             articleBlock.data as ListBatchElement[];
             return <ListRenderer data={articleBlock.data} key={index} />;
+          case BatchType.Delimiter:
+            articleBlock.data as undefined;
+            return (
+              <div
+                key={index}
+                className="before:inline-block before:content-['***']  before:text-3xl before:leading-10 before:h-10 before:tracking-widest align-middle text-center w-full leading-5"
+              ></div>
+            );
+          case BatchType.Image:
+            articleBlock.data as ImageData;
+            return (
+              <div className="w-full h-64 relative">
+                <Image
+                  layout="fill"
+                  src={articleBlock.data.src}
+                  alt={articleBlock.data.alt}
+                  width={articleBlock.data.width}
+                  height={articleBlock.data.height}
+                  objectFit="contain"
+                  className="bg-slate-500 w-4"
+                />
+              </div>
+            );
+
           default:
             return (
               <div key={index}>

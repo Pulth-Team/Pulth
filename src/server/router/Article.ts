@@ -146,6 +146,18 @@ export const ArticleRouter = createRouter()
             },
           },
         ],
+        [{ type: "delimiter" }],
+        [
+          {
+            type: "image",
+            data: {
+              src: "https://via.placeholder.com/300x200.png",
+              alt: "This is an image",
+              width: 300,
+              height: 200,
+            },
+          },
+        ],
       ] as BatchElement[][];
     },
   });
