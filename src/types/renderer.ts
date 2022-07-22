@@ -1,23 +1,11 @@
+import { BaseEditor } from "slate";
+import { ReactEditor } from "slate-react";
+
 export interface BatchElement {
   // todo add id
   type: BatchType;
   data: any;
 }
-
-export interface ListBatchElement {
-  type: ListBatchType;
-  data: any;
-}
-
-export enum ListBatchType {
-  Link = "link",
-  Bold = "bold",
-  Italic = "italic",
-  Code = "code",
-  Highlight = "highlight",
-  Paragraph = "paragraph",
-}
-
 export enum BatchType {
   Link = "link",
   Bold = "bold",
@@ -32,41 +20,32 @@ export enum BatchType {
   Paragraph = "paragraph",
 }
 
-export interface LinkData {
-  href: string;
-  text: string;
-}
-export interface BoldData {
-  text: string;
-}
-export interface ItalicData {
-  text: string;
-}
-export interface CodeData {
-  text: string;
-}
-export interface HighlightData {
-  text: string;
-}
-export interface ImageData {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
+// Newer implementation of the Editor interface
+
+export enum ElementTypes {
+  Code = "code",
+  Paragraph = "paragraph",
+  Heading = "heading",
+  Image = "image",
 }
 
-export interface QuoteData {
-  text: string;
-}
-export interface ListData {
-  isOrdered: boolean;
-  items: ListBatchElement[][];
+type CustomText = { text: string; bold?: true };
+interface BaseElement {
+  type: ElementTypes;
+  children: CustomText[];
 }
 
-export interface HeadingData {
-  text: string;
-  level: number;
+declare module "slate" {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor;
+    Element: BaseElement | HeadingElement;
+    Text: CustomText;
+  }
 }
-export interface ParagraphData {
-  text: string;
+
+interface HeadingElement extends BaseElement {
+  type: ElementTypes.Heading;
+  data: {
+    level: number;
+  };
 }
