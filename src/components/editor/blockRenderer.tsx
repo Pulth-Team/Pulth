@@ -69,6 +69,7 @@ const BlockRenderer = (props: RenderElementProps) => {
             className="absolute z-10 bg-white p-1 rounded shadow select-none"
             contentEditable={false}
           >
+            {/* Add Icons for Ponel Items */}
             <div className="m-1 p-1 text-sm font-medium hover:bg-slate-100 active:bg-slate-200 rounded">
               <p>Heading</p>
             </div>
@@ -96,13 +97,45 @@ const BlockRenderer = (props: RenderElementProps) => {
             contentEditable={false}
           >
             <div className=" bg-white shadow  flex grid-cols-3 gap-1 w-full rounded ">
-              <div className="m-1 p-1 hover:bg-slate-100 active:bg-slate-200 rounded">
+              <div
+                className="m-1 p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                onClick={() => {
+                  const elementCount = editor.children.length;
+                  const toPosition =
+                    editor.selection?.anchor.path[0]! === elementCount - 1
+                      ? elementCount - 1
+                      : editor.selection?.anchor.path[0]! + 1;
+                  Transforms.moveNodes(editor, {
+                    at: getFocusedProps().anchor,
+                    to: [toPosition],
+                  });
+                }}
+              >
                 <ArrowDownIcon className="w-5 h-5" />
               </div>
-              <div className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded">
+              <div
+                className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                onClick={() => {
+                  Transforms.removeNodes(editor, {
+                    at: getFocusedProps().anchor,
+                  });
+                }}
+              >
                 <XIcon className="w-5 h-5" />
               </div>
-              <div className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded">
+              <div
+                className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                onClick={() => {
+                  const toPosition =
+                    editor.selection?.anchor.path[0]! === 0
+                      ? 0
+                      : editor.selection?.anchor.path[0]! - 1;
+                  Transforms.moveNodes(editor, {
+                    at: getFocusedProps().anchor,
+                    to: [toPosition],
+                  });
+                }}
+              >
                 <ArrowUpIcon className="w-5 h-5" />
               </div>
             </div>
