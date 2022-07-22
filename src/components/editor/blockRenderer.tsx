@@ -63,7 +63,7 @@ const BlockRenderer = (props: RenderElementProps) => {
   return (
     <div className="flex flex-row gap-2">
       <Popover.Group className="flex flex-nowrap gap-1 self-center">
-        <Popover className="relative">
+        <Popover className="relative" contentEditable={false}>
           <Popover.Button
             disabled={!isCurrentElement(editor, props)}
             className={`p-1 ${
@@ -110,7 +110,7 @@ const BlockRenderer = (props: RenderElementProps) => {
             </div>
           </Popover.Panel>
         </Popover>
-        <Popover className="relative ">
+        <Popover className="relative" contentEditable={false}>
           <Popover.Button
             disabled={!isCurrentElement(editor, props)}
             className={`py-1 ${
