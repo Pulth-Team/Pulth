@@ -4,16 +4,15 @@ import Link from "next/link";
 
 import { useState } from "react";
 
-import { createEditor, Transforms, Editor } from "slate";
+import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 
 // TypeScript users only add this code
-import { BaseEditor, Descendant, Node } from "slate";
-import { ReactEditor, useSlate } from "slate-react";
-
-import { ElementTypes } from "../types/renderer";
+import { BaseEditor, Descendant } from "slate";
+import { ReactEditor } from "slate-react";
 
 import BlockRenderer from "../components/editor/blockRenderer";
+import { getDocument } from "../utils/editorHelpers";
 
 const initialValue = [
   {
@@ -31,22 +30,6 @@ const EditorPage: NextPage = () => {
     withReact(createEditor())
   );
 
-  const serialize = (value: Descendant[]) => {
-    return (
-      value
-        // Return the string content of each paragraph in the value's children.
-        .map((n: Descendant) => JSON.stringify(n))
-        // Join them all with line breaks denoting paragraphs.
-        .join("\n")
-    );
-  };
-
-  const getDocument = () => Array.from(Node.elements(editor));
-  const getFocusedElement = () => {
-    if (editor.selection?.anchor.path[0])
-      return editor.children[editor.selection?.anchor.path[0]];
-    else return null;
-  };
   return (
     <>
       <Head>
@@ -77,11 +60,11 @@ const EditorPage: NextPage = () => {
       </main>
       <button
         onClick={() => {
-          let value = getDocument();
+          let value = getDocument(editor);
           console.log(value);
         }}
       >
-        Selection
+        Log Document
       </button>
     </>
   );
