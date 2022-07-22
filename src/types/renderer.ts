@@ -30,6 +30,7 @@ export enum ElementTypes {
 }
 
 type CustomText = { text: string; bold?: true };
+
 interface BaseElement {
   type: ElementTypes;
   children: CustomText[];
@@ -38,7 +39,7 @@ interface BaseElement {
 declare module "slate" {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor;
-    Element: BaseElement | HeadingElement;
+    Element: ParagraphElement | HeadingElement;
     Text: CustomText;
   }
 }
@@ -48,4 +49,7 @@ interface HeadingElement extends BaseElement {
   data: {
     level: number;
   };
+}
+interface ParagraphElement extends BaseElement {
+  type: ElementTypes.Paragraph;
 }
