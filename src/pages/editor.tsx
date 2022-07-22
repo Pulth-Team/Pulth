@@ -72,26 +72,7 @@ const EditorPage: NextPage = () => {
       </nav>
       <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto ">
         <Slate editor={editor} value={initialValue}>
-          <Editable
-            renderElement={BlockRenderer}
-            onKeyDown={(event) => {
-              if (event.key === "." && event.ctrlKey) {
-                event.preventDefault();
-                // Determine whether any of the currently selected blocks are code blocks.
-                const [match] = Editor.nodes(editor, {
-                  match: (n) => Editor.isBlock(editor, n) && n.type === "code",
-                });
-                // Toggle the block type depending on whether there's already a match.
-                Transforms.setNodes(
-                  editor,
-                  { type: match ? ElementTypes.Paragraph : ElementTypes.Code },
-                  { match: (n) => Editor.isBlock(editor, n) }
-                );
-              }
-            }}
-          >
-            <Toolbar />
-          </Editable>
+          <Editable renderElement={BlockRenderer}></Editable>
         </Slate>
       </main>
       <button
@@ -103,17 +84,6 @@ const EditorPage: NextPage = () => {
         Selection
       </button>
     </>
-  );
-};
-const Toolbar = () => {
-  const editor = useSlate();
-  return (
-    <div>
-      {/* <button onClick={isBoldActive(editor)}>B</button> */}
-      <button>B</button>
-      {/* <button onClick={isItalicActive(editor)}>I</button> */}
-      <button>I</button>
-    </div>
   );
 };
 
