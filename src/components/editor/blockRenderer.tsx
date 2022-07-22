@@ -130,7 +130,10 @@ const BlockRenderer = (props: RenderElementProps) => {
             className={`absolute z-10 -translate-x-10`}
             contentEditable={false}
           >
-            <div className=" bg-white shadow  grid grid-cols-6 gap-1 w-max rounded ">
+            <div
+              className=" bg-white shadow  grid grid-cols-6 gap-1 w-max rounded "
+              contentEditable={false}
+            >
               {SettingsRenderElement()}
 
               <div
@@ -146,6 +149,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                     to: [toPosition],
                   });
                 }}
+                contentEditable={false}
               >
                 <ArrowDownIcon className="w-5 h-5" />
               </div>
@@ -162,6 +166,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                     });
                   else setIsError(true);
                 }}
+                contentEditable={false}
               >
                 <XIcon className="w-5 h-5" />
               </div>
@@ -177,6 +182,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                     to: [toPosition],
                   });
                 }}
+                contentEditable={false}
               >
                 <ArrowUpIcon className="w-5 h-5" />
               </div>
