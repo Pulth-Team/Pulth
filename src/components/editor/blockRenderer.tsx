@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   PlusIcon,
@@ -45,6 +45,17 @@ const BlockRenderer = (props: RenderElementProps) => {
       anchor: editor.selection?.anchor,
     };
   };
+
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    var timeout = setTimeout(() => {
+      setIsError(false);
+    }, 200);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isError]);
 
   let tabProps = isCurrentElement() ? { tabIndex: 0 } : { tabIndex: -1 };
   return (
@@ -114,11 +125,17 @@ const BlockRenderer = (props: RenderElementProps) => {
                 <ArrowDownIcon className="w-5 h-5" />
               </div>
               <div
-                className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                className={`m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded ${
+                  isError ? "animate-shake" : "animate-none"
+                }`}
                 onClick={() => {
-                  Transforms.removeNodes(editor, {
-                    at: getFocusedProps().anchor,
-                  });
+                  if (isError) return;
+
+                  if (editor.children.length > 1)
+                    Transforms.removeNodes(editor, {
+                      at: getFocusedProps().anchor,
+                    });
+                  else setIsError(true);
                 }}
               >
                 <XIcon className="w-5 h-5" />
