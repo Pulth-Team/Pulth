@@ -16,8 +16,12 @@ import { Popover } from "@headlessui/react";
 import DefaultElement from "./DefaultElement";
 import HeadingElement from "./HeadingElement";
 
-import { Editor, Node, Transforms } from "slate";
+import HeadingSettings from "./HeadingSettings";
+
+import { Transforms } from "slate";
 import { ElementTypes } from "../../types/renderer";
+
+import { getFocusedProps, isCurrentElement } from "../../utils/editorHelpers";
 
 const BlockRenderer = (props: RenderElementProps) => {
   const ComponentRenderElement = (prop: { className: string }) => {
@@ -32,19 +36,15 @@ const BlockRenderer = (props: RenderElementProps) => {
     }
   };
 
+  const SettingsRenderElement = () => {
+    switch (props.element.type) {
+      case ElementTypes.Heading:
+        return <HeadingSettings props={props} className="" />;
+      default:
+        return;
+    }
+  };
   const editor = useSlate();
-
-  // const getDocument = () => Array.from(Node.elements(editor));
-  const isCurrentElement = () => getFocusedElement() === props.element;
-  const getFocusedElement = () => {
-    return editor.children[editor.selection?.anchor.path[0]!];
-  };
-  const getFocusedProps = () => {
-    return {
-      element: editor.children[editor.selection?.anchor.path[0]!],
-      anchor: editor.selection?.anchor,
-    };
-  };
 
   const [isError, setIsError] = useState(false);
 
@@ -57,21 +57,25 @@ const BlockRenderer = (props: RenderElementProps) => {
     };
   }, [isError]);
 
-  let tabProps = isCurrentElement() ? { tabIndex: 0 } : { tabIndex: -1 };
+  let tabProps = isCurrentElement(editor, props)
+    ? { tabIndex: 0 }
+    : { tabIndex: -1 };
   return (
     <div className="flex flex-row gap-2">
-      <Popover.Group className="flex flex-nowrap gap-1">
+      <Popover.Group className="flex flex-nowrap gap-1 self-center">
         <Popover className="relative">
           <Popover.Button
-            disabled={!isCurrentElement()}
+            disabled={!isCurrentElement(editor, props)}
             className={`p-1 ${
-              isCurrentElement() ? "hover:bg-slate-200" : ""
+              isCurrentElement(editor, props) ? "hover:bg-slate-200" : ""
             } rounded `}
           >
             <PlusIcon
               className={`
               w-5 h-5 flex-shrink-0
-              ${isCurrentElement() ? "opacity-100" : "opacity-0 "}`}
+              ${
+                isCurrentElement(editor, props) ? "opacity-100" : "opacity-0 "
+              }`}
               {...tabProps}
             />
           </Popover.Button>
@@ -81,25 +85,44 @@ const BlockRenderer = (props: RenderElementProps) => {
             contentEditable={false}
           >
             {/* Add Icons for Ponel Items */}
-            <div className="m-1 p-1 text-sm font-medium hover:bg-slate-100 active:bg-slate-200 rounded">
+            <div
+              className="m-1 p-1 text-sm font-medium hover:bg-slate-100 active:bg-slate-200 rounded"
+              onClick={() => {
+                Transforms.setNodes(editor, {
+                  type: ElementTypes.Heading,
+                  data: {
+                    level: 1,
+                  },
+                });
+              }}
+            >
               <p>Heading</p>
             </div>
-            <div className="m-1 p-1 text-sm font-medium hover:bg-slate-100 active:bg-slate-200 rounded">
+            <div
+              className="m-1 p-1 text-sm font-medium hover:bg-slate-100 active:bg-slate-200 rounded"
+              onClick={() => {
+                Transforms.setNodes(editor, {
+                  type: ElementTypes.Paragraph,
+                });
+              }}
+            >
               <p>Paragraph</p>
             </div>
           </Popover.Panel>
         </Popover>
         <Popover className="relative ">
           <Popover.Button
-            disabled={!isCurrentElement()}
+            disabled={!isCurrentElement(editor, props)}
             className={`py-1 ${
-              isCurrentElement() ? "hover:bg-slate-200" : ""
+              isCurrentElement(editor, props) ? "hover:bg-slate-200" : ""
             } rounded `}
           >
             <DotsVerticalIcon
               className={`
               w-5 h-5 flex-shrink-0
-              ${isCurrentElement() ? "opacity-100" : "opacity-0 "}`}
+              ${
+                isCurrentElement(editor, props) ? "opacity-100" : "opacity-0 "
+              }`}
               {...tabProps}
             />
           </Popover.Button>
@@ -107,9 +130,11 @@ const BlockRenderer = (props: RenderElementProps) => {
             className={`absolute z-10 -translate-x-10`}
             contentEditable={false}
           >
-            <div className=" bg-white shadow  flex grid-cols-3 gap-1 w-full rounded ">
+            <div className=" bg-white shadow  grid grid-cols-6 gap-1 w-max rounded ">
+              {SettingsRenderElement()}
+
               <div
-                className="m-1 p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                className="p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded"
                 onClick={() => {
                   const elementCount = editor.children.length;
                   const toPosition =
@@ -117,7 +142,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                       ? elementCount - 1
                       : editor.selection?.anchor.path[0]! + 1;
                   Transforms.moveNodes(editor, {
-                    at: getFocusedProps().anchor,
+                    at: getFocusedProps(editor).anchor,
                     to: [toPosition],
                   });
                 }}
@@ -125,7 +150,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                 <ArrowDownIcon className="w-5 h-5" />
               </div>
               <div
-                className={`m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded ${
+                className={`p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded ${
                   isError ? "animate-shake" : "animate-none"
                 }`}
                 onClick={() => {
@@ -133,7 +158,7 @@ const BlockRenderer = (props: RenderElementProps) => {
 
                   if (editor.children.length > 1)
                     Transforms.removeNodes(editor, {
-                      at: getFocusedProps().anchor,
+                      at: getFocusedProps(editor).anchor,
                     });
                   else setIsError(true);
                 }}
@@ -141,14 +166,14 @@ const BlockRenderer = (props: RenderElementProps) => {
                 <XIcon className="w-5 h-5" />
               </div>
               <div
-                className="m-1  p-1 hover:bg-slate-100 active:bg-slate-200 rounded"
+                className="p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded"
                 onClick={() => {
                   const toPosition =
                     editor.selection?.anchor.path[0]! === 0
                       ? 0
                       : editor.selection?.anchor.path[0]! - 1;
                   Transforms.moveNodes(editor, {
-                    at: getFocusedProps().anchor,
+                    at: getFocusedProps(editor).anchor,
                     to: [toPosition],
                   });
                 }}
