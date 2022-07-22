@@ -10,9 +10,9 @@ export const isCurrentElement = (
 ) => getFocusedElement(editor) === props.element;
 
 export const getFocusedElement = (editor: BaseEditor & ReactEditor) => {
-  if (editor.selection?.anchor.path[0])
+  if (editor.selection?.anchor.path[0] !== undefined)
     return editor.children[editor.selection?.anchor.path[0]];
-  else return null;
+  else return undefined;
 };
 
 export const getFocusedProps = (editor: BaseEditor & ReactEditor) => {
