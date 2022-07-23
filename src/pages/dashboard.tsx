@@ -5,7 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 // import BatchRenderer from "../components/BatchRenderer";
-import DocumentRenderer from "../components/DocumentRenderer";
+// import DocumentRenderer from "../components/DocumentRenderer";
 
 const Dashboard: NextPage = () => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
@@ -36,9 +36,7 @@ const Dashboard: NextPage = () => {
         </div>
       </nav>
       <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
-        {documentFetch.data ? (
-          <DocumentRenderer data={documentFetch.data} />
-        ) : null}
+        {documentFetch.data ? <p>Work in Progress</p> : null}
       </main>
     </>
   );
