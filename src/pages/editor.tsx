@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
@@ -30,6 +30,10 @@ const EditorPage: NextPage = () => {
     withReact(createEditor())
   );
 
+  useEffect(() => {
+    document.execCommand("defaultParagraphSeparator", false, "br");
+  }, []);
+
   return (
     <>
       <Head>
@@ -53,7 +57,7 @@ const EditorPage: NextPage = () => {
           </Link>
         </div>
       </nav>
-      <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto ">
+      <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto select-none">
         <Slate editor={editor} value={initialValue}>
           <Editable renderElement={BlockRenderer}></Editable>
         </Slate>

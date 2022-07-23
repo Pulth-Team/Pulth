@@ -10,7 +10,12 @@ import {
   XIcon,
 } from "@heroicons/react/solid";
 
-import { RenderElementProps, useFocused, useSlate } from "slate-react";
+import {
+  ReactEditor,
+  RenderElementProps,
+  useFocused,
+  useSlate,
+} from "slate-react";
 import { Popover } from "@headlessui/react";
 
 import DefaultElement from "./DefaultElement";
@@ -61,7 +66,7 @@ const BlockRenderer = (props: RenderElementProps) => {
     ? { tabIndex: 0 }
     : { tabIndex: -1 };
   return (
-    <div className="flex flex-row gap-2">
+    <span className="flex flex-row gap-2">
       <Popover.Group className="flex flex-nowrap gap-1 self-center">
         <Popover className="relative" contentEditable={false}>
           <Popover.Button
@@ -139,6 +144,8 @@ const BlockRenderer = (props: RenderElementProps) => {
               <div
                 className="p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded"
                 onClick={() => {
+                  // needs inspectation more !!
+                  ReactEditor.focus(editor);
                   const elementCount = editor.children.length;
                   const toPosition =
                     editor.selection?.anchor.path[0]! === elementCount - 1
@@ -151,7 +158,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                 }}
                 contentEditable={false}
               >
-                <ArrowDownIcon className="w-5 h-5" />
+                <ArrowDownIcon className="w-5 h-5 " />
               </div>
               <div
                 className={`p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded ${
@@ -168,7 +175,7 @@ const BlockRenderer = (props: RenderElementProps) => {
                 }}
                 contentEditable={false}
               >
-                <XIcon className="w-5 h-5" />
+                <XIcon className="w-5 h-5 " />
               </div>
               <div
                 className="p-1 m-1 col-span-2 hover:bg-slate-100 active:bg-slate-200 rounded"
@@ -192,7 +199,7 @@ const BlockRenderer = (props: RenderElementProps) => {
       </Popover.Group>
 
       <ComponentRenderElement className={"flex-grow-0 w-full"} />
-    </div>
+    </span>
   );
 };
 
