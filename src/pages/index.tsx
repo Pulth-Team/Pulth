@@ -27,9 +27,9 @@ const Home: NextPage = () => {
         <p className="text-lg text-gray-700">
           You can still go to{" "}
           <Link href="/dashboard">
-            <p className="text-blue-600 inline-block cursor-pointer">
+            <a className="text-blue-600 inline-block cursor-pointer">
               Dashboard
-            </p>
+            </a>
           </Link>
         </p>
       </main>
