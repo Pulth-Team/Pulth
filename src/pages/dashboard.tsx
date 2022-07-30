@@ -23,15 +23,13 @@ const Dashboard: NextPage = () => {
       <nav className="bg-slate-200 h-12  w-screen px-12 flex justify-between items-center">
         <Link href="/">Pulth</Link>
         <div className="flex gap-4">
-          <Link href="#">
-            <div className="p-1.5 rounded-md  border border-slate-400">
-              Login
-            </div>
+          <Link href="/api/auth/signin">
+            <a className="p-1.5 rounded-md  border border-slate-400">Login</a>
           </Link>
           <Link href="#">
-            <div className="p-1.5 rounded-md  border border-slate-400">
+            <a className="p-1.5 rounded-md  border border-slate-400">
               Register
-            </div>
+            </a>
           </Link>
         </div>
       </nav>

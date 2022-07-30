@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials, _req) {
-        const user = { id: 1, name: credentials?.name ?? "J Smith" };
+        // const user = { id: 1, name: credentials?.name ?? "J Smith" };
         return user;
       },
     }),
