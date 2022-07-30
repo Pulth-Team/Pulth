@@ -9,6 +9,24 @@ import { prisma } from "../../../server/db/client";
 import { env } from "../../../server/env.mjs";
 
 export const authOptions: NextAuthOptions = {
+  session: {
+    // Choose how you want to save the user session.
+    // The default is `"jwt"`, an encrypted JWT (JWE) stored in the session cookie.
+    // If you use an `adapter` however, we default it to `"database"` instead.
+    // You can still force a JWT session by explicitly defining `"jwt"`.
+    // When using `"database"`, the session cookie will only contain a `sessionToken` value,
+    // which is used to look up the session in the database.
+    strategy: "database",
+
+    // Seconds - How long until an idle session expires and is no longer valid.
+    maxAge: 24 * 60 * 60, // 1 days
+
+    // Seconds - Throttle how frequently to write to database to extend a session.
+    // Use it to limit write operations. Set to 0 to always update the database.
+    // Note: This option is ignored if using JSON Web Tokens
+    updateAge: 4 * 60 * 60, // 4 hours
+  },
+
   // Include user.id on session
   callbacks: {
     session({ session, user }) {
@@ -28,20 +46,6 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
-    }),
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        name: {
-          label: "Name",
-          type: "text",
-          placeholder: "Enter your name",
-        },
-      },
-      async authorize(credentials, _req) {
-        // const user = { id: 1, name: credentials?.name ?? "J Smith" };
-        return user;
-      },
     }),
   ],
 };

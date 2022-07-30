@@ -6,28 +6,23 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./db.sqlite"
-    // url      = env("DATABASE_URL")
-}
-
-model Example {
-    id String @id @default(cuid())
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
+    id                String  @id @default(auto()) @map("_id") @db.ObjectId
     userId            String
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?
-    access_token      String?
+    refresh_token     String? @db.String
+    access_token      String? @db.String
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String?
+    id_token          String? @db.String
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -35,7 +30,7 @@ model Account {
 }
 
 model Session {
-    id           String   @id @default(cuid())
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
     sessionToken String   @unique
     userId       String
     expires      DateTime
@@ -43,7 +38,7 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String    @id @default(auto()) @map("_id") @db.ObjectId
     name          String?
     email         String?   @unique
     emailVerified DateTime?
@@ -53,9 +48,12 @@ model User {
 }
 
 model VerificationToken {
+    // im not hundred percent sure this is the right way to do this
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+    @@map("verificationtokens")
 }

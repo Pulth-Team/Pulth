@@ -6,12 +6,17 @@ import Link from "next/link";
 
 // import BatchRenderer from "../components/BatchRenderer";
 import DocumentRenderer from "../components/DocumentRenderer";
+import { useSession } from "next-auth/react";
 
 const Dashboard: NextPage = () => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
   const documentFetch = trpc.useQuery(["article.document-data"]);
   console.log(documentFetch.data);
 
+  const { data } = useSession();
+  const user = data?.user;
+
+  console.log(user);
   return (
     <>
       <Head>
@@ -23,14 +28,25 @@ const Dashboard: NextPage = () => {
       <nav className="bg-slate-200 h-12  w-screen px-12 flex justify-between items-center">
         <Link href="/">Pulth</Link>
         <div className="flex gap-4">
-          <Link href="/api/auth/signin">
-            <a className="p-1.5 rounded-md  border border-slate-400">Login</a>
-          </Link>
-          <Link href="#">
-            <a className="p-1.5 rounded-md  border border-slate-400">
-              Register
-            </a>
-          </Link>
+          {user ? (
+            <>
+              <Link href="/api/auth/signout">Logout</Link>
+              <p>{user.name}</p>
+            </>
+          ) : (
+            <>
+              <Link href="/api/auth/signin">
+                <a className="p-1.5 rounded-md  border border-slate-400">
+                  Login
+                </a>
+              </Link>
+              <Link href="#">
+                <a className="p-1.5 rounded-md  border border-slate-400">
+                  Register
+                </a>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
       <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
