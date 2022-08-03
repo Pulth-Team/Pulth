@@ -16,6 +16,6 @@ export default defineNextConfig({
   reactStrictMode: true,
   images: {
     // Just for demo purposes, we'll use the aws cloudfront url
-    domains: ["via.placeholder.com"],
+    domains: ["via.placeholder.com", "lh3.googleusercontent.com"],
   },
 });
