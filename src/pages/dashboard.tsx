@@ -8,14 +8,24 @@ import Link from "next/link";
 import DocumentRenderer from "../components/DocumentRenderer";
 import { useSession } from "next-auth/react";
 import ProfileNavbar from "../components/ProfileNavbar";
+import NotAuthenticated from "../components/responses/not-authenticated";
 
 const Dashboard: NextPage = () => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
   const documentFetch = trpc.useQuery(["article.document-data"]);
   console.log(documentFetch.data);
 
-  const { data } = useSession();
-  const user = data?.user;
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "unauthenticated") {
+    return <NotAuthenticated></NotAuthenticated>;
+  }
+
+  const user = session?.user;
 
   return (
     <>
