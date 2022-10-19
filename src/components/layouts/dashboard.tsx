@@ -3,6 +3,12 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+
+import { Menu } from "@headlessui/react";
+
+import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
+
 import { useRouter } from "next/router";
 
 // import BatchRenderer from "../components/BatchRenderer";
@@ -77,27 +83,44 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               </Link>
             </div>
           </div>
-          <div
-            className={`${
-              user ? "hidden" : ""
-            } bg-gray-700 flex p-3 rounded-md gap-x-2 items-center`}
-          >
-            Please login to see your account credentials
-          </div>
+          <Link href="/api/auth/signin">
+            <div
+              className={`${
+                user ? "hidden" : ""
+              } bg-gray-700 flex p-3 rounded-md items-center justify-center cursor-pointer transition-all duration-300 hover:bg-gray-600 hover:shadow-lg active:bg-gray-700`}
+            >
+              <a>Login</a>
+            </div>
+          </Link>
           <div
             className={`${
               user ? "" : "hidden"
             } bg-gray-700 flex p-3 rounded-md gap-x-2 items-center`}
           >
-            <div className={`h-12 w-12`}>
-              <Image
-                src={user?.image || "/default_profile.jpg"}
-                alt="profile"
-                height={64}
-                width={64}
-                className="rounded-full aspect-square"
-              ></Image>
-            </div>
+            <Menu as="div">
+              <Menu.Items className="absolute bg-white p-1 -translate-y-12 rounded-lg">
+                <div>
+                  <Menu.Item>
+                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black">
+                      {/* <Link href="/api/auth/signout">Logout</Link> */}
+                      <a onClick={() => signOut()}>Logout</a>
+                    </div>
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+              <div className={`h-12 w-12 relative`}>
+                <Menu.Button>
+                  <Image
+                    src={user?.image || "/default_profile.jpg"}
+                    alt="profile"
+                    height={64}
+                    width={64}
+                    className="rounded-full aspect-square"
+                  ></Image>
+                </Menu.Button>
+              </div>
+            </Menu>
+
             <div className="flex flex-col text-sm">
               <div className="text-base">{user?.name}</div>
               <div className="cursor-pointer text-white/70 hover:text-white/90">
@@ -106,7 +129,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="flex-grow">{children}</div>
+        <div className="flex-grow overflow-y-scroll p-2">{children}</div>
       </div>
     </>
   );
