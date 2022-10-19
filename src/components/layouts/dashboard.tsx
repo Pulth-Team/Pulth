@@ -20,6 +20,9 @@ import {
   MapIcon,
   PhotoIcon,
   DocumentTextIcon,
+  ArrowRightOnRectangleIcon,
+  ArrowLeftOnRectangleIcon,
+  Cog8ToothIcon,
 } from "@heroicons/react/24/outline";
 import { router } from "@trpc/server";
 
@@ -87,9 +90,10 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             <div
               className={`${
                 user ? "hidden" : ""
-              } bg-gray-700 flex p-3 rounded-md items-center justify-center cursor-pointer transition-all duration-300 hover:bg-gray-600 hover:shadow-lg active:bg-gray-700`}
+              } bg-gray-700 flex p-3 rounded-md items-center justify-center cursor-pointer transition-all gap-x-1 duration-300 hover:bg-gray-600 hover:shadow-lg active:bg-gray-700`}
             >
-              <a>Login</a>
+              <p className="text-lg font-medium">Login</p>
+              <ArrowLeftOnRectangleIcon className="h-6 w-6 rotate-180"></ArrowLeftOnRectangleIcon>
             </div>
           </Link>
           <div
@@ -98,12 +102,22 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             } bg-gray-700 flex p-3 rounded-md gap-x-2 items-center`}
           >
             <Menu as="div">
-              <Menu.Items className="absolute bg-white p-1 -translate-y-12 rounded-lg">
+              <Menu.Items className="absolute bg-white p-1 -translate-y-20 rounded-lg">
                 <div>
                   <Menu.Item>
-                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black">
+                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
                       {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <a onClick={() => signOut()}>Logout</a>
+                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                      <p className="max-h-fit h-fit">Settings</p>
+                    </div>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
+                      {/* <Link href="/api/auth/signout">Logout</Link> */}
+                      <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
+                      <a className="max-h-min" onClick={() => signOut()}>
+                        Logout
+                      </a>
                     </div>
                   </Menu.Item>
                 </div>
