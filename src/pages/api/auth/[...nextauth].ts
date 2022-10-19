@@ -35,6 +35,26 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async signIn({user, profile,}){
+      user.metaData = {create: {followers: 0, follows: 0}}
+      // const isReturningUser = await prisma.user.findFirst({where: {
+      //   email: user.email
+      // }})? true:false;
+
+      // if(isReturningUser)
+      //   return true;
+      // else
+      //   return "/register"
+    
+      
+      return true;
+    },
+    
+    
+    /*async redirect({url, baseUrl}) {
+      return baseUrl;
+    }*/
+
   },
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
