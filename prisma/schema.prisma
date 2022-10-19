@@ -45,6 +45,16 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+
+    metaData   MetaData @relation(fields: [metaDataId], references: [id])
+    metaDataId String   @unique
+}
+
+model MetaData {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    user      User?
+    follows   Int    @default(0)
+    followers Int    @default(0)
 }
 
 model VerificationToken {

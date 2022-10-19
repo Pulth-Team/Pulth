@@ -35,6 +35,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async signIn({user, profile,}){
+      user.metaData = {create: {followers: 0, follows: 0}}
+      return true;
+    },
   },
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
