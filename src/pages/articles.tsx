@@ -9,7 +9,7 @@ import ProfileNavbar from "../components/ProfileNavbar";
 
 import DashboardLayout from "../components/layouts/dashboard";
 
-const Courses: NextPage = () => {
+const Articles: NextPage = () => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
 
   const { data } = useSession();
@@ -44,12 +44,8 @@ const Courses: NextPage = () => {
           )}
         </div>
       </nav>
-      <div className="h-full"></div>
-      <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
-        Courses
-      </main>
     </DashboardLayout>
   );
 };
 
-export default Courses;
+export default Articles;

@@ -44,10 +44,6 @@ const Explore: NextPage = () => {
           )}
         </div>
       </nav>
-      <div className="h-full"></div>
-      <main className="w-full p-5 sm:w-11/12 md:w-10/12 lg:w-9/12 xl:w-8/12 mx-auto">
-        Explore
-      </main>
     </DashboardLayout>
   );
 };
