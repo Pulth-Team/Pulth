@@ -1,9 +1,9 @@
 import type { NextPage } from "next";
-
 import { Menu } from "@headlessui/react";
 import Link from "next/link";
 
 import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 
 const Dashboard: NextPage<{ user: Session["user"] }> = ({ user }) => {
@@ -29,7 +29,8 @@ const Dashboard: NextPage<{ user: Session["user"] }> = ({ user }) => {
           <div className=" gap-1 ">
             <Menu.Item>
               <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded">
-                <Link href="/api/auth/signout">Logout</Link>
+                {/* <Link href="/api/auth/signout">Logout</Link> */}
+                <a onClick={() => signOut()}>Logout</a>
               </div>
             </Menu.Item>
             {/* <Menu.Item>

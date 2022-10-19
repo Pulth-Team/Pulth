@@ -26,6 +26,11 @@ export const authOptions: NextAuthOptions = {
     // Note: This option is ignored if using JSON Web Tokens
     updateAge: 4 * 60 * 60, // 4 hours
   },
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error", // Error code passed in query string as ?error=
+    newUser: "/auth/new-user", // New users will be directed here on first sign in (leave the property out if not of interest)
+  },
 
   // Include user.id on session
   callbacks: {
