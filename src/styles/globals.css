@@ -14,3 +14,7 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #555; 
   }
+  .spcScreen{
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
