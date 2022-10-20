@@ -30,7 +30,7 @@ const Explore: NextPage = () => {
           <p className="text-2xl font-semibold">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <div className="flex flex-nowrap overflow-x-scroll gap-x-2 scrollbarStyle">
+          <div className="flex flex-nowrap overflow-x-scroll gap-x-4 scrollbarStyle pb-2 h-72 ">
             <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
@@ -54,8 +54,7 @@ const Explore: NextPage = () => {
               Author={{ Title: "Security Assistant", Name: "John Wall" }}
             >
               How security works as an whole article with 3000 word. we
-              discussed nearly all of them if you need more than that please
-              leave it there.
+              discussed nearly all of them.
             </ArticleCard>
 
             <ArticleCard
@@ -64,8 +63,7 @@ const Explore: NextPage = () => {
               Author={{ Title: "Lead Developer", Name: "Micheal Rocks" }}
             >
               We will talk about how Microservices work in a nutshell. This
-              article will be a part of an series of &quot;Microservices in a
-              nutshell&quot; follow for next episodes
+              article will be a part of an serie.
             </ArticleCard>
 
             <ArticleCard
@@ -82,9 +80,7 @@ const Explore: NextPage = () => {
               Author={{ Title: "Social Scientist", Name: "Parry Gustave" }}
             >
               Since the 1970s, a panic about “disaffected” boys underachieving
-              in formal schooling has gripped Western society. Despite efforts
-              in Australia like Boys: Getting It Right and the UK Raising Boys
-              Achievement…
+              in formal schooling has gripped Western society.
             </ArticleCard>
 
             <ArticleCard
@@ -93,8 +89,7 @@ const Explore: NextPage = () => {
               Author={{ Title: "Federal Gov. Member", Name: "Samanta Sue" }}
             >
               Government agencies and private security companies in the U.S.
-              have found a cost-effective way to engage in warrantless
-              surveillance of individuals.
+              have found a cost-effective way to engage in ...
             </ArticleCard>
           </div>
         </div>
