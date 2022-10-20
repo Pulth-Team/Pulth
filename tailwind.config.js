@@ -3,7 +3,11 @@
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        "safe-area": "env(safe-area-inset)",
+      },
+    },
   },
   plugins: [],
 };

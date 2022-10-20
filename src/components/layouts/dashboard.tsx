@@ -34,7 +34,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
-      <div className="min-h-screen flex flex-nowrap inset-y-0">
+      <div className="min-h-screen flex flex-nowrap inset-y-0 pt-safe-area">
         <div className="sm:w-72 p-4 bg-gray-800 flex-shrink-0 flex flex-col justify-between text-white">
           <div className="flex flex-col">
             <div className="h-16 text-xl font-bold text-indigo-400">Pulth</div>
