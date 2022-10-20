@@ -30,7 +30,7 @@ const Explore: NextPage = () => {
           <p className="text-2xl font-semibold">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <div className="flex flex-nowrap overflow-x-scroll gap-x-2 scrollbarStyle">
+          <div className="flex flex-nowrap overflow-x-scroll gap-x-2 scrollbarStyle pb-2">
             <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
