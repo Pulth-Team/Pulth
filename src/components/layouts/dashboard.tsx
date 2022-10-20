@@ -34,7 +34,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
-      <div className="min-h-screen flex flex-nowrap inset-y-0 pt-safe-area">
+      <div className="h-[calc(100vh-env(safe-area-inset-top))] flex flex-nowrap inset-y-0 pt-safe-area">
         <div className="sm:w-72 p-4 bg-gray-800 flex-shrink-0 flex flex-col justify-between text-white">
           <div className="flex flex-col">
             <div className="h-16 text-xl font-bold text-indigo-400">Pulth</div>
@@ -104,13 +104,15 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             <Menu as="div">
               <Menu.Items className="absolute bg-white p-1 -translate-y-20 rounded-lg">
                 <div>
-                  <Menu.Item>
-                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
-                      {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                      <p className="max-h-fit h-fit">Settings</p>
-                    </div>
-                  </Menu.Item>
+                  <Link href="/settings">
+                    <Menu.Item>
+                      <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
+                        {/* <Link href="/api/auth/signout">Logout</Link> */}
+                        <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                        <p className="max-h-fit h-fit">Settings</p>
+                      </div>
+                    </Menu.Item>
+                  </Link>
                   <Menu.Item>
                     <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
                       {/* <Link href="/api/auth/signout">Logout</Link> */}
