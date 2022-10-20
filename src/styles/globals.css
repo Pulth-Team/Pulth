@@ -15,5 +15,5 @@
     background: #555; 
   }
   .spcScreen{
-    height: calc(100vh - env(safe-area-inset-bottom));
+    height: calc(100vh - env(safe-area-inset-top));
   }
