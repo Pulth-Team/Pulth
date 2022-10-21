@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+html {
+  height: -webkit-fill-available;
+} */
 ::-webkit-scrollbar {
     height: 2px;
   }
@@ -15,5 +22,9 @@
     background: #555; 
   }
   .spcScreen{
-    height: calc(100vh - env(safe-area-inset-top));
+    position: fixed;
+    max-height: -moz-available;
+max-height: -webkit-fill-available;
+max-height: fill-available;
+height: 100vh;
   }
