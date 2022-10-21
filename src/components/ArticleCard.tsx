@@ -16,7 +16,7 @@ const ArticleCard: NextPage<
   ArticleCardProps & { children: React.ReactNode }
 > = ({ Title, Topics, Author, children }) => {
   return (
-    <div className="w-64 bg-gray-100 shadow p-6 flex-shrink-0 rounded-lg flex flex-col justify-between">
+    <div className="w-64 bg-gray-100 shadow p-6 flex-shrink-0 rounded-lg flex flex-col justify-between snap-center">
       <div>
         <h1 className="text-lg font-medium pb-2">{Title}</h1>
         <p className="text-black/70">{children}</p>
