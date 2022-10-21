@@ -104,13 +104,15 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             <Menu as="div">
               <Menu.Items className="absolute bg-white p-1 -translate-y-20 rounded-lg">
                 <div>
-                  <Menu.Item>
-                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
-                      {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                      <p className="max-h-fit h-fit">Settings</p>
-                    </div>
-                  </Menu.Item>
+                  <Link href="/settings">
+                    <Menu.Item>
+                      <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
+                        {/* <Link href="/api/auth/signout">Logout</Link> */}
+                        <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                        <p className="max-h-fit h-fit">Settings</p>
+                      </div>
+                    </Menu.Item>
+                  </Link>
                   <Menu.Item>
                     <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
                       {/* <Link href="/api/auth/signout">Logout</Link> */}
