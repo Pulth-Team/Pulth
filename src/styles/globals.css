@@ -27,7 +27,7 @@ html {
     position: sticky;
     top:0;
     max-height: -moz-available;
-max-height: -webkit-fill-available;
-max-height: fill-available;
-height: 100vh;
+    max-height: -webkit-fill-available;
+    max-height: fill-available;
+    height: 100vh;
   }
