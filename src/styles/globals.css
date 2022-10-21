@@ -10,7 +10,8 @@ html {
   height: -webkit-fill-available;
 } */
 ::-webkit-scrollbar {
-    height: 2px;
+    height: 4px;
+    width: 5px;
   }
   ::-webkit-scrollbar-track {
     background: transparent; 
