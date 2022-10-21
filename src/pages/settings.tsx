@@ -1,16 +1,16 @@
 import type { NextPage } from "next";
 
-import { useState } from "react";
-
 import Head from "next/head";
 import Link from "next/link";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 
 import DashboardLayout from "../components/layouts/dashboard";
 import Image from "next/image";
 
 import { Switch } from "@headlessui/react";
+import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
 
 const Settings: NextPage = () => {
   const { data } = useSession();
@@ -26,7 +26,12 @@ const Settings: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="p-10 flex flex-col gap-y-10">
-        <h1 className="text-4xl font-bold">Settings</h1>
+        <div className="flex items-center gap-x-5">
+          <Link href="/dashboard">
+            <ChevronLeftIcon className="h-9 w-9 mt-1 cursor-pointer"></ChevronLeftIcon>
+          </Link>
+          <h1 className="text-4xl font-bold">Settings</h1>
+        </div>
         <div className="flex border-b-2 relative gap-x-5">
           <div className="border-b-2 border-indigo-600 pb-2 px-2 text-indigo-700 box-border translate-y-[1.5px] cursor-pointer">
             General
