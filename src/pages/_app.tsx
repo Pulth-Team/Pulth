@@ -5,15 +5,31 @@ import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
+import Script from "next/script";
 
 const MyApp: AppType = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-D5PY4EFWHL"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-D5PY4EFWHL');
+        `}
+      </Script>
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </>
   );
 };
 
