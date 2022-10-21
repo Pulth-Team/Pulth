@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 import DashboardLayout from "../components/layouts/dashboard";
 import Image from "next/image";
@@ -13,6 +14,8 @@ import { Switch } from "@headlessui/react";
 import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
 
 const Settings: NextPage = () => {
+  const router = useRouter();
+
   const { data } = useSession();
   const user = data?.user;
   const [textareaCount, setTextareaCount] = useState(0);
@@ -27,9 +30,10 @@ const Settings: NextPage = () => {
       </Head>
       <div className="p-10 flex flex-col gap-y-10">
         <div className="flex items-center gap-x-5">
-          <Link href="/dashboard">
-            <ChevronLeftIcon className="h-9 w-9 mt-1 cursor-pointer"></ChevronLeftIcon>
-          </Link>
+          <ChevronLeftIcon
+            onClick={() => router.back()}
+            className="h-9 w-9 mt-1 cursor-pointer"
+          ></ChevronLeftIcon>
           <h1 className="text-4xl font-bold">Settings</h1>
         </div>
         <div className="flex border-b-2 relative gap-x-5">
@@ -70,7 +74,7 @@ const Settings: NextPage = () => {
                 </p>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative cursor-pointer">
               <div className="absolute flex items-center justify-center text-white bg-black z-20 w-full rounded-full h-44 opacity-0 hover:opacity-60">
                 Change Image
               </div>
