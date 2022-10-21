@@ -22,7 +22,9 @@ html {
     background: #555; 
   }
   .spcScreen{
-    position: fixed;
+    position: -webkit-sticky;
+    position: sticky;
+    top:0;
     max-height: -moz-available;
 max-height: -webkit-fill-available;
 max-height: fill-available;
