@@ -140,7 +140,10 @@ const Settings: NextPage = () => {
                   />
                 </Switch>
               </div>
-              <div>
+              <div className="flex gap-x-5">
+                <button className="text-indigo-600 border-2 border-indigo-600 rounded-lg p-2 font-semibold transition-all hover:bg-indigo-600 hover:text-white duration-100 hover:shadow-xl hover:shadow-indigo-300">
+                  Save Settings
+                </button>
                 <button className="text-red-500 border-2 border-red-500 rounded-lg p-2 font-semibold transition-all hover:bg-red-500 hover:text-white duration-100 hover:shadow-xl hover:shadow-red-300 ">
                   Delete Profile
                 </button>
