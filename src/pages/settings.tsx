@@ -3,7 +3,9 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 
-import { useState } from "react";
+import { prisma } from "../server/db/client";
+
+import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
@@ -12,18 +14,45 @@ import Image from "next/image";
 
 import { Switch } from "@headlessui/react";
 import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
+import { trpc } from "../utils/trpc";
 
 const Settings: NextPage = () => {
   const router = useRouter();
 
-  const { data } = useSession({
+  const { data, status } = useSession({
     required: true,
     onUnauthenticated: () => signIn(),
   });
   const user = data?.user;
+
+  const [userName, setUserName] = useState(data?.user?.name || "");
   const [textareaCount, setTextareaCount] = useState(0);
   const [recomEnabled, setRecomEnabled] = useState(false);
+  const {
+    data: settingsData,
+    refetch,
+    status: settingsStatus,
+    isSuccess,
+  } = trpc.useQuery(
+    ["auth.updateSettings", { userId: user?.id!, data: { name: userName } }],
+    { refetchOnWindowFocus: false, enabled: false }
+  );
 
+  useEffect(() => {
+    if (isSuccess)
+      if (settingsStatus == "success" && settingsData == "Updated") {
+        const event = new Event("visibilitychange");
+        document.dispatchEvent(event);
+      }
+  }, [settingsStatus, isSuccess, settingsData]);
+
+  useEffect(() => {
+    if (status == "authenticated") setUserName(data?.user?.name);
+  }, [status, data]);
+
+  if (status == "loading") return <p>Loading</p>;
+
+  console.log(user);
   return (
     <DashboardLayout>
       <Head>
@@ -62,7 +91,8 @@ const Settings: NextPage = () => {
                 <p>Name</p>
                 <input
                   className="border-2 rounded-lg p-2 w-full focus:outline-none focus:border-indigo-600"
-                  defaultValue={user?.name?.toString()}
+                  defaultValue={userName?.toString()}
+                  onChange={(e) => setUserName(e.target.value)}
                 />
               </div>
               <div>
@@ -141,7 +171,13 @@ const Settings: NextPage = () => {
                 </Switch>
               </div>
               <div className="flex gap-x-5">
-                <button className="text-indigo-600 border-2 border-indigo-600 rounded-lg p-2 font-semibold transition-all hover:bg-indigo-600 hover:text-white duration-100 hover:shadow-xl hover:shadow-indigo-300">
+                <button
+                  onClick={async () => {
+                    await refetch();
+                    console.log(settingsData);
+                  }}
+                  className="text-indigo-600 border-2 border-indigo-600 rounded-lg p-2 font-semibold transition-all hover:bg-indigo-600 hover:text-white duration-100 hover:shadow-xl hover:shadow-indigo-300"
+                >
                   Save Settings
                 </button>
                 <button className="text-red-500 border-2 border-red-500 rounded-lg p-2 font-semibold transition-all hover:bg-red-500 hover:text-white duration-100 hover:shadow-xl hover:shadow-red-300 ">
