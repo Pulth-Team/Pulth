@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { createRouter } from "./context";
 
 export const authRouter = createRouter()
@@ -6,6 +7,34 @@ export const authRouter = createRouter()
     resolve({ ctx }) {
       return ctx.session;
     },
+  })
+  .query("updateSettings",{
+    input:z.object({
+      "userId":z.string(),
+
+      "data": z.object({
+        "name":z.string().optional(),
+
+        // todo Add Photo Change
+        // "photo": z.string().optional()
+
+        // Todo Add change Email
+        // "email": z.string().optional()
+      })
+    }),
+    async resolve({input}){
+      
+      const updatedUser  = await prisma?.user.update({
+        where:{
+        id: input.userId
+        },
+        data:{
+          name: input.data.name ?? undefined
+        }
+      })
+      
+      return updatedUser ? "Updated" : "Something went wrong while updating"
+    }
   })
   .middleware(async ({ ctx, next }) => {
     // Any queries or mutations after this middleware will
