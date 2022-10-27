@@ -18,8 +18,8 @@ const ArticleCard: NextPage<
   return (
     <div className="w-64 bg-gray-100 shadow p-6 flex-shrink-0 rounded-lg flex flex-col justify-between snap-center">
       <div>
-        <h1 className="text-lg font-medium pb-2">{Title}</h1>
-        <p className="text-black/70">{children}</p>
+        <h1 className="text-lg font-medium pb-2 line-clamp-1">{Title}</h1>
+        <p className="text-black/70 line-clamp-4">{children}</p>
       </div>
       <div className="">
         <div className="flex gap-2 pt-3">
@@ -34,7 +34,7 @@ const ArticleCard: NextPage<
           </div>
           <div>
             <p className="text-sm">{Author?.Name}</p>
-            <p className="text-xs  ">{Author?.Title}</p>
+            <p className="text-xs">{Author?.Title}</p>
           </div>
         </div>
         <p className="text-xs mt-2 text-black/70">5 minutes read</p>
