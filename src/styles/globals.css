@@ -10,24 +10,24 @@ html {
   height: -webkit-fill-available;
 } */
 ::-webkit-scrollbar {
-    height: 4px;
-    width: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent; 
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #888; 
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
-  }
-  .spcScreen{
-    position: -webkit-sticky;
-    position: sticky;
-    top:0;
-    max-height: -moz-available;
-    max-height: -webkit-fill-available;
-    max-height: fill-available;
-    height: 100vh;
-  }
+  height: 4px;
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+.spcScreen {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  max-height: -moz-available;
+  max-height: -webkit-fill-available;
+  max-height: fill-available;
+  height: 100vh;
+}
