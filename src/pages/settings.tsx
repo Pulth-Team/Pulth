@@ -47,7 +47,9 @@ const Settings: NextPage = () => {
   }, [settingsStatus, isSuccess, settingsData]);
 
   useEffect(() => {
-    if (status == "authenticated") setUserName(data?.user?.name);
+    // todo type checks data.user.name
+
+    if (status == "authenticated") setUserName(data?.user?.name || "");
   }, [status, data]);
 
   if (status == "loading") return <p>Loading</p>;
