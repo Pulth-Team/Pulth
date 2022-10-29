@@ -31,7 +31,7 @@ const Explore: NextPage = () => {
           <p className="text-2xl font-semibold">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <div className="flex flex-nowrap overflow-x-scroll gap-x-4  pb-4 h-72 snap-x px-1">
+          <DragScrollContainer cardWidth={256} >
             <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
@@ -92,8 +92,6 @@ const Explore: NextPage = () => {
               Government agencies and private security companies in the U.S.
               have found a cost-effective way to engage in ...
             </ArticleCard>
-          </div>
-          <DragScrollContainer>
           </DragScrollContainer>
         </div>
       </div>

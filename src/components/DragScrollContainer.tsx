@@ -6,7 +6,12 @@ import { BatchElement } from "../types/renderer";
 import BatchRenderer from "./BatchRenderer";
 
 // creates a NextFunctionComponent
-const DragScrollContainer: NextPage<{ children: React.ReactNode }> = () => {
+const DragScrollContainer: NextPage<{
+  children: React.ReactNode;
+  cardWidth: number;
+  cardGap: number;
+  className?: string;
+}> = ({ children, cardWidth, cardGap, className }) => {
   // i sacrificed my first son to the gods of copilot to make them happy (nearly all of the code below is copilot's doing)
   const container = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -26,6 +31,9 @@ const DragScrollContainer: NextPage<{ children: React.ReactNode }> = () => {
 
     // set scrollLeft to the scrollLeft of the container
     setScrollLeft(container.current.scrollLeft);
+
+    // set the cursor to grabbing
+    container.current.style.cursor = "grabbing";
   };
 
   // declare a mouseDown react handler for drag scrolling
@@ -59,35 +67,29 @@ const DragScrollContainer: NextPage<{ children: React.ReactNode }> = () => {
     // calculate nearest snap point and smoothly scroll to it
     const scrollLeft = container.current.scrollLeft;
 
-    // 176 is the width of the snap element + 16px gap between them
-    const snapPoint = Math.round(scrollLeft / 176) * 176;
+    // totalWidth is the width of the snap element + 16px gap between them
+    let totalWidth = cardWidth + (cardGap ?? 16);
+
+    const snapPoint = Math.round(scrollLeft / totalWidth) * totalWidth;
     container.current.scrollTo({
       left: snapPoint,
       behavior: "smooth",
     });
+
+    // set the cursor to default
+    container.current.style.cursor = "default";
   };
 
   // returns a React component
   return (
     <div
-      className="flex flex-nowrap overflow-x-scroll gap-x-4 h-72"
+      className={`flex flex-nowrap overflow-x-scroll gap-x-4 ${className} scroll-pb-2`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       ref={container}
     >
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">1</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">2</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">3</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">4</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">5</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">6</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">7</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">8</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">9</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">10</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">11</div>
-      <div className="h-64 w-40 bg-gray-300 flex-shrink-0">12</div>
+      {children}
     </div>
   );
 };
