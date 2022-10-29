@@ -9,7 +9,6 @@ import { useSession } from "next-auth/react";
 import DashboardLayout from "../components/layouts/dashboard";
 
 const Articles: NextPage = () => {
-  // const batchFetch = trpc.useQuery(["article.batch-data"]);
 
   const { data } = useSession();
   const user = data?.user;

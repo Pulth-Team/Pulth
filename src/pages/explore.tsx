@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 
+import DragScrollContainer from "../components/DragScrollContainer";
 import ArticleCard from "../components/ArticleCard";
 import DashboardLayout from "../components/layouts/dashboard";
 
@@ -30,7 +31,7 @@ const Explore: NextPage = () => {
           <p className="text-2xl font-semibold">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <div className="flex flex-nowrap overflow-x-scroll gap-x-4 scrollbarStyle pb-4 h-72 snap-x px-1">
+          <div className="flex flex-nowrap overflow-x-scroll gap-x-4  pb-4 h-72 snap-x px-1">
             <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
@@ -92,6 +93,8 @@ const Explore: NextPage = () => {
               have found a cost-effective way to engage in ...
             </ArticleCard>
           </div>
+          <DragScrollContainer>
+          </DragScrollContainer>
         </div>
       </div>
     </DashboardLayout>
