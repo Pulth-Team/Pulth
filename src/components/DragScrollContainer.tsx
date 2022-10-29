@@ -7,6 +7,7 @@ import BatchRenderer from "./BatchRenderer";
 
 // creates a NextFunctionComponent
 const DragScrollContainer: NextPage<{ children: React.ReactNode }> = () => {
+  // i sacrificed my first son to the gods of copilot to make them happy (nearly all of the code below is copilot's doing)
   const container = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -41,13 +42,38 @@ const DragScrollContainer: NextPage<{ children: React.ReactNode }> = () => {
       scrollLeft + startX - (e.pageX - container.current.offsetLeft);
   };
 
+  // declare a mouseUp react handler for drag scrolling
+  const handleMouseUp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!container.current) return;
+
+    // set isDragging to false
+    setIsDragging(false);
+
+    // set startX to 0
+    setStartX(0);
+
+    // set scrollLeft to 0
+    setScrollLeft(0);
+
+    // calculate nearest snap point and smoothly scroll to it
+    const scrollLeft = container.current.scrollLeft;
+
+    // 176 is the width of the snap element + 16px gap between them
+    const snapPoint = Math.round(scrollLeft / 176) * 176;
+    container.current.scrollTo({
+      left: snapPoint,
+      behavior: "smooth",
+    });
+  };
+
   // returns a React component
   return (
     <div
-      className="flex flex-nowrap overflow-x-scroll gap-x-4 h-72 snap-x snap-mandatory snap-center"
+      className="flex flex-nowrap overflow-x-scroll gap-x-4 h-72"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
-      onMouseUp={() => setIsDragging(false)}
+      onMouseUp={handleMouseUp}
       ref={container}
     >
       <div className="h-64 w-40 bg-gray-300 flex-shrink-0">1</div>
