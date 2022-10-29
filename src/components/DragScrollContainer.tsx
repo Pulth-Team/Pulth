@@ -9,7 +9,7 @@ import BatchRenderer from "./BatchRenderer";
 const DragScrollContainer: NextPage<{
   children: React.ReactNode;
   cardWidth: number;
-  cardGap: number;
+  cardGap?: number;
   className?: string;
 }> = ({ children, cardWidth, cardGap, className }) => {
   // i sacrificed my first son to the gods of copilot to make them happy (nearly all of the code below is copilot's doing)
