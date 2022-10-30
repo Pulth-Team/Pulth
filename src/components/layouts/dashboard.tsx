@@ -139,9 +139,11 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
 
             <div className="flex flex-col text-sm">
               <div className="text-base">{user?.name}</div>
-              <div className="cursor-pointer text-white/70 hover:text-white/90">
-                View Profile
-              </div>
+              <Link href="/profile">
+                <div className="cursor-pointer text-white/70 hover:text-white/90">
+                  View Profile
+                </div>
+              </Link>
             </div>
           </div>
         </div>
