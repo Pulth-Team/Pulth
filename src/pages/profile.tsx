@@ -29,7 +29,8 @@ const Articles: NextPage = () => {
             <Image
               src={user?.image || "/default_profile.jpg"}
               alt="profile"
-              layout="fill"
+              width={128}
+              height={128}
               className="rounded-full"
             ></Image>
           </div>
@@ -106,7 +107,7 @@ const Articles: NextPage = () => {
           Recent Articles from{" "}
           <span className="text-indigo-700">{user?.name}</span>
         </p>
-        <DragScrollContainer cardWidth={256}>
+        <DragScrollContainer>
           <ArticleCard
             Title="Next.js Auth Errors"
             Topics={["Javascript", "Web", "React"]}
@@ -184,7 +185,7 @@ const Articles: NextPage = () => {
           Most popular courses from{" "}
           <span className="text-indigo-700">{user?.name}</span>
         </p>
-        <DragScrollContainer cardWidth={256}>
+        <DragScrollContainer>
           <ArticleCard
             Title="Next.js Auth Errors"
             Topics={["Javascript", "Web", "React"]}
