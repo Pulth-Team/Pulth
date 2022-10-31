@@ -8,10 +8,8 @@ import BatchRenderer from "./BatchRenderer";
 // creates a NextFunctionComponent
 const DragScrollContainer: NextPage<{
   children: React.ReactNode;
-  cardWidth: number;
-  cardGap?: number;
   className?: string;
-}> = ({ children, cardWidth, cardGap, className }) => {
+}> = ({ children, className }) => {
   // i sacrificed my first son to the gods of copilot to make them happy (nearly all of the code below is copilot's doing)
   const container = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -63,18 +61,6 @@ const DragScrollContainer: NextPage<{
 
     // set scrollLeft to 0
     setScrollLeft(0);
-
-    // calculate nearest snap point and smoothly scroll to it
-    const scrollLeft = container.current.scrollLeft;
-
-    // totalWidth is the width of the snap element + 16px gap between them
-    let totalWidth = cardWidth + (cardGap ?? 16);
-
-    const snapPoint = Math.round(scrollLeft / totalWidth) * totalWidth;
-    container.current.scrollTo({
-      left: snapPoint,
-      behavior: "smooth",
-    });
 
     // set the cursor to default
     container.current.style.cursor = "default";

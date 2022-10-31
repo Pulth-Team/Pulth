@@ -37,7 +37,9 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
       <div className="flex flex-nowrap spcScreen">
         <div className="sm:w-72 p-4 bg-gray-800 flex-shrink-0 flex flex-col justify-between text-white">
           <div className="flex flex-col">
-            <div className="h-16 text-xl font-bold text-indigo-400">Pulth</div>
+            <div className="text-3xl font-bold text-indigo-400 mb-2">
+              PulthApp
+            </div>
             <div className="flex flex-col gap-1">
               <Link href="/dashboard">
                 <div
@@ -139,9 +141,11 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
 
             <div className="flex flex-col text-sm">
               <div className="text-base">{user?.name}</div>
-              <div className="cursor-pointer text-white/70 hover:text-white/90">
-                View Profile
-              </div>
+              <Link href="/profile">
+                <div className="cursor-pointer text-white/70 hover:text-white/90">
+                  View Profile
+                </div>
+              </Link>
             </div>
           </div>
         </div>
