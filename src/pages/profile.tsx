@@ -65,17 +65,17 @@ const Articles: NextPage = () => {
           <div className="col-start-3 translate-y-0.5">Courses</div>
           <div className="col-start-5 translate-y-0.5">Articles</div>
         </div>
-        <div className="bg-gray-200 flex flex-wrap p-4 rounded-lg">
+        <div className="bg-gray-200 flex flex-wrap p-4 rounded-lg justify-between">
           <div className="w-full">
             <h3 className="text-lg font-semibold">About Me</h3>
           </div>
-          <p className="text-black/70 w-1/2 pr-1">
+          <p className="text-black/70 w-[calc(50%-8px)]">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor
             nulla nunc, amet, in eget consequat, dui. In consectetur viverra
             non, interdum pharetra imperdiet maecenas neque. Nisl, nisl at ut
             dui turpis suspendisse suspendisse congue
           </p>
-          <div className="flex flex-col gap-y-4 w-1/2 pl-1">
+          <div className="flex flex-col gap-y-4 w-[calc(50%-8px)] px-4">
             <div className="flex justify-between">
               <p>Students</p>
               <p className="font-semibold">190.225</p>
