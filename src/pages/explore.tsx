@@ -31,7 +31,7 @@ const Explore: NextPage = () => {
           <p className="text-2xl font-semibold">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <DragScrollContainer cardWidth={256} >
+          <DragScrollContainer>
             <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
