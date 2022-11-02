@@ -35,7 +35,60 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <>
       <div className="flex flex-nowrap spcScreen">
-        <div className="sm:w-72 p-4 bg-gray-800 flex-shrink-0 flex flex-col justify-between text-white">
+        <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 w-full text-white/80 justify-between items-center">
+          <Link href="/dashboard">
+            <HomeIcon className="h-8 w-8"></HomeIcon>
+          </Link>
+          <Link href="/explore">
+            <MapIcon className="h-8 w-8"></MapIcon>
+          </Link>
+          <Link href="/courses">
+            <PhotoIcon className="h-8 w-8"></PhotoIcon>
+          </Link>
+          <Link href="/dashboard">
+            <DocumentTextIcon className="h-8 w-8"></DocumentTextIcon>
+          </Link>
+          <Menu>
+            <Menu.Items className="absolute p-1 -translate-y-16 rounded-tl-2xl right-0 bg-gray-800">
+              <div>
+                <Link href="/settings">
+                  <Menu.Item>
+                    <div className="p-1 text-white hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                      {/* <Link href="/api/auth/signout">Logout</Link> */}
+                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                      <p className="max-h-fit h-fit">Settings</p>
+                    </div>
+                  </Menu.Item>
+                </Link>
+                <Menu.Item>
+                  <div className="p-1 text-white hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                    {/* <Link href="/api/auth/signout">Logout</Link> */}
+                    <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
+                    <a className="max-h-min" onClick={() => signOut()}>
+                      Logout
+                    </a>
+                  </div>
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+            <Menu.Button className={`${user ? "inline" : "hidden"} h-8 w-8`}>
+              <Image
+                src={user?.image || "/default_profile.jpg"}
+                alt="profile"
+                height={32}
+                width={32}
+                className="rounded-full aspect-square"
+              ></Image>
+            </Menu.Button>
+          </Menu>
+          <Link href="/api/auth/signin">
+            <ArrowLeftOnRectangleIcon
+              className={`${user ? "hidden" : "inline"} h-8 w-8 rotate-180`}
+            ></ArrowLeftOnRectangleIcon>
+          </Link>
+        </div>
+
+        <div className="hidden md:w-72 md:static p-4 bg-gray-800 flex-shrink-0 md:flex flex-col justify-between text-white">
           <div className="flex flex-col">
             <div className="text-3xl font-bold text-indigo-400 mb-2">
               PulthApp
