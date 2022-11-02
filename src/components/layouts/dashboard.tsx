@@ -202,7 +202,9 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="flex-grow overflow-y-scroll p-2">{children}</div>
+        <div className="flex-grow overflow-y-scroll p-2 md:mb-0 mb-20">
+          {children}
+        </div>
       </div>
     </>
   );
