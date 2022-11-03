@@ -238,7 +238,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="p-2 md:pb-16 md:mb-0 md:flex-grow md:overflow-y-scroll">
+        <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-5">
           {children}
         </div>
       </div>
