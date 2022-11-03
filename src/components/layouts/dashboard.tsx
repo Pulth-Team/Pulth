@@ -35,21 +35,46 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <>
       <div className="flex flex-nowrap spcScreen">
-        <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 w-full text-white/80 justify-between items-center">
+        <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 py-3 w-full text-white/50 justify-between items-center">
           <Link href="/dashboard">
-            <HomeIcon className="h-8 w-8"></HomeIcon>
+            <div
+              className={`${
+                router.pathname == "/dashboard" ? "text-white" : ""
+              } flex flex-col items-center`}
+            >
+              <HomeIcon className="h-6 w-6"></HomeIcon>
+              <p className="text-sm">Panel</p>
+            </div>
           </Link>
           <Link href="/explore">
-            <MapIcon className="h-8 w-8"></MapIcon>
+            <div
+              className={`${router.pathname == "/explore" ? "text-white" : ""}
+            flex flex-col items-center`}
+            >
+              <MapIcon className="h-6 w-6"></MapIcon>
+              <p className="text-sm">Explore</p>
+            </div>
           </Link>
           <Link href="/courses">
-            <PhotoIcon className="h-8 w-8"></PhotoIcon>
+            <div
+              className={`${router.pathname == "/courses" ? "text-white" : ""}
+            flex flex-col items-center`}
+            >
+              <PhotoIcon className="h-6 w-6"></PhotoIcon>
+              <p className="text-sm">Courses</p>
+            </div>
           </Link>
-          <Link href="/dashboard">
-            <DocumentTextIcon className="h-8 w-8"></DocumentTextIcon>
+          <Link href="/articles">
+            <div
+              className={`${router.pathname == "/articles" ? "text-white" : ""}
+            flex flex-col items-center`}
+            >
+              <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
+              <p className="text-sm">Articles</p>
+            </div>
           </Link>
           <Menu>
-            <Menu.Items className="absolute p-1 -translate-y-16 rounded-tl-2xl right-0 bg-gray-800">
+            <Menu.Items className="absolute p-1 -translate-y-16 rounded-tl-2xl right-0 bg-gray-800 focus:outline-none active:outline-none">
               <div>
                 <Link href="/settings">
                   <Menu.Item>
@@ -71,7 +96,11 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
                 </Menu.Item>
               </div>
             </Menu.Items>
-            <Menu.Button className={`${user ? "inline" : "hidden"} h-8 w-8`}>
+            <Menu.Button
+              className={`${
+                user ? "inline" : "hidden"
+              } h-8 w-8 focus:outline-none`}
+            >
               <Image
                 src={user?.image || "/default_profile.jpg"}
                 alt="profile"
@@ -82,9 +111,16 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </Menu.Button>
           </Menu>
           <Link href="/api/auth/signin">
-            <ArrowLeftOnRectangleIcon
-              className={`${user ? "hidden" : "inline"} h-8 w-8 rotate-180`}
-            ></ArrowLeftOnRectangleIcon>
+            <div
+              className={`${
+                user ? "hidden" : "inline"
+              } flex flex-col items-center`}
+            >
+              <ArrowLeftOnRectangleIcon
+                className={`h-6 w-6 rotate-180`}
+              ></ArrowLeftOnRectangleIcon>
+              <p className="text-sm">Login</p>
+            </div>
           </Link>
         </div>
 
