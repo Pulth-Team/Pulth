@@ -35,6 +35,46 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       <div className="md:flex md:flex-nowrap spcScreen">
+        <div className="md:hidden sticky top-0 bg-gray-800 flex items-center justify-between p-2 z-20">
+          <div className="text-lg font-bold text-indigo-400">PulthApp</div>
+          <Menu>
+            <Menu.Button
+              className={`${
+                user ? "inline" : "hidden"
+              } h-12 w-12 focus:outline-none`}
+            >
+              <Image
+                src={user?.image || "/default_profile.jpg"}
+                alt="profile"
+                height={48}
+                width={48}
+                className="rounded-full aspect-square"
+              ></Image>
+            </Menu.Button>
+            <Menu.Items className="absolute p-1 rounded-md translate-y-[72px] right-1 bg-gray-700 focus:outline-none active:outline-none">
+              <div>
+                <Link href="/settings">
+                  <Menu.Item>
+                    <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                      {/* <Link href="/api/auth/signout">Logout</Link> */}
+                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                      <p className="max-h-fit h-fit">Settings</p>
+                    </div>
+                  </Menu.Item>
+                </Link>
+                <Menu.Item>
+                  <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                    {/* <Link href="/api/auth/signout">Logout</Link> */}
+                    <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
+                    <a className="max-h-min" onClick={() => signOut()}>
+                      Logout
+                    </a>
+                  </div>
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Menu>
+        </div>
         <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 py-3 w-full text-white/50 justify-between items-center">
           <Link href="/dashboard">
             <div
@@ -73,43 +113,6 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               <p className="text-sm">Articles</p>
             </div>
           </Link>
-          <Menu>
-            <Menu.Items className="absolute p-1 -translate-y-16 rounded-tl-2xl right-0 bg-gray-800 focus:outline-none active:outline-none">
-              <div>
-                <Link href="/settings">
-                  <Menu.Item>
-                    <div className="p-1 text-white hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                      {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                      <p className="max-h-fit h-fit">Settings</p>
-                    </div>
-                  </Menu.Item>
-                </Link>
-                <Menu.Item>
-                  <div className="p-1 text-white hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                    {/* <Link href="/api/auth/signout">Logout</Link> */}
-                    <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
-                    <a className="max-h-min" onClick={() => signOut()}>
-                      Logout
-                    </a>
-                  </div>
-                </Menu.Item>
-              </div>
-            </Menu.Items>
-            <Menu.Button
-              className={`${
-                user ? "inline" : "hidden"
-              } h-8 w-8 focus:outline-none`}
-            >
-              <Image
-                src={user?.image || "/default_profile.jpg"}
-                alt="profile"
-                height={32}
-                width={32}
-                className="rounded-full aspect-square"
-              ></Image>
-            </Menu.Button>
-          </Menu>
           <Link href="/api/auth/signin">
             <div
               className={`${
