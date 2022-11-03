@@ -33,8 +33,8 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   const user = data?.user;
   //
   return (
-    <>
-      <div className="flex flex-nowrap spcScreen">
+    <div>
+      <div className="md:flex md:flex-nowrap spcScreen">
         <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 py-3 w-full text-white/50 justify-between items-center">
           <Link href="/dashboard">
             <div
@@ -238,11 +238,9 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="flex-grow overflow-y-scroll p-2 md:mb-0 mb-20">
-          {children}
-        </div>
+        <div className="p-2 pb-16 md:mb-0">{children}</div>
       </div>
-    </>
+    </div>
   );
 };
 
