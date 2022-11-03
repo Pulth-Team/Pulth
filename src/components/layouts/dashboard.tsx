@@ -26,6 +26,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { router } from "@trpc/server";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
   const router = useRouter();
@@ -242,7 +244,17 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
         <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-5">
-          {children}
+          <AnimatePresence>
+            {/* figure out on exit transition */}
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.075, type: "linear" }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>
