@@ -37,23 +37,35 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       <div className="md:flex md:flex-nowrap spcScreen">
-        <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full">
-          <div className="text-lg font-bold text-indigo-400">PulthApp</div>
+        <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
+          <div className="text-xl font-bold text-indigo-400">PulthApp</div>
+          <Link href="/api/auth/signin">
+            <div
+              className={`${
+                user ? "hidden" : "inline"
+              } flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2`}
+            >
+              <ArrowLeftOnRectangleIcon
+                className={`h-6 w-6 rotate-180`}
+              ></ArrowLeftOnRectangleIcon>
+              <p className="text-xl ">Login</p>
+            </div>
+          </Link>
           <Menu>
             <Menu.Button
               className={`${
                 user ? "inline" : "hidden"
-              } h-12 w-12 focus:outline-none`}
+              } h-10 w-10 focus:outline-none`}
             >
               <Image
                 src={user?.image || "/default_profile.jpg"}
                 alt="profile"
-                height={48}
-                width={48}
+                height={40}
+                width={40}
                 className="rounded-full aspect-square"
               ></Image>
             </Menu.Button>
-            <Menu.Items className="absolute p-1 rounded-md translate-y-[72px] right-1 bg-gray-700 focus:outline-none active:outline-none">
+            <Menu.Items className="absolute p-1 rounded-md translate-y-[68px] right-1 bg-gray-700 focus:outline-none active:outline-none">
               <div>
                 <Link href="/settings">
                   <Menu.Item>
@@ -113,18 +125,6 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             >
               <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
               <p className="text-sm">Articles</p>
-            </div>
-          </Link>
-          <Link href="/api/auth/signin">
-            <div
-              className={`${
-                user ? "hidden" : "inline"
-              } flex flex-col items-center`}
-            >
-              <ArrowLeftOnRectangleIcon
-                className={`h-6 w-6 rotate-180`}
-              ></ArrowLeftOnRectangleIcon>
-              <p className="text-sm">Login</p>
             </div>
           </Link>
         </div>
