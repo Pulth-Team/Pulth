@@ -37,7 +37,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       <div className="md:flex md:flex-nowrap spcScreen">
-        <div className="md:hidden sticky top-0 bg-gray-800 flex items-center justify-between p-2 z-20">
+        <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full">
           <div className="text-lg font-bold text-indigo-400">PulthApp</div>
           <Menu>
             <Menu.Button
@@ -243,7 +243,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-5">
+        <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-16">
           <AnimatePresence>
             {/* figure out on exit transition */}
             <motion.div
