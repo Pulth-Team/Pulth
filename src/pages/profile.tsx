@@ -58,51 +58,64 @@ const Articles: NextPage = () => {
             Follow
           </div>
         </div>
-        <div className="grid grid-cols-12 border-b-2 border-gray-400 text-lg">
-          <div className="font-semibold border-b-2 border-indigo-900 translate-y-0.5">
-            General
-          </div>
-          <div className="col-start-3 translate-y-0.5">Courses</div>
-          <div className="col-start-5 translate-y-0.5">Articles</div>
-        </div>
-        <div className="bg-gray-200 flex flex-wrap p-4 rounded-lg justify-between">
-          <div className="w-full">
-            <h3 className="text-lg font-semibold">About Me</h3>
-          </div>
-          <p className="text-black/70 w-[calc(50%-8px)]">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor
-            nulla nunc, amet, in eget consequat, dui. In consectetur viverra
-            non, interdum pharetra imperdiet maecenas neque. Nisl, nisl at ut
-            dui turpis suspendisse suspendisse congue
-          </p>
-          <div className="flex flex-col gap-y-4 w-[calc(50%-8px)] px-4">
-            <div className="flex justify-between">
-              <p>Students</p>
-              <p className="font-semibold">190.225</p>
+        <p className="font-semibold">
+          About <span className="text-indigo-700">{user?.name}</span>
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Porttitor
+          nulla nunc, amet, in eget consequat, dui. In consectetur viverra non,
+          interdum pharetra imperdiet maecenas neque. Nisl, nisl at ut dui
+          turpis suspendisse suspendisse congue
+        </p>
+        <div className="grid grid-cols-2 gap-x-6">
+          <div className="bg-gray-200 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
+            <p className="font-semibold text-2xl">Popularity</p>
+            <div className="grid grid-cols-6 justify-between gap-x-2 w-full">
+              <div className="flex flex-col items-center gap-y-2 rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-4xl font-bold">#1</p>
+                <p className="text-white text-2xl font-semibold w-full text-center">
+                  in Web
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-y-2 rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-4xl font-bold">#6</p>
+                <p className="text-white text-2xl font-semibold w-full text-center">
+                  in React
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-y-2 rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-4xl font-bold">#16</p>
+                <p className="text-white text-2xl font-semibold w-full text-center">
+                  in JS
+                </p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <p>Articles</p>
-              <p className="font-semibold">1.023</p>
-            </div>
-            <div className="flex justify-between">
-              <p className="flex-shrink-0">Popularity*</p>
-              <div className="flex flex-col">
-                <div className="flex justify-between items-center gap-x-2">
-                  <p className="font-semibold text-xl">#1</p>
-                  <p>in Web</p>
-                </div>
-                <div className="flex justify-between items-center gap-x-2">
-                  <p className="font-semibold text-xl">#6</p>
-                  <p>in React</p>
-                </div>
-                <div className="flex justify-between items-center gap-x-2">
-                  <p className="font-semibold text-xl">#13</p>
-                  <p>in Javascript</p>
-                </div>
+          </div>
+          <div className="bg-gray-200 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
+            <p className="font-semibold text-2xl">Statics</p>
+            <div className="grid grid-cols-6 justify-between gap-x-2 w-full h-full">
+              <div className="flex flex-col items-center justify-between rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-2xl font-bold">Students</p>
+                <p className="text-white text-xl font-bold w-full text-center">
+                  190.215
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-between rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-2xl font-bold">Articles</p>
+                <p className="text-white text-xl font-bold w-full text-center">
+                  1.025
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-between gap-y-2 rounded-lg bg-indigo-500 p-3 col-span-2">
+                <p className="text-white text-2xl font-bold">Courses</p>
+                <p className="text-white text-xl font-bold w-full text-center">
+                  316
+                </p>
               </div>
             </div>
           </div>
         </div>
+
         <p className="font-semibold">
           Recent Articles from{" "}
           <span className="text-indigo-700">{user?.name}</span>
