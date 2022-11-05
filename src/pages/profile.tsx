@@ -23,9 +23,9 @@ const Articles: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="px-16 pt-16 flex flex-col gap-y-4">
-        <div className="grid grid-cols-12 gap-x-4 items-center">
-          <div className="col-span-2 relative h-32">
+      <div className="md:px-16 px-4 pt-16 pb-12 flex flex-col gap-y-4">
+        <div className="md:grid grid-cols-12 gap-x-4 items-center flex">
+          <div className="col-span-2 relative md:h-32">
             <Image
               src={user?.image || "/default_profile.jpg"}
               alt="profile"
@@ -35,10 +35,33 @@ const Articles: NextPage = () => {
             ></Image>
           </div>
           <div className="col-span-3 flex flex-col gap-y-2">
-            <h2 className="text-2xl font-semibold">{user?.name}</h2>
-            <p className="">Web Programmer</p>
+            <h2 className="text-base  md:text-2xl font-semibold">
+              {user?.name}
+            </h2>
+            <p className="text-sm">Web Programmer</p>
           </div>
-          <div className="flex col-span-2 col-start-8 gap-x-9">
+          <div className="md:hidden flex flex-col gap-y-3">
+            <div className="flex gap-x-9">
+              <div>
+                <p className="text-lg font-semibold text-center">4.2k</p>
+                <p className="text-xs text-center">followers</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-center">820</p>
+                <p className="text-xs text-center">following</p>
+              </div>
+            </div>
+            <div className="bg-indigo-500 cursor-pointer flex align-middle items-center gap-x-2 pl-2 rounded-md text-white text-lg font-semibold py-0.5">
+              <Image
+                src="/userPlus.svg"
+                height={36}
+                width={36}
+                alt="icon"
+              ></Image>
+              Follow
+            </div>
+          </div>
+          <div className="hidden md:flex col-span-2 col-start-8 gap-x-9">
             <div>
               <p className="text-lg font-semibold">4.2k</p>
               <p className="text-xs">followers</p>
@@ -48,7 +71,7 @@ const Articles: NextPage = () => {
               <p className="text-xs">following</p>
             </div>
           </div>
-          <div className="bg-indigo-500 cursor-pointer flex align-middle items-center gap-x-2 pl-2 rounded-md col-start-11 col-span-2 text-white text-lg font-semibold py-0.5">
+          <div className="bg-indigo-500 cursor-pointer hidden md:flex align-middle items-center gap-x-2 pl-2 rounded-md col-start-11 col-span-2 text-white text-lg font-semibold py-0.5">
             <Image
               src="/userPlus.svg"
               height={36}
@@ -67,8 +90,8 @@ const Articles: NextPage = () => {
           interdum pharetra imperdiet maecenas neque. Nisl, nisl at ut dui
           turpis suspendisse suspendisse congue
         </p>
-        <div className="grid grid-cols-2 gap-x-6">
-          <div className="bg-gray-200 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-x-6 gap-y-3">
+          <div className="bg-gray-100 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
             <p className="font-semibold text-2xl">Popularity</p>
             <div className="grid grid-cols-6 justify-between gap-x-2 w-full">
               <div className="flex flex-col items-center gap-y-2 rounded-lg bg-indigo-500 p-3 col-span-2">
@@ -91,7 +114,7 @@ const Articles: NextPage = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gray-200 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
+          <div className="bg-gray-100 w-full flex flex-col gap-y-3 py-3 px-2 items-center rounded-lg">
             <p className="font-semibold text-2xl">Statics</p>
             <div className="grid grid-cols-6 justify-between gap-x-2 w-full h-full">
               <div className="flex flex-col items-center justify-between rounded-lg bg-indigo-500 p-3 col-span-2">
