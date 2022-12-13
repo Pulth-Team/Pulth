@@ -69,7 +69,9 @@ const DragScrollContainer: NextPage<{
   // returns a React component
   return (
     <div
-      className={`flex flex-nowrap overflow-x-scroll gap-x-4 ${className} scroll-pb-2`}
+      className={`flex flex-nowrap overflow-x-scroll gap-x-4 ${
+        className || ""
+      } scroll-pb-2`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

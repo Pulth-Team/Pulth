@@ -38,6 +38,7 @@ const Explore: NextPage = () => {
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
               Author={{ Title: "Web Architect", Name: "Bekir Gulestan" }}
+              isRecommended={true}
             >
               Some article made for explaining Next Auth Errors deeply. That
               cover nearly 4 (Four) error which is nearly all(102) of them.
@@ -46,6 +47,7 @@ const Explore: NextPage = () => {
               Title="Photoshop Eraser Tool"
               Topics={["Editing", "Adobe"]}
               Author={{ Title: "Designer", Name: "Yaprak Özlem Öz" }}
+              isRecommended={true}
             >
               Some article about how eraser tool works in Photoshop 2023 with an
               original Adobe product.
