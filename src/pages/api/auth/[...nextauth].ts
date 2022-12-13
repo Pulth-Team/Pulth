@@ -40,8 +40,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async signIn({user, profile,}){
-      user.metaData = {create: {followers: 0, follows: 0}}
+    async signIn({ user, profile }) {
+      // Add this to profile callback
+      // user.metaData = {create: {followers: 0, follows: 0}}
+
       // const isReturningUser = await prisma.user.findFirst({where: {
       //   email: user.email
       // }})? true:false;
@@ -50,16 +52,12 @@ export const authOptions: NextAuthOptions = {
       //   return true;
       // else
       //   return "/register"
-    
-      
+
       return true;
     },
-    
-    
     /*async redirect({url, baseUrl}) {
       return baseUrl;
     }*/
-
   },
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
@@ -67,11 +65,20 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
+      profile(profile) {
+        return {
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          metaData: { followers: 0, follows: 0 },
+        };
+      },
     }),
-    GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    }),
+    // GitHubProvider({
+    //   clientId: env.GITHUB_CLIENT_ID,
+    //   clientSecret: env.GITHUB_CLIENT_SECRET,
+    // }),
   ],
 };
 

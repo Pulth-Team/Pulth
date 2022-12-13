@@ -23,12 +23,7 @@ const Courses: NextPage = () => {
       </Head>
       <button
         type="button"
-        style={{
-          ...boxStyles,
-          backgroundColor: "#c73852",
-          borderRadius: "12px",
-          border: "none",
-        }}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
           throw new Error("Sentry Frontend Error");
         }}
