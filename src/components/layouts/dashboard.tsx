@@ -36,7 +36,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   //
   return (
     <div>
-      <div className="md:flex md:flex-nowrap spcScreen">
+      <div className="md:flex md:flex-nowrap max-h-[stretch] h-screen">
         <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
           <div className="text-xl font-bold text-indigo-400">PulthApp</div>
           <Link href="/api/auth/signin">
