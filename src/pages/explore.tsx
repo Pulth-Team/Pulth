@@ -94,7 +94,8 @@ const Explore: NextPage = () => {
               Author={{ Title: "Federal Gov. Member", Name: "Samanta Sue" }}
             >
               Government agencies and private security companies in the U.S.
-              have found a cost-effective way to engage in ...
+              have found a cost-effective way to engage in mass surveillance
+              using a technology called “fog computing.”
             </ArticleCard>
           </DragScrollContainer>
         </div>
