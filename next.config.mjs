@@ -1,5 +1,5 @@
 import { env } from "./src/server/env.mjs";
-const { withSentryConfig } = require("@sentry/nextjs");
+import { withSentryConfig } from "@sentry/nextjs";
 
 /**
  * Don't be scared of the generics here.
