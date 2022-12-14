@@ -1,15 +1,18 @@
 // src/pages/_app.tsx
 import type { AppRouter } from "../server/router";
 import type { AppType } from "next/app";
+import type { Session } from "next-auth";
 
 import { withTRPC } from "@trpc/next";
 import superjson from "superjson";
+import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Script from "next/script";
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp: AppType<{ session: Session }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
   return (
     <>
       <Script
@@ -25,9 +28,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           gtag('config', 'G-D5PY4EFWHL');
         `}
       </Script>
-      <UserProvider>
+      <SessionProvider session={session}>
         <Component {...pageProps} />
-      </UserProvider>
+      </SessionProvider>
     </>
   );
 };
