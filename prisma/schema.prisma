@@ -46,15 +46,15 @@ model User {
     accounts      Account[]
     sessions      Session[]
 
-    metaData   MetaData @relation(fields: [metaDataId], references: [id])
-    metaDataId String   @unique
+    metaData MetaData?
 }
 
 model MetaData {
     id        String @id @default(auto()) @map("_id") @db.ObjectId
-    user      User?
+    user      User   @relation(fields: [userId], references: [id])
     follows   Int    @default(0)
     followers Int    @default(0)
+    userId    String @unique @db.ObjectId
 }
 
 model VerificationToken {

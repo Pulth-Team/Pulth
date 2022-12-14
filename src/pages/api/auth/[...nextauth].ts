@@ -65,15 +65,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      profile(profile) {
-        return {
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          metaData: { followers: 0, follows: 0 },
-        };
-      },
     }),
     // GitHubProvider({
     //   clientId: env.GITHUB_CLIENT_ID,
