@@ -8,6 +8,10 @@ import { useSession } from "next-auth/react";
 
 import DashboardLayout from "../components/layouts/dashboard";
 
+// load editor only on client side
+import dynamic from "next/dynamic";
+const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
+
 const Articles: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
@@ -22,6 +26,11 @@ const Articles: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <div className="p-4">
+        <h1 className="text-5xl pb-8">My Article</h1>
+
+        <Editor />
+      </div>
     </DashboardLayout>
   );
 };
