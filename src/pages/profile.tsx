@@ -12,9 +12,10 @@ import DragScrollContainer from "../components/DragScrollContainer";
 import ArticleCard from "../components/ArticleCard";
 
 const Articles: NextPage = () => {
-  const { data } = useSession();
+  const { data, status } = useSession({ required: true });
   const user = data?.user;
 
+  if (status === "loading") return <p>Loading...</p>;
   return (
     <DashboardLayout>
       <Head>
