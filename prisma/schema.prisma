@@ -47,6 +47,11 @@ model User {
     sessions      Session[]
 
     metaData MetaData?
+    Article  Article[]
+
+    Comment   Comment[]
+    Comment   Comment?  @relation(fields: [commentId], references: [id])
+    commentId String?   @db.ObjectId
 }
 
 model MetaData {
@@ -66,4 +71,45 @@ model VerificationToken {
 
     @@unique([identifier, token])
     @@map("verificationtokens")
+}
+
+model Article {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    title         String
+    description   String
+    createdAt     DateTime
+    updatedAt     DateTime
+    editorVersion String
+    bodyData      Json
+
+    authorId String @db.ObjectId
+    author   User   @relation(fields: [authorId], references: [id])
+
+    Comments Comment[]
+
+    rate       Int
+    ratedbyIds String[] @db.ObjectId
+    ratedby    User[]   @relation("ratedby", fields: [ratedbyIds], references: [id])
+}
+
+// recursive comment Model
+model Comment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    authorId String @db.ObjectId
+    author   User   @relation(fields: [authorId], references: [id])
+
+    Article   Article? @relation(fields: [articleId], references: [id])
+    articleId String?  @db.ObjectId
+
+    content String
+
+    rate       Int
+    ratedbyIds String[] @db.ObjectId
+    ratedby    User[]   @relation("ratedby", fields: [ratedbyIds], references: [id])
+
+    childDepth Int
+    parentId   String?  @db.ObjectId
+    parent     Comment? @relation("parent", fields: [parentId], references: [id])
 }
