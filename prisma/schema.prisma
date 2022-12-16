@@ -47,11 +47,13 @@ model User {
     sessions      Session[]
 
     metaData MetaData?
-    Article  Article[]
 
-    Comment   Comment[]
-    Comment   Comment?  @relation(fields: [commentId], references: [id])
-    commentId String?   @db.ObjectId
+    Articles Article[]
+    Comments Comment[] @relation("AuthorUser")
+
+    ratedCommentsId String[]  @db.ObjectId
+    // im not hundred percent sure this is the right way to do this
+    ratedComments   Comment[] @relation("RatedUser", fields: [ratedCommentsId], references: [id])
 }
 
 model MetaData {
@@ -76,21 +78,17 @@ model VerificationToken {
 model Article {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
+    author   User   @relation(fields: [authorId], references: [id])
+    authorId String @db.ObjectId
+
     title         String
     description   String
     createdAt     DateTime
-    updatedAt     DateTime
+    updatedAt     DateTime @updatedAt
     editorVersion String
     bodyData      Json
 
-    authorId String @db.ObjectId
-    author   User   @relation(fields: [authorId], references: [id])
-
     Comments Comment[]
-
-    rate       Int
-    ratedbyIds String[] @db.ObjectId
-    ratedby    User[]   @relation("ratedby", fields: [ratedbyIds], references: [id])
 }
 
 // recursive comment Model
@@ -98,18 +96,22 @@ model Comment {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
     authorId String @db.ObjectId
-    author   User   @relation(fields: [authorId], references: [id])
+    author   User   @relation("AuthorUser", fields: [authorId], references: [id], onDelete: Cascade)
 
-    Article   Article? @relation(fields: [articleId], references: [id])
     articleId String?  @db.ObjectId
+    Article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
     content String
 
-    rate       Int
+    rating     Int
     ratedbyIds String[] @db.ObjectId
-    ratedby    User[]   @relation("ratedby", fields: [ratedbyIds], references: [id])
+    ratedby    User[]   @relation("RatedUser", fields: [ratedbyIds], references: [id])
 
-    childDepth Int
-    parentId   String?  @db.ObjectId
-    parent     Comment? @relation("parent", fields: [parentId], references: [id])
+    // NoAction might be a problem in the future :FUTURE_PROBLEM:
+    parent   Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    Comment  Comment[] @relation("ParentChild")
+    parentId String?   @db.ObjectId
+
+    createdAt DateTime
+    updatedAt DateTime @updatedAt
 }
