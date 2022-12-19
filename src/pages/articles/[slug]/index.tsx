@@ -18,6 +18,20 @@ const Editor = dynamic(() => import("../../../components/Editor"), {
   ssr: false,
 });
 
+// this component's experience is not good
+// the code itself is not good
+// but it works
+// so I will leave it as it is for now
+// and I will fix it later
+
+// TODO: fix this component
+// bad parts:
+// - the channel between backend and frontend is not good
+// - the code is not good
+// - the experience is not good
+// - the not supporting SSG
+// - the not supporting SSR (maybe, I don't know)
+
 interface InitialArticleProps {
   article:
     | {
