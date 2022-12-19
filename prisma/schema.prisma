@@ -83,13 +83,13 @@ model Article {
 
     title       String
     description String
-    slug        String @unique
+    slug        String  @unique
+    bodyData    Json
+    isPublished Boolean @default(false)
 
-    createdAt DateTime
-    updatedAt DateTime @updatedAt
-
+    createdAt     DateTime
+    updatedAt     DateTime @updatedAt
     editorVersion String
-    bodyData      Json
 
     Comments Comment[]
 }
