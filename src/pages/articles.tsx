@@ -26,11 +26,6 @@ const Articles: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="p-4">
-        <h1 className="text-5xl pb-8">My Article</h1>
-
-        <Editor />
-      </div>
     </DashboardLayout>
   );
 };
