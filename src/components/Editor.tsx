@@ -2,7 +2,12 @@ import EditorJS from "@editorjs/editorjs";
 import { NextPage } from "next";
 import React, { useState, useEffect, useRef, useId } from "react";
 
-const Editor: NextPage<{ className?: string }> = ({ className }) => {
+// todo add editorjs DataTypes
+const Editor: NextPage<{
+  className?: string;
+  data?: any;
+  readonly: boolean;
+}> = ({ className, data, readonly }) => {
   const id = useId();
   const [editor, setEditor] = useState<EditorJS | null>(null);
 
@@ -13,6 +18,9 @@ const Editor: NextPage<{ className?: string }> = ({ className }) => {
       if (!prevEditor) {
         return new EditorJS({
           holder: id,
+          autofocus: false,
+          data: data,
+          readOnly: true,
         });
       }
       // if editor is set, return null
@@ -30,7 +38,7 @@ const Editor: NextPage<{ className?: string }> = ({ className }) => {
     // run effect only if id changes
   }, [editor, id]);
 
-  return <div id={id} className={className}></div>;
+  return <div id={id} className={className + ""}></div>;
 };
 
 export default Editor;

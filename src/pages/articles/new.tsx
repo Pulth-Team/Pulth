@@ -1,10 +1,14 @@
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { useState } from "react";
+
+import { Dialog } from "@headlessui/react";
 
 const Editor = dynamic(() => import("../../components/Editor"), {
   ssr: false,
@@ -14,6 +18,11 @@ import DashboardLayout from "../../components/layouts/dashboard";
 
 const CreateArticle: NextPage = () => {
   const [ArticleName, setArticleName] = useState("Untitled Article");
+
+  const [isDialogOpen, setIsDialogOpen] = useState(true);
+  const [dialogTitle, setDialogTitle] = useState("");
+
+  const router = useRouter();
 
   return (
     <DashboardLayout>
@@ -38,8 +47,63 @@ const CreateArticle: NextPage = () => {
 
         <hr />
         <div className="mt-4 ">
-          <Editor />
+          <Editor className={isDialogOpen ? "hidden" : "block"} />
         </div>
+
+        <Dialog
+          open={isDialogOpen}
+          onClose={() => {
+            return;
+          }}
+        >
+          <div
+            className="fixed inset-0 bg-black/30  backdrop-blur-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          />
+          <div className="fixed inset-0 flex items-center justify-center  ">
+            <Dialog.Panel className="bg-white p-4 rounded-2xl w-2/5">
+              <Dialog.Title className="text-xl font-bold">
+                Create new article
+              </Dialog.Title>
+              <Dialog.Description className={"text-sm font-light"}>
+                Enter a name and a description for your new article.
+              </Dialog.Description>
+              <label htmlFor="articleName" className="mt-4 block">
+                Title
+              </label>
+              <input
+                name="articleName"
+                type="text"
+                value={dialogTitle}
+                onChange={(e) => setDialogTitle(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg p-2 "
+              />
+
+              <label htmlFor="articleDescription" className="mt-4 block">
+                Description
+              </label>
+              <textarea
+                name="articleDescription"
+                className="w-full border border-gray-200 rounded-lg p-2 "
+              ></textarea>
+
+              <button className="mr-4" onClick={() => setIsDialogOpen(false)}>
+                Continue
+              </button>
+              <button
+                onClick={() => {
+                  router.back();
+                  setIsDialogOpen(false);
+                }}
+              >
+                Cancel
+              </button>
+            </Dialog.Panel>
+          </div>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
