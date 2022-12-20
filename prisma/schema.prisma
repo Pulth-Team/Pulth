@@ -87,9 +87,9 @@ model Article {
     bodyData    Json
     isPublished Boolean @default(false)
 
-    createdAt     DateTime
+    createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
-    editorVersion String
+    editorVersion String?
 
     Comments Comment[]
 }
