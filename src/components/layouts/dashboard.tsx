@@ -51,7 +51,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               <p className="text-xl ">Login</p>
             </div>
           </Link>
-          <Menu>
+          <Menu as="div">
             <Menu.Button
               className={`${
                 user ? "inline" : "hidden"
