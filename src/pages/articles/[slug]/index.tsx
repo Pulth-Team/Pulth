@@ -58,6 +58,7 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
 
   // TODO: add type for articleData
   const [articleData, setArticleData] = useState<any>({});
+  let Title;
 
   let articleErrorText = "";
 
@@ -66,14 +67,18 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
       case "No Slug detected":
         articleErrorText =
           "There is no slug detected. Please try again with valid slug.";
+        Title = "No Slug ";
         break;
       case "Article not published":
         articleErrorText =
           "The article you are looking for is not published or does not exist.";
+        Title = "Article not published";
         break;
       case "Article not found":
         articleErrorText =
           "There is no article with this url. Maybe it was deleted?";
+        Title = "Article not found";
+        break;
     }
   }
   if ("code" in articleInfo && articleInfo.code == 4001) {
@@ -84,7 +89,6 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
     });
   }
 
-  let Body: JSX.Element;
   const Bodyfn = () => {
     if ("error" in articleInfo && !("code" in articleInfo)) {
       return <ArticleError title={articleInfo.error} desc={articleErrorText} />;
@@ -104,6 +108,7 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
         }
         if (article.status === "success") {
           console.log("there is code 4001");
+          Title = article.data.title;
           return (
             <article>
               <Editor
@@ -115,18 +120,23 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
         }
       }
 
+      // TODO: fix this type issue later
+      Title = articleInfo.title!;
       return (
         <article>
+          {/* solve type issue */}
           <Editor data={{ blocks: articleInfo.bodyData! }} readonly={false} />
         </article>
       );
     }
   };
+  // dummy solution fix this later
+  const Body = Bodyfn();
 
   return (
     <DashboardLayout>
       <Head>
-        <title>{articleData.title} - Pulth App</title>
+        <title>{Title} - Pulth App</title>
         <meta
           name="description"
           content="articles dor your usage of pulth. join our community now!"
@@ -141,7 +151,7 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
             <Editor data={{ blocks: article.bodyData }} readonly={false} />
           </article>
         )} */}
-        {Bodyfn()}
+        {Body}
       </div>
     </DashboardLayout>
   );

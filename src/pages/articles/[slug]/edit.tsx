@@ -21,7 +21,8 @@ const Articles: NextPage = () => {
   return (
     <DashboardLayout>
       <Head>
-        <title>Articles - Pulth App</title>
+        {/* Add Article name here */}
+        <title>Edit Article - Pulth App</title>
         <meta
           name="description"
           content="articles dor your usage of pulth. join our community now!"
