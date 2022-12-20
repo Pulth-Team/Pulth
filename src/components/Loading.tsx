@@ -4,9 +4,13 @@ import React from "react";
 
 interface LoadingProps {
   className?: string;
-  borderWidth?: number;
 }
 
+// className: tailwindcss class name
+// must include w-* or h-* to set the size
+// must include border-* to set the border width
+//
+// example: className="w-10 h-10 border-2"
 const Loading: NextPage<LoadingProps> = ({ className }) => {
   return (
     <div
