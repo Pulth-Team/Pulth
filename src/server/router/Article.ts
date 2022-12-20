@@ -2,6 +2,8 @@ import { createRouter } from "./context";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
+import slugify from "slugify";
+
 // returns a router with the batch data route
 export const ArticleRouter = createRouter()
   .query("getArticleBySlug", {
@@ -61,5 +63,56 @@ export const ArticleRouter = createRouter()
           authorId: input.userId,
         },
       });
+    },
+  })
+  .query("createArticle", {
+    input: z.object({
+      title: z.string(),
+      description: z.string(),
+      bodyData: z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          data: z.any(),
+        })
+      ),
+    }),
+    async resolve({ input, ctx }) {
+      const makeid = (length: number) => {
+        var result = "";
+        var characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+        }
+        return result;
+      };
+
+      const slugified = slugify(input.title, {
+        replacement: "-",
+        lower: true,
+        strict: true,
+      }).substring(0, 20);
+
+      const slug = slugified + "-" + makeid(5);
+
+      const article = await prisma?.article.create({
+        data: {
+          authorId: ctx.session?.user?.id!,
+          title: input.title,
+          description: input.description,
+          slug: slug,
+          bodyData: input.bodyData,
+        },
+      });
+
+      return {
+        id: article?.id,
+        slug: article?.slug,
+        isPublished: article?.isPublished,
+      };
     },
   });
