@@ -21,6 +21,43 @@ const Editor: NextPage<{
           autofocus: false,
           data: data,
           readOnly: true,
+
+          tools: {
+            header: {
+              class: require("@editorjs/header"),
+              inlineToolbar: ["link"],
+              config: {
+                placeholder: "Header",
+              },
+            },
+            list: {
+              class: require("@editorjs/list"),
+              inlineToolbar: true,
+              shortcut: "CMD+SHIFT+L",
+            },
+            // todo Add more tools
+            // such as
+            // quote: require("@editorjs/quote"),
+            // warning: require("@editorjs/warning"),
+            // marker: require("@editorjs/marker"),
+            // code: require("@editorjs/code"),
+            // delimiter: require("@editorjs/delimiter"),
+            // inlineCode: require("@editorjs/inline-code"),
+            // linkTool: require("@editorjs/link"),
+            // raw: require("@editorjs/raw"),
+            // checklist: require("@editorjs/checklist"),
+
+            // Todo add image upload Endpoints etc.
+            // image: {
+            //   class: require("@editorjs/image"),
+            //   config: {
+            //     endpoints: {
+            //       byFile: "http://localhost:8008/uploadFile", // Your backend file uploader endpoint
+            //       byUrl: "http://localhost:8008/fetchUrl", // Your endpoint that provides uploading by Url
+            //     },
+            //   },
+            // },
+          },
         });
       }
       // if editor is set, return null
