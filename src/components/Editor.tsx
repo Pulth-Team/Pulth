@@ -20,7 +20,7 @@ const Editor: NextPage<{
           holder: id,
           autofocus: false,
           data: data,
-          readOnly: true,
+          readOnly: readonly,
 
           tools: {
             header: {
