@@ -65,6 +65,30 @@ export const ArticleRouter = createRouter()
       });
     },
   })
+  .query("getArticleBySlugAuthor", {
+    input: z.object({
+      slug: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      const article = await prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+          authorId: ctx.session?.user?.id,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          bodyData: true,
+          updatedAt: true,
+          createdAt: true,
+          editorVersion: true,
+          isPublished: true,
+        },
+      });
+      return article;
+    },
+  })
   .query("createArticle", {
     input: z.object({
       title: z.string(),
