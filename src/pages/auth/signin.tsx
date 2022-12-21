@@ -19,7 +19,10 @@ const Home: NextPage<{ providers: Provider[] }> = ({ providers }) => {
     <div className="flex flex-col justify-center items-center h-screen">
       {error && <SignInError error={error as AuthError} />}
 
-      {Object.values(providers).map((provider) => (
+      <div className="border hover:shadow-md shadow active:shadow p-2 m-1 rounded">
+        <button onClick={() => signIn("google")}>Sign in with Google</button>
+      </div>
+      {/* {Object.values(providers).map((provider) => (
         <div
           key={provider.name}
           className="border hover:shadow-md shadow active:shadow p-2 m-1 rounded"
@@ -28,20 +31,20 @@ const Home: NextPage<{ providers: Provider[] }> = ({ providers }) => {
             Sign in with {provider.name}
           </button>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 };
 
 export default Home;
 
-export async function getServerSideProps() {
-  const providers = await getProviders();
-  providers;
-  return {
-    props: { providers },
-  };
-}
+// export async function getServerSideProps() {
+//   const providers = await getProviders();
+//   providers;
+//   return {
+//     props: { providers },
+//   };
+// }
 
 enum AuthError {
   Signin = "Try signing with a different account.",
