@@ -48,10 +48,69 @@ export const ArticleRouter = createRouter()
   .middleware(async ({ ctx, next }) => {
     // Any queries or mutations after this middleware will
     // raise an error unless there is a current session
-    if (!ctx.session) {
+    if (!ctx.session || !ctx.session.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next();
+  })
+  .query("publishArticle", {
+    input: z.object({
+      slug: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      // check if user is the author of the article
+      const isArticle = await prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+          authorId: ctx.session?.user?.id,
+        },
+      });
+      // if with the slug and authorId there is no article
+      if (!isArticle) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const article = await prisma?.article.update({
+        where: {
+          slug: input.slug,
+        },
+        data: {
+          isPublished: true,
+        },
+      });
+      return article;
+    },
+  })
+  .query("updateArticleBody", {
+    input: z.object({
+      slug: z.string(),
+      bodyData: z.array(
+        z.object({ id: z.string(), type: z.string(), data: z.any() })
+      ),
+    }),
+    async resolve({ input, ctx }) {
+      // check if user is the author of the article
+      const isArticle = await prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+          authorId: ctx.session?.user?.id,
+        },
+      });
+      // if with the slug and authorId there is no article
+      if (!isArticle) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const article = await prisma?.article.update({
+        where: {
+          slug: input.slug,
+        },
+        data: {
+          bodyData: input.bodyData,
+        },
+      });
+      return article;
+    },
   })
   .query("getUserArticleInfos", {
     input: z.object({
