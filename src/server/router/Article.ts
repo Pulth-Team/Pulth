@@ -81,6 +81,7 @@ export const ArticleRouter = createRouter()
       return article;
     },
   })
+
   .query("updateArticleBody", {
     input: z.object({
       slug: z.string(),
@@ -107,6 +108,31 @@ export const ArticleRouter = createRouter()
         },
         data: {
           bodyData: input.bodyData,
+        },
+      });
+      return article;
+    },
+  })
+  .query("deleteArticleBySlug", {
+    input: z.object({
+      slug: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      // check if user is the author of the article
+      const isArticle = await prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+          authorId: ctx.session?.user?.id,
+        },
+      });
+      // if with the slug and authorId there is no article
+      if (!isArticle) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const article = await prisma?.article.delete({
+        where: {
+          slug: input.slug,
         },
       });
       return article;

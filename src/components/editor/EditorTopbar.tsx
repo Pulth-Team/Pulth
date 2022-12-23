@@ -6,22 +6,30 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Menu } from "@headlessui/react";
+import { Menu, Dialog, Transition } from "@headlessui/react";
 import { trpc } from "../../utils/trpc";
 import Loading from "../Loading";
+import { Fragment, useState } from "react";
 
 const EditorTopbar: NextPage<{
   slug: string;
   onSave: () => void;
+  onMenuClick: (type: "delete" | "privacy" | "share") => void;
   saveLoading: boolean;
-}> = ({ slug, onSave, saveLoading }) => {
+}> = ({ slug, onSave, onMenuClick, saveLoading }) => {
   const publishArticleQuery = trpc.useQuery(
     ["article.publishArticle", { slug }],
     {
       enabled: false,
     }
   );
-
+  const getArticleBySlug = trpc.useQuery([
+    "article.getArticleBySlug",
+    {
+      slug: slug as string,
+    },
+  ]);
+  console.log(getArticleBySlug.data?.title + "title");
   return (
     <div className="flex gap-x-2 px-4 bg-white shadow-md mb-4 py-2 items-center">
       <h1 className="mr-auto">
@@ -74,6 +82,8 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
             as="button"
+            onClick={() => onMenuClick("delete")}
+            // onClick={() => deleteArticleFetch.refetch()}
           >
             <TrashIcon className="w-5 h-5" />
             <p>Delete</p>
