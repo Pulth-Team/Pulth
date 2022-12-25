@@ -16,7 +16,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { Transition, Dialog } from "@headlessui/react";
-import { type } from "os";
+
 const Editor = dynamic(() => import("../../../components/Editor"), {
   ssr: false,
 });
@@ -45,6 +45,17 @@ const Articles: NextPage = ({}) => {
       //   refetchOnReconnect: false,
       //   refetchInterval: false,
       //   refetchIntervalInBackground: false,
+      onSuccess: (data) => {
+        if (data) {
+          setBodyData(data.bodyData);
+        }
+      },
+    }
+  );
+  const publishArticleQuery = trpc.useQuery(
+    ["article.publishArticle", { slug: slug as string }],
+    {
+      enabled: false,
     }
   );
   const articleUpdateBodyFetch = trpc.useQuery(
@@ -77,6 +88,8 @@ const Articles: NextPage = ({}) => {
       setDeleteModal(false);
       router.push("/profile");
     } else {
+      // todo add error message more than just an alert
+
       alert("Wrong Title Name");
     }
   };
@@ -86,18 +99,11 @@ const Articles: NextPage = ({}) => {
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
 
-  useEffect(() => {
-    if (bodyData) {
-      articleUpdateBodyFetch.refetch();
-    }
-  }, [bodyData]);
-
   const OnSave = () => {
     editor?.save().then((outputData) => {
-      console.log(outputData);
+      console.log("Saved Article Data", outputData);
       setBodyData(outputData.blocks);
     });
-    // console.log(editor);
   };
 
   const OnMenuClick = (menuType: string) => {
@@ -107,6 +113,7 @@ const Articles: NextPage = ({}) => {
         break;
 
       default:
+        console.log("Menu Item onClick not defined");
         break;
     }
   };
@@ -121,12 +128,29 @@ const Articles: NextPage = ({}) => {
           articleAuthorFetch.data ? (
             <div>
               <EditorTopbar
-                slug={slug as string}
+                title={articleAuthorFetch.data.title}
                 onSave={OnSave}
+                onPublish={async () => {
+                  const currentData = await editor?.save();
+
+                  if (
+                    JSON.stringify(currentData?.blocks) !==
+                    JSON.stringify(bodyData)
+                  ) {
+                    console.log("Changes");
+                    articleUpdateBodyFetch.refetch().then(() => {
+                      publishArticleQuery.refetch();
+                    });
+                    return;
+                  }
+
+                  publishArticleQuery.refetch();
+                }}
                 onMenuClick={(type) => {
                   OnMenuClick(type);
                 }}
                 saveLoading={articleUpdateBodyFetch.isLoading}
+                publishLoading={publishArticleQuery.isLoading}
               />
               <Editor
                 readonly={false}
@@ -185,14 +209,14 @@ const Articles: NextPage = ({}) => {
                     <label className="mb-2">
                       To delete your article write the name of you article below
                     </label>
+                    <label className="italic text-black/50 text-sm ">
+                      {articleAuthorFetch.data?.title}
+                    </label>
                     <input
                       placeholder="Article Name"
                       className="p-2 rounded-lg border-2 focus:border-red-500 focus:ring-0 focus:outline-none"
                       onChange={(e) => setTitleInput(e.target.value.toString())}
                     ></input>
-                    <label className="italic text-black/50 text-sm ml-2">
-                      Article Title: {articleAuthorFetch.data?.title}
-                    </label>
                   </div>
                   <button
                     className="bg-red-500 rounded p-2 text-white w-1/3"

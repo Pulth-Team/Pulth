@@ -12,29 +12,25 @@ import Loading from "../Loading";
 import { Fragment, useState } from "react";
 
 const EditorTopbar: NextPage<{
-  slug: string;
+  title: string;
   onSave: () => void;
+  onPublish: () => void;
   onMenuClick: (type: "delete" | "privacy" | "share") => void;
   saveLoading: boolean;
-}> = ({ slug, onSave, onMenuClick, saveLoading }) => {
-  const publishArticleQuery = trpc.useQuery(
-    ["article.publishArticle", { slug }],
-    {
-      enabled: false,
-    }
-  );
-  const getArticleBySlug = trpc.useQuery([
-    "article.getArticleBySlug",
-    {
-      slug: slug as string,
-    },
-  ]);
-  console.log(getArticleBySlug.data?.title + "title");
+  publishLoading: boolean;
+}> = ({
+  title,
+  onSave,
+  onPublish,
+  onMenuClick,
+  saveLoading,
+  publishLoading,
+}) => {
   return (
     <div className="flex gap-x-2 px-4 bg-white shadow-md mb-4 py-2 items-center">
       <h1 className="mr-auto">
         <span className="sr-only">Title of the article</span>
-        Title
+        {title}
       </h1>
       <button
         className="rounded-md text-black/70 px-2 py-1 flex gap-2 items-center"
@@ -45,9 +41,9 @@ const EditorTopbar: NextPage<{
       </button>
       <button
         className="rounded-md font-medium p-2 px-4 bg-indigo-600 text-white flex gap-2 items-center"
-        onClick={() => publishArticleQuery.refetch()}
+        onClick={() => onPublish()}
       >
-        {publishArticleQuery.isLoading && <Loading className="w-4 border-2" />}
+        {publishLoading && <Loading className="w-4 border-2" />}
         Publish
       </button>
       <Menu as="div" className="">
