@@ -2,22 +2,14 @@ import type { NextPage } from "next";
 
 import { trpc } from "../../../utils/trpc";
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { useSession } from "next-auth/react";
-import {} from "@trpc/client";
-
-import type { Prisma } from "@prisma/client";
 import DashboardLayout from "../../../components/layouts/dashboard";
 import ArticleError from "../../../components/responses/ArticleError";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import Loading from "../../../components/Loading";
-
-const Editor = dynamic(() => import("../../../components/Editor"), {
-  ssr: false,
-});
+import DocumentRenderer, {
+  OutputBlockType,
+} from "../../../components/editor/renderer/DocumentRenderer";
 
 // this component's experience is not good
 // the code itself is not good
@@ -33,27 +25,7 @@ const Editor = dynamic(() => import("../../../components/Editor"), {
 // - the not supporting SSG
 // - the not supporting SSR (maybe, I don't know)
 
-interface InitialArticleProps {
-  article:
-    | {
-        id: string;
-        author: {
-          name: string | null;
-          email: string | null;
-          image: string | null;
-        };
-        title: string;
-        description: string;
-        bodyData: Prisma.JsonValue;
-        isPublished: boolean;
-      }
-    | {
-        error: string;
-        code?: number;
-      };
-}
-
-const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
+const Articles: NextPage = () => {
   const router = useRouter();
   const { slug } = router.query;
 
@@ -62,29 +34,26 @@ const Articles: NextPage<InitialArticleProps> = ({ article: articleInfo }) => {
     { slug: slug as string },
   ]);
 
+  let blocks: OutputBlockType[] = [];
+  if (articleData.data?.bodyData) {
+    blocks = articleData.data.bodyData as unknown as OutputBlockType[];
+  }
   return (
     <DashboardLayout>
       <Head>
-        <title>{"Title"} - Pulth App</title>
+        <title>{articleData.data?.title} - Pulth App</title>
         <meta
           name="description"
           content="articles dor your usage of pulth. join our community now!"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="p-4">
-        {/* {"error" in article && !("code" in article) ? (
-          <ArticleError title={article.error} desc={articleErrorText} />
+      {/* read article container for our article renderer with media queries */}
+      <div className="p-4 container max-w-2xl mx-auto">
+        {articleData.data?.error ? (
+          <p>{articleData.data.error}</p>
         ) : (
-          <article>
-            <Editor data={{ blocks: article.bodyData }} readonly={false} />
-          </article>
-        )} */}
-
-        {articleData.isLoading ? (
-          <Loading className="w-12 h-12 border-2" />
-        ) : (
-          "LOADED and authentificated"
+          <DocumentRenderer blocks={blocks} />
         )}
       </div>
     </DashboardLayout>
