@@ -3,7 +3,6 @@ import { NextPage } from "next";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
 import { BatchElement } from "../types/renderer";
-import BatchRenderer from "./BatchRenderer";
 
 // creates a NextFunctionComponent
 const DragScrollContainer: NextPage<{

@@ -20,7 +20,9 @@ const Editor: NextPage<{
           autofocus: false,
           data: data,
           readOnly: readonly,
-          onReady: () => OnInit(newEditor),
+          onReady: () => {
+            if (OnInit) OnInit(newEditor);
+          },
           tools: {
             header: {
               class: require("@editorjs/header"),
