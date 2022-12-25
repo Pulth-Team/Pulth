@@ -1,28 +1,21 @@
 import { unified } from "unified";
 import parse from "rehype-parse";
 import type { RootContent } from "hast";
+import { type } from "os";
 
-export type NodeAST = ElementAST | TextAST;
-export type PureNodeAST = PureElementAST | PureTextAST;
-type PointAST = {
+interface AST {
+  type: "element" | "text";
+}
+type Point = {
   line: number;
   column: number;
   offset: number;
 };
 
-export interface ElementAST {
-  type: "element";
-  tagName: string;
-  properties: {
-    className?: string[];
-  };
-  children: NodeAST[];
-  position: {
-    start: PointAST;
-    end: PointAST;
-  };
-}
-export interface PureElementAST {
+type PureNodeAST = PureElement | PureText;
+type NodeAST = Element | Text;
+
+interface PureElement extends AST {
   type: "element";
   tagName: string;
   properties: {
@@ -31,17 +24,31 @@ export interface PureElementAST {
   children: PureNodeAST[];
 }
 
-export interface TextAST {
+interface PureText extends AST {
+  type: "text";
+  value: string;
+}
+
+interface Element extends PureElement {
+  type: "element";
+  tagName: string;
+  properties: {
+    className?: string[];
+  };
+  children: NodeAST[];
+  position: {
+    start: Point;
+    end: Point;
+  };
+}
+
+interface Text extends PureText {
   type: "text";
   value: string;
   position: {
-    start: PointAST;
-    end: PointAST;
+    start: Point;
+    end: Point;
   };
-}
-export interface PureTextAST {
-  type: "text";
-  value: string;
 }
 
 type ValidityError = "Invalid ClassName" | "Invalid TagName";
@@ -177,3 +184,5 @@ function ValidateNode(node: PureNodeAST):
   }
   return undefined;
 }
+
+export type { PureNodeAST, NodeAST, PureElement, PureText, Element, Text };
