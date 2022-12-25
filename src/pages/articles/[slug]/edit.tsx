@@ -99,10 +99,17 @@ const Articles: NextPage = ({}) => {
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
 
+  useEffect(() => {
+    if (bodyData) {
+      articleUpdateBodyFetch.refetch();
+    }
+  }, [bodyData]);
+
   const OnSave = () => {
     editor?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
       setBodyData(outputData.blocks);
+      articleUpdateBodyFetch.refetch();
     });
   };
 
@@ -141,10 +148,9 @@ const Articles: NextPage = ({}) => {
                     articleUpdateBodyFetch.refetch().then(() => {
                       publishArticleQuery.refetch();
                     });
-                    return;
+                  } else {
+                    publishArticleQuery.refetch();
                   }
-
-                  publishArticleQuery.refetch();
                 }}
                 onMenuClick={(type) => {
                   OnMenuClick(type);
