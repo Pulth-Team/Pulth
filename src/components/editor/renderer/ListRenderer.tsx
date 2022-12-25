@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import InlineRenderer from "./InlineRenderer";
 
 const ListRenderer: NextPage<{
   isOrdered: boolean;
@@ -9,7 +10,7 @@ const ListRenderer: NextPage<{
       <ol className="list-decimal list-inside py-2 px-3 ">
         {items.map((item, index) => (
           <li key={index} className="py-1 pl-1">
-            {item}
+            <InlineRenderer text={item} />
           </li>
         ))}
       </ol>
@@ -19,7 +20,7 @@ const ListRenderer: NextPage<{
       <ul className="list-disc list-inside py-2 px-3 ">
         {items.map((item, index) => (
           <li key={index} className="py-1 pl-1">
-            {item}
+            <InlineRenderer text={item} />
           </li>
         ))}
       </ul>
