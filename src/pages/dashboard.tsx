@@ -1,11 +1,7 @@
 import type { NextPage } from "next";
 
 import { trpc } from "../utils/trpc";
-import {
-  getASTfromHTML,
-  PureElementAST,
-  ValidateTree,
-} from "../utils/editorHelpers";
+import { getASTfromHTML, ValidateTree } from "../utils/editorHelpers";
 import Head from "next/head";
 import Link from "next/link";
 
