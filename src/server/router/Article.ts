@@ -10,8 +10,8 @@ export const ArticleRouter = createRouter()
     input: z.object({
       slug: z.string(),
     }),
-    async resolve({ input }) {
-      const article = await prisma?.article.findUnique({
+    async resolve({ input, ctx }) {
+      const article = await ctx.prisma?.article.findUnique({
         where: {
           slug: input.slug,
         },
@@ -59,7 +59,7 @@ export const ArticleRouter = createRouter()
     }),
     async resolve({ input, ctx }) {
       // check if user is the author of the article
-      const isArticle = await prisma?.article.findFirst({
+      const isArticle = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
           authorId: ctx.session?.user?.id,
@@ -70,7 +70,7 @@ export const ArticleRouter = createRouter()
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const article = await prisma?.article.update({
+      const article = await ctx.prisma?.article.update({
         where: {
           slug: input.slug,
         },
@@ -91,7 +91,7 @@ export const ArticleRouter = createRouter()
     }),
     async resolve({ input, ctx }) {
       // check if user is the author of the article
-      const isArticle = await prisma?.article.findFirst({
+      const isArticle = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
           authorId: ctx.session?.user?.id,
@@ -102,7 +102,7 @@ export const ArticleRouter = createRouter()
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const article = await prisma?.article.update({
+      const article = await ctx.prisma?.article.update({
         where: {
           slug: input.slug,
         },
@@ -119,7 +119,7 @@ export const ArticleRouter = createRouter()
     }),
     async resolve({ input, ctx }) {
       // check if user is the author of the article
-      const isArticle = await prisma?.article.findFirst({
+      const isArticle = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
           authorId: ctx.session?.user?.id,
@@ -130,7 +130,7 @@ export const ArticleRouter = createRouter()
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      const article = await prisma?.article.delete({
+      const article = await ctx.prisma?.article.delete({
         where: {
           slug: input.slug,
         },
@@ -155,7 +155,7 @@ export const ArticleRouter = createRouter()
       slug: z.string(),
     }),
     async resolve({ input, ctx }) {
-      const article = await prisma?.article.findFirst({
+      const article = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
           authorId: ctx.session?.user?.id,
@@ -208,7 +208,7 @@ export const ArticleRouter = createRouter()
 
       const slug = slugified + "-" + makeid(5);
 
-      const article = await prisma?.article.create({
+      const article = await ctx.prisma?.article.create({
         data: {
           authorId: ctx.session?.user?.id!,
           title: input.title,
