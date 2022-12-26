@@ -1,14 +1,11 @@
 import type { NextPage } from "next";
 
-import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
 import { Menu } from "@headlessui/react";
 
-import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
-
 import { useRouter } from "next/router";
 
 // import BatchRenderer from "../components/BatchRenderer";
@@ -23,8 +20,8 @@ import {
   ArrowRightOnRectangleIcon,
   ArrowLeftOnRectangleIcon,
   Cog8ToothIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import { router } from "@trpc/server";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -39,7 +36,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
       <div className="md:flex md:flex-nowrap max-h-[stretch] h-screen">
         <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
           <div className="text-xl font-bold text-indigo-400">PulthApp</div>
-          <Link href="/api/auth/signin">
+          <Link href="/api/auth/signin" className={user ? "hidden" : ""}>
             <div
               className={`${
                 user ? "hidden" : "inline"
@@ -51,41 +48,41 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               <p className="text-xl ">Login</p>
             </div>
           </Link>
-          <Menu as="div">
-            <Menu.Button
-              className={`${
-                user ? "inline" : "hidden"
-              } h-10 w-10 focus:outline-none`}
-            >
+          <Menu as="div" className={`${user ? "" : "hidden"} self-stretch`}>
+            <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
               <Image
                 src={user?.image || "/default_profile.jpg"}
                 alt="profile"
-                height={40}
-                width={40}
+                layout="fill"
                 className="rounded-full aspect-square"
               ></Image>
             </Menu.Button>
-            <Menu.Items className="absolute p-1 rounded-md translate-y-[68px] right-1 bg-gray-700 focus:outline-none active:outline-none">
-              <div>
-                <Link href="/settings">
-                  <Menu.Item>
-                    <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                      {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                      <p className="max-h-fit h-fit">Settings</p>
-                    </div>
-                  </Menu.Item>
-                </Link>
+            <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
+              <Link href={"/profile"}>
                 <Menu.Item>
                   <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                    {/* <Link href="/api/auth/signout">Logout</Link> */}
-                    <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
-                    <a className="max-h-min" onClick={() => signOut()}>
-                      Logout
-                    </a>
+                    <UserCircleIcon className="h-5 w-5" />
+                    <p className="max-h-fit h-fit">Profile</p>
                   </div>
                 </Menu.Item>
-              </div>
+              </Link>
+
+              <Link href="/settings">
+                <Menu.Item>
+                  <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                    <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+                    <p className="max-h-fit h-fit">Settings</p>
+                  </div>
+                </Menu.Item>
+              </Link>
+              <Menu.Item>
+                <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+                  <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
+                  <a className="max-h-min" onClick={() => signOut()}>
+                    Logout
+                  </a>
+                </div>
+              </Menu.Item>
             </Menu.Items>
           </Menu>
         </div>
@@ -220,7 +217,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
                   </Menu.Item>
                 </div>
               </Menu.Items>
-              <div className={`h-12 w-12 relative`}>
+              <div className={`h-12 w-12 relative `}>
                 <Menu.Button>
                   <Image
                     src={user?.image || "/default_profile.jpg"}
