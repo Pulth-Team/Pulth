@@ -29,6 +29,7 @@ const Articles: NextPage = ({}) => {
   const [bodyData, setBodyData] = useState<any>(null);
   const [titleInput, setTitleInput] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
+  const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
   const { slug } = router.query;
 
@@ -120,11 +121,19 @@ const Articles: NextPage = ({}) => {
       case "delete":
         setDeleteModal(true);
         break;
-
+      case "share":
+        setShareModal(true);
+        break;
       default:
         console.log("Menu Item onClick not defined");
         break;
     }
+  };
+
+  const shareURL = `https://pulth.com/articles/${slug}`;
+
+  const copyURL = async () => {
+    await navigator.clipboard.writeText(shareURL);
   };
 
   return (
@@ -232,6 +241,70 @@ const Articles: NextPage = ({}) => {
                   >
                     Delete Article
                   </button>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+      <Transition appear show={shareModal} as={Fragment}>
+        <Dialog
+          open={shareModal}
+          onClose={() => setShareModal(false)}
+          className="z-20 relative"
+          as="div"
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50"></div>
+          </Transition.Child>
+          <div className="fixed inset-0">
+            <div className="flex justify-center items-center h-full">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Dialog.Panel className="bg-white rounded-md p-4 flex flex-col gap-y-4">
+                  <Dialog.Title className="text-xl font-semibold">
+                    Share Article
+                  </Dialog.Title>
+                  <div className="flex flex-col gap-y-2">
+                    <p>Share via</p>
+                    <div className="flex gap-x-4">
+                      <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-500 hover:bg-blue-500">
+                        <TwitterIcon className="stroke-blue-500 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                      </div>
+                      <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-900 hover:bg-blue-900">
+                        <FacebookIcon className="stroke-blue-900 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                      </div>
+                    </div>
+                    <p>You can use link</p>
+                    <div className="bg-black/10 p-2 rounded-md flex gap-x-3">
+                      <input
+                        className="bg-transparent"
+                        disabled
+                        value={shareURL}
+                      />
+                      <button
+                        onClick={copyURL}
+                        className="bg-indigo-500 text-white py-1 px-2 rounded-md"
+                      >
+                        Copy Link
+                      </button>
+                    </div>
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
