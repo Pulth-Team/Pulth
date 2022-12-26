@@ -16,6 +16,8 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { Transition, Dialog } from "@headlessui/react";
+import TwitterIcon from "../../../components/icons/TwitterIcon";
+import FacebookIcon from "../../../components/icons/FacebookIcon";
 
 const Editor = dynamic(() => import("../../../components/Editor"), {
   ssr: false,
