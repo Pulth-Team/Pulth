@@ -6,10 +6,9 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Menu, Dialog, Transition } from "@headlessui/react";
+import { Menu } from "@headlessui/react";
 import { trpc } from "../../utils/trpc";
 import Loading from "../Loading";
-import { Fragment, useState } from "react";
 
 const EditorTopbar: NextPage<{
   title: string;
@@ -56,6 +55,7 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
             as="button"
+            onClick={() => onMenuClick("share")}
           >
             <ShareIcon className="w-5 h-5" />
             <p>Share</p>
@@ -63,6 +63,7 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
             as="button"
+            onClick={() => onMenuClick("privacy")}
           >
             <LockClosedIcon className="w-5 h-5" />
             <p>Privacy</p>
