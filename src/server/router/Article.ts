@@ -1,8 +1,12 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { env } from "../env.mjs";
+import algoliasearch from "algoliasearch";
 
 import slugify from "slugify";
+
+const client = algoliasearch(env.ALGOLIA_APP_ID, env.ALGOLIA_API_KEY);
 
 // returns a router with the batch data route
 export const ArticleRouter = createRouter()
@@ -78,6 +82,18 @@ export const ArticleRouter = createRouter()
           isPublished: true,
         },
       });
+      client
+        .initIndex("article_name")
+        .saveObject({
+          objectID: article?.id,
+          title: article?.title,
+          description: article?.description,
+          author: ctx.session?.user?.name,
+          slug: article?.slug,
+        })
+        .catch((err) => {
+          console.log("Failed to create article in algolia", err);
+        });
       return article;
     },
   })
@@ -135,6 +151,18 @@ export const ArticleRouter = createRouter()
           slug: input.slug,
         },
       });
+      article;
+      console.log(input.slug);
+      client
+        .initIndex("article_name")
+        .deleteObject(article?.id)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log("Failed to delete article in algolia", err);
+        });
+
       return article;
     },
   })

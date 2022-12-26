@@ -3,15 +3,17 @@ import type { NextPage } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
-import { Menu } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 
 // import BatchRenderer from "../components/BatchRenderer";
 
+import CustomSearchBox from "../CustomSearchBox";
+
 import { useSession } from "next-auth/react";
-import React from "react";
+import React, { Fragment, useState } from "react";
 import {
   HomeIcon,
   MapIcon,
@@ -21,18 +23,105 @@ import {
   ArrowLeftOnRectangleIcon,
   Cog8ToothIcon,
   UserCircleIcon,
+  MagnifyingGlassIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
 import { motion, AnimatePresence } from "framer-motion";
+import algoliasearch from "algoliasearch/lite";
+import {
+  SearchBox,
+  InstantSearch,
+  RefinementList,
+  Hits,
+} from "react-instantsearch-dom";
 
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);
   const router = useRouter();
   const { data } = useSession();
   const user = data?.user;
-  //
+  const [searchModal, setSearchModal] = useState(false);
+
+  const searchClient = algoliasearch(
+    "BNEEQPGY1H",
+    "d20546fd91f26a1493abd70457c47e7b"
+  );
+  function Hit({ hit }: { hit: any }) {
+    console.log(hit);
+    return (
+      <Link href={`/articles/${hit.slug}`}>
+        <div
+          className="bg-slate-700/30 hover:bg-indigo-900/70 p-1.5 rounded-md mb-2 cursor-pointer flex flex-row justify-between items-center"
+          onClick={() => setSearchModal(false)}
+        >
+          <div className="flex flex-col gap-y-2">
+            <p className="text-xl line-clamp-1 text-white font-bold">
+              {hit.title}
+            </p>
+            <p className="text-gray-400 italic text-sm line-clamp-1 font-semibold">
+              {hit.description}
+            </p>
+            <Link href="/profile">
+              <div className="flex gap-x-1 items-center">
+                <UserCircleIcon className="stroke-white h-5 w-5" />
+                <p className="text-gray-400 font-semibold hover:underline">
+                  {hit.author}
+                </p>
+              </div>
+            </Link>
+          </div>
+          <ChevronRightIcon className="stroke-white h-4 w-4 flex-shrink-0" />
+        </div>
+      </Link>
+    );
+  }
   return (
     <div>
+      <Transition appear show={searchModal} as={Fragment}>
+        <Dialog
+          open={searchModal}
+          onClose={() => setSearchModal(false)}
+          className="z-20 relative"
+          as="div"
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-70"></div>
+          </Transition.Child>
+          <div className="fixed inset-0">
+            <div className="flex justify-center items-center h-full">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Dialog.Panel className="bg-gray-800 rounded-md p-4 flex flex-col gap-y-4 w-1/2">
+                  <InstantSearch
+                    searchClient={searchClient}
+                    indexName="article_name"
+                  >
+                    <CustomSearchBox />
+                    <Hits hitComponent={Hit} />
+                  </InstantSearch>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
       <div className="md:flex md:flex-nowrap max-h-[stretch] h-screen">
         <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
           <div className="text-xl font-bold text-indigo-400">PulthApp</div>
@@ -241,6 +330,18 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
         <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-16">
+          <div className="bg-gray-800 w-full  flex flex-row items-center p-2">
+            <button
+              className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none"
+              onClick={() => setSearchModal(true)}
+            >
+              <MagnifyingGlassIcon className="h-8 w-8" />
+            </button>
+            {/* <InstantSearch searchClient={searchClient} indexName="article_name">
+              <SearchBox />
+              <Hits hitComponent={Hit} />
+            </InstantSearch> */}
+          </div>
           <AnimatePresence>
             {/* figure out on exit transition */}
             <motion.div

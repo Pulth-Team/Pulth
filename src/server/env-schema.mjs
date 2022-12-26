@@ -8,6 +8,7 @@ export const envSchema = z.object({
 
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  GITHUB_CLIENT_ID: z.string(),
-  GITHUB_CLIENT_SECRET: z.string(),
+
+  ALGOLIA_APP_ID: z.string(),
+  ALGOLIA_API_KEY: z.string(),
 });
