@@ -14,7 +14,7 @@ const EditorTopbar: NextPage<{
   title: string;
   onSave: () => void;
   onPublish: () => void;
-  onMenuClick: (type: "delete" | "privacy" | "share") => void;
+  onMenuClick: (type: "delete" | "privacy" | "share" | "configure") => void;
   saveLoading: boolean;
   publishLoading: boolean;
 }> = ({
@@ -71,9 +71,10 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
             as="button"
+            onClick={() => onMenuClick("configure")}
           >
             <PencilSquareIcon className="w-5 h-5" />
-            <p>Edit</p>
+            <p>Configure</p>
           </Menu.Item>
           <hr className="" />
           <Menu.Item

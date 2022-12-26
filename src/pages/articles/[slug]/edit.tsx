@@ -280,14 +280,15 @@ const Articles: NextPage = ({}) => {
                   <Dialog.Title className="text-xl font-semibold">
                     Share Article
                   </Dialog.Title>
+                  <hr />
                   <div className="flex flex-col gap-y-2">
-                    <p>Share via</p>
+                    <p>Share this article via</p>
                     <div className="flex gap-x-4">
                       <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-500 hover:bg-blue-500">
-                        <TwitterIcon className="stroke-blue-500 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                        <TwitterIcon className="stroke-none fill-blue-500 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
                       </div>
                       <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-900 hover:bg-blue-900">
-                        <FacebookIcon className="stroke-blue-900 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                        <FacebookIcon className="stroke-none fill-blue-900 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
                       </div>
                     </div>
                     <p>You can use link</p>
