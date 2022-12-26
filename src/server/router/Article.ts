@@ -142,8 +142,8 @@ export const ArticleRouter = createRouter()
     input: z.object({
       userId: z.string().optional(),
     }),
-    async resolve({ input }) {
-      return await prisma?.article.findMany({
+    async resolve({ input, ctx }) {
+      return await ctx.prisma?.article.findMany({
         where: {
           authorId: input.userId,
         },
