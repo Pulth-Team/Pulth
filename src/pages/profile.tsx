@@ -83,7 +83,7 @@ const Articles: NextPage = () => {
 
               {/* Add Project div */}
               <button
-                className="col-span-1 group bg-white border-dashed border-2 rounded-md hover:border-solid hover:border-indigo-500 flex flex-col justify-center items-center"
+                className="py-6 col-span-1 group bg-white border-dashed border-2 rounded-md hover:border-solid hover:border-indigo-500 flex flex-col justify-center items-center"
                 onClick={() => setIsOpen(true)}
               >
                 <PlusIcon className="w-6 h-6 group-hover:text-indigo-500"></PlusIcon>
