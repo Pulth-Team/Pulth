@@ -332,7 +332,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
         <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-16">
           <div className="bg-gray-800 w-full  flex flex-row items-center p-2">
             <button
-              className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none"
+              className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none ml-auto"
               onClick={() => setSearchModal(true)}
             >
               <MagnifyingGlassIcon className="h-8 w-8" />

@@ -3,7 +3,6 @@ import { connectSearchBox } from "react-instantsearch-dom";
 
 const SearchBox: NextPage<{
   currentRefinement: any;
-  isSearchStalled: boolean;
   refine: any;
 }> = ({ currentRefinement, refine }) => (
   <div>
