@@ -28,8 +28,12 @@ export default withSentryConfig(
   defineNextConfig({
     reactStrictMode: true,
     images: {
-      // Just for demo purposes, we'll use the aws cloudfront url
-      domains: ["via.placeholder.com", "lh3.googleusercontent.com"],
+      // lh3.googleusercontent.com is used for Google OAuth profile pictures
+      domains: [
+        "via.placeholder.com",
+        "lh3.googleusercontent.com",
+        "cdn.pulth.com",
+      ],
     },
     sentry: {
       // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
