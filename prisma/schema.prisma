@@ -13,7 +13,7 @@ datasource db {
 // Necessary for Next auth
 model Account {
     id                String  @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String
+    userId            String  @db.ObjectId
     type              String
     provider          String
     providerAccountId String
@@ -32,7 +32,7 @@ model Account {
 model Session {
     id           String   @id @default(auto()) @map("_id") @db.ObjectId
     sessionToken String   @unique
-    userId       String
+    userId       String   @db.ObjectId
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -54,6 +54,7 @@ model User {
     ratedCommentsId String[]  @db.ObjectId
     // im not hundred percent sure this is the right way to do this
     ratedComments   Comment[] @relation("RatedUser", fields: [ratedCommentsId], references: [id])
+    images          Image[]
 }
 
 model MetaData {
@@ -117,4 +118,14 @@ model Comment {
 
     createdAt DateTime
     updatedAt DateTime @updatedAt
+}
+
+model Image {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    url String
+    alt String
 }
