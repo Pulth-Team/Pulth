@@ -35,7 +35,7 @@ const MyApp: AppType<{ session: Session }> = ({
   );
 };
 
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   if (typeof window !== "undefined") {
     return "";
   }

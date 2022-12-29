@@ -12,6 +12,7 @@
   "dependencies": {
     "@editorjs/editorjs": "^2.26.4",
     "@editorjs/header": "^2.7.0",
+    "@editorjs/image": "^2.8.1",
     "@editorjs/list": "^1.8.0",
     "@headlessui/react": "^1.6.6",
     "@headlessui/tailwindcss": "^0.1.2",
@@ -24,6 +25,7 @@
     "@trpc/next": "^9.26.2",
     "@trpc/react": "^9.26.2",
     "@trpc/server": "^9.26.2",
+    "aws-sdk": "^2.1283.0",
     "dayjs": "^1.11.7",
     "framer": "^2.2.1",
     "framer-motion": "^6.5.1",
