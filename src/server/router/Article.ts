@@ -151,8 +151,7 @@ export const ArticleRouter = createRouter()
           slug: input.slug,
         },
       });
-      article;
-      console.log(input.slug);
+
       client
         .initIndex("article_name")
         .deleteObject(article?.id)
@@ -248,6 +247,14 @@ export const ArticleRouter = createRouter()
           description: true,
           slug: true,
         },
+      });
+
+      client.initIndex("article_name").saveObject({
+        objectID: article?.id,
+        title: article?.title,
+        description: article?.description,
+        slug: article?.slug,
+        author: ctx.session?.user?.name,
       });
       return article as {
         id: string;
