@@ -125,6 +125,12 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
       <div className="md:flex md:flex-nowrap max-h-[stretch] h-screen">
         <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
           <div className="text-xl font-bold text-indigo-400">PulthApp</div>
+          <button
+            className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none ml-auto mr-4"
+            onClick={() => setSearchModal(true)}
+          >
+            <MagnifyingGlassIcon className="h-8 w-8 " />
+          </button>
           <Link href="/api/auth/signin" className={user ? "hidden" : ""}>
             <div
               className={`${
@@ -329,7 +335,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="pb-16 md:pb-0 md:mb-0 md:flex-grow md:overflow-y-scroll md:pt-0 pt-16">
+        <div className="pb-16 md:pt-0 pt-16 md:pb-0 md:mb-0 md:flex-grow hidden md:block">
           <div className="bg-gray-800 w-full  flex flex-row items-center p-2">
             <button
               className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none ml-auto"
@@ -337,10 +343,6 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             >
               <MagnifyingGlassIcon className="h-8 w-8" />
             </button>
-            {/* <InstantSearch searchClient={searchClient} indexName="article_name">
-              <SearchBox />
-              <Hits hitComponent={Hit} />
-            </InstantSearch> */}
           </div>
           <AnimatePresence>
             {/* figure out on exit transition */}
