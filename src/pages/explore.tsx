@@ -11,10 +11,16 @@ import ArticleCard from "../components/ArticleCard";
 import DashboardLayout from "../components/layouts/dashboard";
 
 const Explore: NextPage = () => {
-  // const batchFetch = trpc.useQuery(["article.batch-data"]);
-
   const { data } = useSession();
   const user = data?.user;
+
+  const { data: articles } = trpc.useQuery([
+    "article.getLatestArticles",
+    {
+      limit: 10,
+      skip: 0,
+    },
+  ]);
 
   return (
     <DashboardLayout>
@@ -37,7 +43,23 @@ const Explore: NextPage = () => {
             {user ? "Selected for you..." : "Recent articles"}
           </p>
           <DragScrollContainer>
-            <ArticleCard
+            {articles?.map((article) => (
+              <ArticleCard
+                Title={article.title}
+                // Topics={article.topics}
+                Author={{
+                  // Title: article.author.title,
+                  Name: article.author.name!,
+                }}
+                isRecommended={false}
+                key={article.slug}
+                slug={article.slug}
+              >
+                {article.description}
+              </ArticleCard>
+            ))}
+
+            {/* <ArticleCard
               Title="Next.js Auth Errors"
               Topics={["Javascript", "Web", "React"]}
               Author={{ Title: "Web Architect", Name: "Bekir Gulestan" }}
@@ -45,61 +67,7 @@ const Explore: NextPage = () => {
             >
               Some article made for explaining Next Auth Errors deeply. That
               cover nearly 4 (Four) error which is nearly all(102) of them.
-            </ArticleCard>
-            <ArticleCard
-              Title="Photoshop Eraser Tool"
-              Topics={["Editing", "Adobe"]}
-              Author={{ Title: "Designer", Name: "Yaprak Özlem Öz" }}
-              isRecommended={true}
-            >
-              Some article about how eraser tool works in Photoshop 2023 with an
-              original Adobe product.
-            </ArticleCard>
-
-            <ArticleCard
-              Title="Web Security as a One Piece"
-              Topics={["Security", "Web", "Firewall"]}
-              Author={{ Title: "Security Assistant", Name: "John Wall" }}
-            >
-              How security works as an whole article with 3000 word. we
-              discussed nearly all of them.
-            </ArticleCard>
-
-            <ArticleCard
-              Title="How Microservices work?"
-              Topics={["Kafka", "Infrastructure", "Microservices"]}
-              Author={{ Title: "Lead Developer", Name: "Micheal Rocks" }}
-            >
-              We will talk about how Microservices work in a nutshell. This
-              article will be a part of an serie.
-            </ArticleCard>
-
-            <ArticleCard
-              Title="What 's RNB ?"
-              Topics={["Producer", "Music"]}
-              Author={{ Title: "Disc Jockey", Name: "Alexis Diamonds" }}
-            >
-              This new way of reaching audiences has created a whole new djing
-              experience that is more accessible to a wider range of people.
-            </ArticleCard>
-            <ArticleCard
-              Title="Do boys dislike school?"
-              Topics={["School"]}
-              Author={{ Title: "Social Scientist", Name: "Parry Gustave" }}
-            >
-              Since the 1970s, a panic about “disaffected” boys underachieving
-              in formal schooling has gripped Western society.
-            </ArticleCard>
-
-            <ArticleCard
-              Title="What is Fog Reveal?"
-              Topics={["Police", "Federal"]}
-              Author={{ Title: "Federal Gov. Member", Name: "Samanta Sue" }}
-            >
-              Government agencies and private security companies in the U.S.
-              have found a cost-effective way to engage in mass surveillance
-              using a technology called “fog computing.”
-            </ArticleCard>
+            </ArticleCard> */}
           </DragScrollContainer>
         </div>
       </div>

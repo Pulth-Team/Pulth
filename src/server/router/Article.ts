@@ -49,6 +49,37 @@ export const ArticleRouter = createRouter()
       }
     },
   })
+  .query("getLatestArticles", {
+    input: z.object({
+      limit: z.number().optional().default(10),
+      skip: z.number().optional().default(0),
+    }),
+    async resolve({ input, ctx }) {
+      const articles = await ctx.prisma?.article.findMany({
+        where: {
+          isPublished: true,
+        },
+        select: {
+          title: true,
+          description: true,
+          slug: true,
+          author: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: input.limit,
+        skip: input.skip,
+      });
+      return articles;
+    },
+  })
   .middleware(async ({ ctx, next }) => {
     // Any queries or mutations after this middleware will
     // raise an error unless there is a current session
@@ -98,7 +129,6 @@ export const ArticleRouter = createRouter()
       return article;
     },
   })
-
   .query("updateArticleBody", {
     input: z.object({
       slug: z.string(),
