@@ -26,6 +26,13 @@ const Inspect: NextPage = () => {
   const router = useRouter();
   const { slug } = router.query;
 
+  const articleData = trpc.useQuery([
+    "article.getArticleBySlugAuthor",
+    { slug: slug as string },
+  ]);
+
+  const [titleValue, setTitleValue] = useState(articleData.data?.title);
+  const [descValue, setDescValue] = useState(articleData.data?.description);
   const [titleResetButton, setTitleResetButton] = useState(false);
   const [descResetButton, setDescResetButton] = useState(false);
   const [deleteArticleModal, setDeleteArticleModal] = useState(false);
@@ -33,10 +40,9 @@ const Inspect: NextPage = () => {
   const [deleteTitleInput, setDeleteTitleInput] = useState("");
   const [inputError, setInputError] = useState(false);
 
-  const articleData = trpc.useQuery([
-    "article.getArticleBySlugAuthor",
-    { slug: slug as string },
-  ]);
+  const [isPublishEvent, setIsPublishEvent] = useState(
+    !articleData.data?.isPublished
+  );
 
   const deleteArticle = trpc.useQuery(
     [
@@ -50,11 +56,16 @@ const Inspect: NextPage = () => {
     }
   );
   const publishArticleQuery = trpc.useQuery(
-    ["article.publishArticle", { slug: slug as string }],
+    ["article.publishArticle", { slug: slug as string, isPublishEvent }],
     {
       enabled: false,
+      onSuccess: (data) => {
+        console.log("onsuccess", data.isPublished);
+        setIsPublishEvent(!data.isPublished);
+      },
     }
   );
+
   const handleDeleteButton = () => {
     if (deleteTitleInput == articleData.data?.title) {
       deleteArticle.refetch();
@@ -73,8 +84,19 @@ const Inspect: NextPage = () => {
     articleData.data?.description,
   ]);
 
-  const [titleValue, setTitleValue] = useState(articleData.data?.title);
-  const [descValue, setDescValue] = useState(articleData.data?.description);
+  const [isEventUpdated, setIsEventUpdated] = useState(false);
+  useEffect(() => {
+    if (publishArticleQuery.isFetched && !isEventUpdated) {
+      setIsPublishEvent(!isPublishEvent);
+      setIsEventUpdated(true);
+    }
+  }, [
+    publishArticleQuery.isFetched,
+    publishArticleQuery.data?.isPublished,
+    isPublishEvent,
+    isEventUpdated,
+  ]);
+
   const saveArticle = trpc.useQuery(
     [
       "article.updateArticleCredidantials",
@@ -93,7 +115,7 @@ const Inspect: NextPage = () => {
     if (saveArticle.isFetched && saveArticle.data?.slug) {
       setDescResetButton(false);
       setTitleResetButton(false);
-      router.push(`/articles/${saveArticle.data?.slug}/inspect`);
+      router.replace(`/articles/${saveArticle.data?.slug}/inspect`);
     }
   }, [
     saveArticle.isFetched,
@@ -102,6 +124,10 @@ const Inspect: NextPage = () => {
     saveArticle.data?.description,
     router,
   ]);
+
+  useEffect(() => {
+    setIsPublishEvent(!articleData.data?.isPublished);
+  }, [articleData.data?.isPublished]);
 
   let body;
 
@@ -259,11 +285,14 @@ const Inspect: NextPage = () => {
                   <hr className="my-2" />
                   <button
                     disabled={!descResetButton && !titleResetButton}
-                    className="bg-indigo-500 text-white text-lg rounded-md px-2 py-1 ml-auto disabled:bg-transparent disabled:border disabled:border-gray-700 disabled:text-gray-700 transition-colors duration-200"
+                    className="flex gap-2 bg-indigo-500 text-white text-lg rounded-md px-2 py-1 ml-auto disabled:bg-transparent disabled:border disabled:border-gray-700 disabled:text-gray-700 transition-colors duration-200"
                     onClick={() => {
                       saveArticle.refetch();
                     }}
                   >
+                    {saveArticle.isLoading && (
+                      <Loading className="h-6 w-6 border-2" />
+                    )}
                     Save Changes
                   </button>
                 </div>
@@ -285,10 +314,15 @@ const Inspect: NextPage = () => {
           {/* Add view count, read time etc */}
           <div className="flex items-baseline justify-between">
             <button
-              className="px-2 p-1 rounded bg-indigo-500 text-white"
-              onClick={() => publishArticleQuery.refetch()}
+              className="px-2 p-1 rounded bg-indigo-500 text-white flex gap-2"
+              onClick={() => {
+                publishArticleQuery.refetch();
+              }}
             >
-              {articleData.data?.isPublished ? "Unpublish" : "Publish"}
+              {publishArticleQuery.isFetching ? (
+                <Loading className="h-6 w-6 border-2" />
+              ) : null}
+              {isPublishEvent ? "Publish" : "Unpublish"}
             </button>
             <div>{updatedDate}</div>
           </div>

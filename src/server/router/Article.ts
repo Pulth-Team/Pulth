@@ -60,6 +60,7 @@ export const ArticleRouter = createRouter()
   .query("publishArticle", {
     input: z.object({
       slug: z.string(),
+      isPublishEvent: z.boolean().optional().default(true),
     }),
     async resolve({ input, ctx }) {
       // check if user is the author of the article
@@ -79,7 +80,7 @@ export const ArticleRouter = createRouter()
           slug: input.slug,
         },
         data: {
-          isPublished: true,
+          isPublished: input.isPublishEvent,
         },
       });
       client
