@@ -14,7 +14,7 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
   isPublished,
 }) => {
   return (
-    <Link href={!isPublished ? `/articles/${slug}/edit` : `/articles/${slug}`}>
+    <Link href={`/articles/${slug}/inspect`}>
       <div
         className={`bg-gray-100 col-span-1 group flex flex-col items-start justify-start
                        p-4 rounded-md shadow-sm hover:shadow-md min-h-[128px]

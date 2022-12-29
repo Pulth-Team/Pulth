@@ -171,7 +171,62 @@ export const ArticleRouter = createRouter()
           isPublished: true,
         },
       });
-      return article;
+      return article as {
+        id: string;
+        title: string;
+        description: string;
+        bodyData: any;
+        updatedAt: Date;
+        createdAt: Date;
+        editorVersion: string;
+        isPublished: boolean;
+      };
+    },
+  })
+  .query("updateArticleCredidantials", {
+    input: z.object({
+      slug: z.string(),
+      title: z.string(),
+      description: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      // check if user is the author of the article
+      const isArticle = await ctx.prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+          authorId: ctx.session?.user?.id,
+        },
+        select: {
+          id: true,
+        },
+      });
+      // if with the slug and authorId there is no article
+      if (!isArticle) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const article = await ctx.prisma?.article.update({
+        where: {
+          id: isArticle.id,
+        },
+        data: {
+          title: input.title,
+          description: input.description,
+          slug: slugified(input.title) + "-" + makeid(5),
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          slug: true,
+        },
+      });
+      return article as {
+        id: string;
+        title: string;
+        description: string;
+        slug: string;
+      };
     },
   })
   .query("createArticle", {
@@ -187,26 +242,7 @@ export const ArticleRouter = createRouter()
       ),
     }),
     async resolve({ input, ctx }) {
-      const makeid = (length: number) => {
-        var result = "";
-        var characters =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
-          result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-          );
-        }
-        return result;
-      };
-
-      const slugified = slugify(input.title, {
-        replacement: "-",
-        lower: true,
-        strict: true,
-      }).substring(0, 20);
-
-      const slug = slugified + "-" + makeid(5);
+      const slug = slugified(input.title) + "-" + makeid(5);
 
       const article = await ctx.prisma?.article.create({
         data: {
@@ -225,3 +261,21 @@ export const ArticleRouter = createRouter()
       };
     },
   });
+
+const makeid = (length: number) => {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+const slugified = (title: string) =>
+  slugify(title, {
+    replacement: "-",
+    lower: true,
+    strict: true,
+  }).substring(0, 20);
