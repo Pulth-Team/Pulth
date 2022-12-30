@@ -29,18 +29,25 @@ const InlineRenderer: NextPage<InlineRendererProps> = ({
             case "element":
               switch (node.tagName) {
                 case "b":
-                  keySeed += "-bold" + "-" + index + "-";
+                  keySeed += "-bold-" + index;
                   return (
                     <span key={index} className="font-bold">
                       <InlineRenderer ast={node.children} keySeed={keySeed} />
                     </span>
                   );
                 case "i":
-                  keySeed += "-italic" + "-" + index + "-";
+                  keySeed += "-italic-" + index;
 
                   return (
                     <span key={index} className="italic">
                       <InlineRenderer ast={node.children} keySeed={keySeed} />
+                    </span>
+                  );
+                case "br":
+                  keySeed += "-br-" + index;
+                  return (
+                    <span key={index} className="text-gray-500 text-sm">
+                      <br />
                     </span>
                   );
 

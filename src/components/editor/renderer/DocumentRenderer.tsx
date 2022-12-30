@@ -2,6 +2,7 @@ import { OutputBlockData } from "@editorjs/editorjs";
 import { NextPage } from "next";
 
 import HeaderRenderer from "./HeaderRenderer";
+import ImageRenderer from "./ImageRenderer";
 import InlineRenderer from "./InlineRenderer";
 import ListRenderer from "./ListRenderer";
 
@@ -35,11 +36,21 @@ interface ListBlockData extends BlockData {
     items: string[];
   };
 }
+interface ImageBlockData extends BlockData {
+  type: "Image";
+  data: {
+    file: {
+      url: string;
+    };
+    caption: string;
+  };
+}
 
 export type OutputBlockType =
   | HeaderBlockData
   | ParagraphBlockData
-  | ListBlockData;
+  | ListBlockData
+  | ImageBlockData;
 
 const DocumentRenderer: NextPage<{
   blocks: OutputBlockType[];
@@ -71,6 +82,14 @@ const DocumentRenderer: NextPage<{
                 key={keySeed + block.id}
                 isOrdered={block.data.style === "ordered"}
                 items={block.data.items}
+              />
+            );
+          case "Image":
+            return (
+              <ImageRenderer
+                key={keySeed + block.id}
+                url={block.data.file.url}
+                caption={block.data.caption}
               />
             );
         }
