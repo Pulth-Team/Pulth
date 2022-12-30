@@ -139,12 +139,12 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           ))}
 
           {/* Feedback Component Add feedback Modal later */}
-          <div className="mt-auto mb-2 hidden">
+          {/* <div className="mt-auto mb-2 ">
             <div className="flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer bg-gray-800 text-gray-400">
               <QuestionMarkCircleIcon className="w-6 h-6" />
               <p>Feedback</p>
             </div>
-          </div>
+          </div> */}
 
           {/* Account Component */}
           {user ? (
@@ -154,10 +154,12 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               path={router.pathname}
             />
           ) : (
-            <div>
-              <Link href="/api/signin">
-                <button className="p-2 bg-gray-700 flex rounded-md mt-auto">
-                  <p className="text-gray-200 font-semibold">Login</p>
+            <div className="mt-auto">
+              <Link href="/api/auth/signin">
+                <button className="p-2 bg-gray-700 flex rounded-md w-full ">
+                  <p className="text-gray-200 font-semibold w-full text-center h-12 flex justify-center items-center ">
+                    Login
+                  </p>
                 </button>
               </Link>
             </div>
@@ -281,16 +283,13 @@ const AccountBox = ({
           </Menu.Item>
 
           <Menu.Item>
-            <div>
-              <Link href="/api/signout">
-                <a
-                  className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
-                >
-                  <ArrowLeftOnRectangleIcon className="w-6 h-6" />
-                  <p>Logout</p>
-                </a>
-              </Link>
-            </div>
+            <a
+              onClick={() => signOut()}
+              className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+            >
+              <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+              <p>Logout</p>
+            </a>
           </Menu.Item>
         </Menu.Items>
       </Menu>
