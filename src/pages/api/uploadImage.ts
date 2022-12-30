@@ -31,8 +31,8 @@ const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     // create s3 client
     const s3 = new S3({
-      accessKeyId: env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: env.AWS_ACCESS_KEY_CDN,
+      secretAccessKey: env.AWS_SECRET_KEY_CDN,
       region: env.AWS_REGION,
     });
 
