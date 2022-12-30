@@ -40,11 +40,28 @@ const Editor: NextPage<{
             Image: {
               class: require("@editorjs/image"),
               config: {
-                endpoints: {
-                  byFile: getBaseUrl() + "/api/uploadImage", // Your backend file uploader endpoint
-
-                  //this is upload by url of an image
-                  // byUrl: "http://localhost:8008/fetchUrl", // Your endpoint that provides uploading by Url
+                uploader: {
+                  uploadByFile(file: File) {
+                    console.log("file", file);
+                    let fm = new FormData();
+                    fm.append("imageFile", file);
+                    return fetch(getBaseUrl() + "/api/uploadImage", {
+                      method: "POST",
+                      body: fm,
+                    })
+                      .then((res) => {
+                        return res.json();
+                      })
+                      .then((res) => {
+                        console.log(res);
+                        return {
+                          success: 1,
+                          file: {
+                            url: res.url,
+                          },
+                        };
+                      });
+                  },
                 },
               },
 
