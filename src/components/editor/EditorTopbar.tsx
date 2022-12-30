@@ -26,7 +26,7 @@ const EditorTopbar: NextPage<{
   publishLoading,
 }) => {
   return (
-    <div className="flex gap-x-2 px-4 bg-white shadow-md mb-4 py-2 items-center">
+    <div className="flex gap-x-2 px-4 bg-white z-10 shadow-md mb-4 py-2 items-center sticky top-0">
       <h1 className="mr-auto">
         <span className="sr-only">Title of the article</span>
         {title}

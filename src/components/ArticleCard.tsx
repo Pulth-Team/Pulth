@@ -7,7 +7,10 @@ import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { create } from "domain";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightCircleIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
 
 interface ArticleCardProps {
   Title: string;
@@ -36,6 +39,7 @@ const ArticleCard: NextPage<
   createdAt,
 }) => {
   dayjs.extend(relativeTime);
+  console.log(Author?.Image);
   return (
     <div
       className={`${
@@ -57,16 +61,16 @@ const ArticleCard: NextPage<
         <Link href={`/articles/${slug}`} className="cursor-pointer">
           <a className="text-xl font-semibold mb-1 line-clamp-1 ">{Title}</a>
         </Link>
-        <div className="whitespace-nowrap font-light text-sm flex-shrink-0">
+        {/* <div className="whitespace-nowrap font-light text-sm flex-shrink-0">
           {dayjs(createdAt).fromNow()}
-        </div>
+        </div> */}
       </div>
       <p className=" line-clamp-4 mb-4">{children}</p>
 
       <div className="mt-auto flex gap-2">
         <div className="w-9 h-9 relative">
           <Image
-            src={"/default_profile.jpg"}
+            src={Author?.Image || "/default-profile.png"}
             alt="profile"
             height={64}
             width={64}
@@ -75,13 +79,19 @@ const ArticleCard: NextPage<
         </div>
         <div>
           <p className="text-sm">{Author?.Name}</p>
-          <p className="text-xs text-black/70">{Author?.Title}</p>
+          <p className="text-xs text-black/70">
+            {/* {Author?.Title} */}
+            {dayjs(createdAt).fromNow()}
+          </p>
         </div>
 
         {/* TODO Add more actions menu including "Dont Recommend me", "I Loved This","Cancel" */}
-        <button className="ml-auto">
-          <EllipsisHorizontalIcon className="w-6 h-6" />
-        </button>
+        <Link href={`/articles/${slug}`} className="cursor-pointer">
+          <button className="ml-auto bg-indigo-500 p-1 flex gap-x-2 items-stretch rounded-md">
+            <p className="text-white">Go to Article</p>
+            <ArrowRightCircleIcon className="self-stretch w-6 stroke-white" />
+          </button>
+        </Link>
       </div>
     </div>
   );

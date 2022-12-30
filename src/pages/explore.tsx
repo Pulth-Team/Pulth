@@ -50,7 +50,9 @@ const Explore: NextPage = () => {
                 Author={{
                   // Title: article.author.title,
                   Name: article.author.name!,
+                  Image: article.author.image!,
                 }}
+                createdAt={article.createdAt}
                 isRecommended={false}
                 key={article.slug}
                 slug={article.slug}
