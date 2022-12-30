@@ -16,8 +16,8 @@ export const envSchema = z.object({
   ALGOLIA_APP_ID: z.string(),
   ALGOLIA_API_KEY: z.string(),
 
-  AWS_ACCESS_KEY: z.string(),
-  AWS_SECRET_ACCESS_KEY: z.string(),
+  AWS_ACCESS_KEY_CDN: z.string(),
+  AWS_SECRET_KEY_CDN: z.string(),
   AWS_REGION: z.string().default("us-east-1"),
 
   AWS_S3_BUCKET: z.string(),
