@@ -25,6 +25,7 @@ import {
   UserCircleIcon,
   MagnifyingGlassIcon,
   ChevronRightIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,18 +38,42 @@ import {
 } from "react-instantsearch-dom";
 
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
-  // const batchFetch = trpc.useQuery(["article.batch-data"]);
-  const router = useRouter();
   const { data } = useSession();
   const user = data?.user;
+  const router = useRouter();
+
   const [searchModal, setSearchModal] = useState(false);
 
   const searchClient = algoliasearch(
     "BNEEQPGY1H",
     "d20546fd91f26a1493abd70457c47e7b"
   );
+  const onSearchClick = () => {
+    setSearchModal(true);
+  };
+  const menuItems = [
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: HomeIcon,
+    },
+    {
+      name: "Explore",
+      path: "/explore",
+      icon: MapIcon,
+    },
+    {
+      name: "Courses",
+      path: "/courses",
+      icon: PhotoIcon,
+    },
+    {
+      name: "Articles",
+      path: "/articles",
+      icon: DocumentTextIcon,
+    },
+  ];
   function Hit({ hit }: { hit: any }) {
-    console.log(hit);
     return (
       <Link href={`/articles/${hit.slug}`}>
         <div
@@ -78,6 +103,82 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   }
   return (
     <div>
+      {/* Mobile Top Bar */}
+      <div className="md:hidden fixed flex w-screen bg-gray-800 p-2  gap-2  ">
+        <span className="text-indigo-500 text-xl font-bold mr-auto self-stretch my-auto">
+          PulthApp
+        </span>
+
+        <SearchButton onClick={onSearchClick} onMobile={true} />
+        {!user ? (
+          <MobileLogin className="" />
+        ) : (
+          <MobilePhoto image={user.image ?? "/default_profile.jpg"} />
+        )}
+      </div>
+      <div className="pt-14 pb-20 md:hidden ">{children}</div>
+
+      {/* Mobile Bottom Bar */}
+      <MobileBottombar path={router.pathname} />
+
+      {/* Laptop Sidebar */}
+      <div className="hidden md:flex ">
+        <div className="flex flex-col flex-shrink-0 p-2 bg-gray-800 w-72 max-h-[stretch] top-0 bottom-0">
+          <div className="flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer bg-gray-800 text-gray-400 mb-8">
+            <span className="text-indigo-500 text-xl font-bold">PulthApp</span>
+          </div>
+
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.name}
+              icon={<item.icon className="w-6 h-6" />}
+              text={item.name}
+              path={item.path}
+              currentPath={router.pathname}
+            />
+          ))}
+
+          {/* Feedback Component Add feedback Modal later */}
+          <div className="mt-auto mb-2 hidden">
+            <div className="flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer bg-gray-800 text-gray-400">
+              <QuestionMarkCircleIcon className="w-6 h-6" />
+              <p>Feedback</p>
+            </div>
+          </div>
+
+          {/* Account Component */}
+          {user ? (
+            <AccountBox
+              image={user?.image!}
+              name={user?.name!}
+              path={router.pathname}
+            />
+          ) : (
+            <div>
+              <Link href="/api/signin">
+                <button className="p-2 bg-gray-700 flex rounded-md mt-auto">
+                  <p className="text-gray-200 font-semibold">Login</p>
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
+        {/* Laptop Top Bar */}
+        {/* the horizontal overflow solution  */}
+        {/* https://stackoverflow.com/questions/36230944/prevent-flex-items-from-overflowing-a-container */}
+        <div className="flex flex-col  flex-grow max-h-[stretch] h-screen min-w-0 ">
+          <div className="flex  bg-gray-800 p-2  gap-2 flex-shrink-0 top-0 text-white  ">
+            <SearchButton
+              onClick={onSearchClick}
+              onMobile={true}
+              className="ml-auto"
+            />
+          </div>
+          {/* Laptop Content */}
+          <div className="overflow-scroll h-full  ">{children}</div>
+        </div>
+      </div>
+
       <Transition appear show={searchModal} as={Fragment}>
         <Dialog
           open={searchModal}
@@ -121,244 +222,237 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </Dialog>
       </Transition>
-
-      <div className="md:flex md:flex-nowrap max-h-[stretch] h-screen">
-        <div className="md:hidden fixed top-0 bg-gray-800 flex items-center justify-between p-2 z-20 w-full px-5">
-          <div className="text-xl font-bold text-indigo-400">PulthApp</div>
-          <button
-            className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none ml-auto mr-4"
-            onClick={() => setSearchModal(true)}
-          >
-            <MagnifyingGlassIcon className="h-8 w-8 " />
-          </button>
-          <Link href="/api/auth/signin" className={user ? "hidden" : ""}>
-            <div
-              className={`${
-                user ? "hidden" : "inline"
-              } flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2`}
-            >
-              <ArrowLeftOnRectangleIcon
-                className={`h-6 w-6 rotate-180`}
-              ></ArrowLeftOnRectangleIcon>
-              <p className="text-xl ">Login</p>
-            </div>
-          </Link>
-          <Menu as="div" className={`${user ? "" : "hidden"} self-stretch`}>
-            <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
-              <Image
-                src={user?.image || "/default_profile.jpg"}
-                alt="profile"
-                layout="fill"
-                className="rounded-full aspect-square"
-              ></Image>
-            </Menu.Button>
-            <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
-              <Link href={"/profile"}>
-                <Menu.Item>
-                  <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                    <UserCircleIcon className="h-5 w-5" />
-                    <p className="max-h-fit h-fit">Profile</p>
-                  </div>
-                </Menu.Item>
-              </Link>
-
-              <Link href="/settings">
-                <Menu.Item>
-                  <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                    <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                    <p className="max-h-fit h-fit">Settings</p>
-                  </div>
-                </Menu.Item>
-              </Link>
-              <Menu.Item>
-                <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
-                  <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
-                  <a className="max-h-min" onClick={() => signOut()}>
-                    Logout
-                  </a>
-                </div>
-              </Menu.Item>
-            </Menu.Items>
-          </Menu>
-        </div>
-        <div className="md:hidden z-20 fixed flex bottom-0 bg-gray-800 p-5 py-3 w-full text-white/50 justify-between items-center">
-          <Link href="/dashboard">
-            <div
-              className={`${
-                router.pathname == "/dashboard" ? "text-white" : ""
-              } flex flex-col items-center`}
-            >
-              <HomeIcon className="h-6 w-6"></HomeIcon>
-              <p className="text-sm">Panel</p>
-            </div>
-          </Link>
-          <Link href="/explore">
-            <div
-              className={`${router.pathname == "/explore" ? "text-white" : ""}
-            flex flex-col items-center`}
-            >
-              <MapIcon className="h-6 w-6"></MapIcon>
-              <p className="text-sm">Explore</p>
-            </div>
-          </Link>
-          <Link href="/courses">
-            <div
-              className={`${router.pathname == "/courses" ? "text-white" : ""}
-            flex flex-col items-center`}
-            >
-              <PhotoIcon className="h-6 w-6"></PhotoIcon>
-              <p className="text-sm">Courses</p>
-            </div>
-          </Link>
-          <Link href="/articles">
-            <div
-              className={`${router.pathname == "/articles" ? "text-white" : ""}
-            flex flex-col items-center`}
-            >
-              <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
-              <p className="text-sm">Articles</p>
-            </div>
-          </Link>
-        </div>
-
-        <div className="hidden md:w-72 md:static p-4 bg-gray-800 flex-shrink-0 md:flex flex-col justify-between text-white">
-          <div className="flex flex-col">
-            <div className="text-3xl font-bold text-indigo-400 mb-2">
-              PulthApp
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href="/dashboard">
-                <div
-                  className={`${
-                    router.pathname == "/dashboard"
-                      ? "bg-gray-900 p-2 rounded flex items-center gap-x-3"
-                      : "p-2 rounded flex items-center gap-x-3 text-white/80 "
-                  } cursor-pointer`}
-                >
-                  <HomeIcon className="h-6 w-6"></HomeIcon> Dashboard
-                </div>
-              </Link>
-              <Link href="/explore">
-                <div
-                  className={`${
-                    router.pathname == "/explore"
-                      ? "bg-gray-900 p-2 rounded flex items-center gap-x-3"
-                      : "p-2 rounded flex items-center gap-x-3 text-white/80 "
-                  } cursor-pointer`}
-                >
-                  <MapIcon className="h-6 w-6"></MapIcon> Explore
-                </div>
-              </Link>
-              <Link href="/courses">
-                <div
-                  className={`${
-                    router.pathname == "/courses"
-                      ? "bg-gray-900 p-2 rounded flex items-center gap-x-3"
-                      : "p-2 rounded flex items-center gap-x-3 text-white/80 "
-                  } cursor-pointer`}
-                >
-                  <PhotoIcon className="h-6 w-6"></PhotoIcon>Courses
-                </div>
-              </Link>
-              <Link href="/articles">
-                <div
-                  className={`${
-                    router.pathname == "/articles"
-                      ? "bg-gray-900 p-2 rounded flex items-center gap-x-3"
-                      : "p-2 rounded flex items-center gap-x-3 text-white/80 "
-                  } cursor-pointer`}
-                >
-                  <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>{" "}
-                  Articles
-                </div>
-              </Link>
-            </div>
-          </div>
-          <Link href="/api/auth/signin">
-            <div
-              className={`${
-                user ? "hidden" : ""
-              } bg-gray-700 flex p-3 rounded-md items-center justify-center cursor-pointer transition-all gap-x-1 duration-300 hover:bg-gray-600 hover:shadow-lg active:bg-gray-700`}
-            >
-              <p className="text-lg font-medium">Login</p>
-              <ArrowLeftOnRectangleIcon className="h-6 w-6 rotate-180"></ArrowLeftOnRectangleIcon>
-            </div>
-          </Link>
-          <div
-            className={`${
-              user ? "" : "hidden"
-            } bg-gray-700 flex p-3 rounded-md gap-x-2 items-center`}
-          >
-            <Menu as="div">
-              <Menu.Items className="absolute bg-white p-1 -translate-y-20 rounded-lg">
-                <div>
-                  <Link href="/settings">
-                    <Menu.Item>
-                      <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
-                        {/* <Link href="/api/auth/signout">Logout</Link> */}
-                        <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-                        <p className="max-h-fit h-fit">Settings</p>
-                      </div>
-                    </Menu.Item>
-                  </Link>
-                  <Menu.Item>
-                    <div className="p-1 hover:bg-slate-100 active:bg-slate-200 cursor-pointer rounded text-black flex items-center align-middle gap-x-1">
-                      {/* <Link href="/api/auth/signout">Logout</Link> */}
-                      <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
-                      <a className="max-h-min" onClick={() => signOut()}>
-                        Logout
-                      </a>
-                    </div>
-                  </Menu.Item>
-                </div>
-              </Menu.Items>
-              <div className={`h-12 w-12 relative `}>
-                <Menu.Button>
-                  <Image
-                    src={user?.image || "/default_profile.jpg"}
-                    alt="profile"
-                    height={64}
-                    width={64}
-                    className="rounded-full aspect-square"
-                  ></Image>
-                </Menu.Button>
-              </div>
-            </Menu>
-
-            <div className="flex flex-col text-sm">
-              <div className="text-base">{user?.name}</div>
-              <Link href="/profile">
-                <div className="cursor-pointer text-white/70 hover:text-white/90">
-                  View Profile
-                </div>
-              </Link>
-            </div>
-          </div>
-        </div>
-        <div className="pb-16 md:pt-0 pt-16 md:pb-0 md:mb-0 md:flex-grow hidden md:block">
-          <div className="bg-gray-800 w-full  flex flex-row items-center p-2">
-            <button
-              className="bg-gray-500 rounded-md p-0.5 focus:ring-0 focus:outline-none ml-auto"
-              onClick={() => setSearchModal(true)}
-            >
-              <MagnifyingGlassIcon className="h-8 w-8" />
-            </button>
-          </div>
-          <AnimatePresence>
-            {/* figure out on exit transition */}
-            <motion.div
-              animate={{ opacity: 1, scale: 1 }}
-              initial={{ opacity: 0, scale: 0.95 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.075, type: "linear" }}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
     </div>
   );
 };
 
 export default Dashboard;
+
+const AccountBox = ({
+  image,
+  name,
+  path,
+}: {
+  image: string;
+  name: string;
+  path: string;
+}) => {
+  return (
+    <div className="p-2 bg-gray-700 flex rounded-md mt-auto">
+      <Menu>
+        <Menu.Button className="relative w-12 h-12 rounded-full overflow-hidden">
+          <Image
+            src={image || "/default_profile.jpg"}
+            layout="fill"
+            className="rounded-full"
+            alt="Profile Picture"
+          />
+        </Menu.Button>
+        <Menu.Items
+          className={`absolute p-1 rounded-md bottom-0 -translate-y-20 bg-gray-700 `}
+        >
+          <Menu.Item>
+            <div>
+              <Link href="/profile">
+                <a
+                  className={`${
+                    path === "/profile" ? "bg-gray-600" : "bg-gray-700"
+                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+                >
+                  <UserCircleIcon className="w-6 h-6" />
+                  <p>Profile</p>
+                </a>
+              </Link>
+            </div>
+          </Menu.Item>
+          <Menu.Item>
+            <div>
+              <Link href="/settings">
+                <a
+                  className={`${
+                    path === "/settings" ? "bg-gray-600" : "bg-gray-700"
+                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+                >
+                  <Cog8ToothIcon className="w-6 h-6" />
+                  <p>Settings</p>
+                </a>
+              </Link>
+            </div>
+          </Menu.Item>
+
+          <Menu.Item>
+            <div>
+              <Link href="/api/signout">
+                <a
+                  className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+                >
+                  <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+                  <p>Logout</p>
+                </a>
+              </Link>
+            </div>
+          </Menu.Item>
+        </Menu.Items>
+      </Menu>
+      <div className="flex flex-col ml-2">
+        <p className="text-gray-200 font-semibold">{name}</p>
+        <Link href="/profile">
+          <button className="text-gray-400 text-sm text-left hover:text-gray-100 ">
+            View Profile
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+const MenuItem = ({
+  icon,
+  text,
+  path,
+  currentPath,
+}: {
+  icon: React.ReactNode;
+  text: string;
+  path: string;
+  currentPath: string;
+}) => {
+  return (
+    <Link href={path}>
+      <div
+        className={`flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer ${
+          currentPath === path
+            ? "bg-gray-700 text-white"
+            : "bg-gray-800 text-gray-400"
+        }`}
+      >
+        {icon}
+        <p>{text}</p>
+      </div>
+    </Link>
+  );
+};
+
+const MobileLogin = ({ className }: { className?: string }) => {
+  return (
+    <Link href="/api/auth/signin" className={className ?? ""}>
+      <div
+        className={` flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2`}
+      >
+        <ArrowLeftOnRectangleIcon
+          className={`h-6 w-6 rotate-180`}
+        ></ArrowLeftOnRectangleIcon>
+        <p className="text-xl ">Login</p>
+      </div>
+    </Link>
+  );
+};
+
+const MobilePhoto = ({ image }: { image: string }) => {
+  return (
+    <Menu as="div" className={` self-stretch`}>
+      <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
+        <Image
+          src={image || "/default_profile.jpg"}
+          alt="profile"
+          layout="fill"
+          className="rounded-full aspect-square"
+        ></Image>
+      </Menu.Button>
+      <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
+        <Link href={"/profile"}>
+          <Menu.Item>
+            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+              <UserCircleIcon className="h-5 w-5" />
+              <p className="max-h-fit h-fit">Profile</p>
+            </div>
+          </Menu.Item>
+        </Link>
+
+        <Link href="/settings">
+          <Menu.Item>
+            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+              <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
+              <p className="max-h-fit h-fit">Settings</p>
+            </div>
+          </Menu.Item>
+        </Link>
+        <Menu.Item>
+          <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
+            <a className="max-h-min" onClick={() => signOut()}>
+              Logout
+            </a>
+          </div>
+        </Menu.Item>
+      </Menu.Items>
+    </Menu>
+  );
+};
+
+const SearchButton = ({
+  className,
+  onClick,
+  onMobile,
+}: {
+  onMobile?: boolean;
+  className?: string;
+  onClick: () => void;
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2 gap-2 hover:bg-gray-500 active:bg-gray-700  ${className}`}
+    >
+      <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
+      <p className={` ${onMobile ? "hidden" : ""}`}>Search</p>
+    </button>
+  );
+};
+
+const MobileBottombar = ({ path }: { path: string }) => {
+  return (
+    <div className="md:hidden fixed flex bottom-0 w-screen bg-gray-800 justify-evenly py-3 text-white/60">
+      <Link href={`/dashboard`}>
+        <button
+          className={`flex flex-col items-center ${
+            path == "/dashboard" ? "text-white" : ""
+          }`}
+        >
+          <HomeIcon className="h-6 w-6" />
+          <p>Home</p>
+        </button>
+      </Link>
+      <Link href={`/explore`}>
+        <button
+          className={`flex flex-col items-center ${
+            path == "/explore" ? "text-white" : ""
+          }`}
+        >
+          <MapIcon className="h-6 w-6" />
+          <p>Explore</p>
+        </button>
+      </Link>
+      <Link href={`/courses`}>
+        <button
+          className={`flex flex-col items-center ${
+            path == "/courses" ? "text-white" : ""
+          }`}
+        >
+          <PhotoIcon className="h-6 w-6" />
+          <p>Courses</p>
+        </button>
+      </Link>
+      <Link href={`/articles`}>
+        <button
+          className={`flex flex-col items-center ${
+            path == "/articles" ? "text-white" : ""
+          }`}
+        >
+          <DocumentTextIcon className="h-6 w-6" />
+          <p>Articles</p>
+        </button>
+      </Link>
+    </div>
+  );
+};

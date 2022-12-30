@@ -15,7 +15,7 @@ const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
 const Articles: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
-
+  const art = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   return (
     <DashboardLayout>
       <Head>
@@ -26,6 +26,16 @@ const Articles: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      aa
+      <br />
+      <div className="flex gap-2 ">
+        {art.map((a, index) => (
+          <div
+            className="w-32 h-32 flex-shrink-0 bg-gray-100"
+            key={index}
+          ></div>
+        ))}
+      </div>
     </DashboardLayout>
   );
 };
