@@ -1,17 +1,6 @@
-import { env } from "./src/server/env.mjs";
 import { withSentryConfig } from "@sentry/nextjs";
+await import("./src/env/server.mjs");
 
-/**
- * Don't be scared of the generics here.
- * All they do is to give us autocompletion when using this.
- *
- * @template {import('next').NextConfig} T
- * @param {T} config - A generic parameter that flows through to the return type
- * @constraint {{import('next').NextConfig}}
- */
-function defineNextConfig(config) {
-  return config;
-}
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -25,7 +14,7 @@ const sentryWebpackPluginOptions = {
 };
 
 export default withSentryConfig(
-  defineNextConfig({
+  {
     reactStrictMode: true,
     images: {
       // lh3.googleusercontent.com is used for Google OAuth profile pictures
@@ -44,6 +33,6 @@ export default withSentryConfig(
       // for more information.
       hideSourceMaps: true,
     },
-  }),
+  },
   sentryWebpackPluginOptions
 );

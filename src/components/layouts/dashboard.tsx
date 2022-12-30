@@ -37,6 +37,8 @@ import {
   Hits,
 } from "react-instantsearch-dom";
 
+import { env } from "../../env/client.mjs";
+
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   const { data } = useSession();
   const user = data?.user;
@@ -45,8 +47,8 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   const [searchModal, setSearchModal] = useState(false);
 
   const searchClient = algoliasearch(
-    "BNEEQPGY1H",
-    "d20546fd91f26a1493abd70457c47e7b"
+    env.NEXT_PUBLIC_ALGOLIA_APP_ID,
+    env.NEXT_PUBLIC_ALGOLIA_API_KEY
   );
   const onSearchClick = () => {
     setSearchModal(true);
@@ -213,7 +215,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
                 <Dialog.Panel className="bg-gray-800 rounded-md p-4 flex flex-col gap-y-4 w-1/2">
                   <InstantSearch
                     searchClient={searchClient}
-                    indexName="article_name"
+                    indexName={env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME}
                   >
                     <CustomSearchBox />
                     <Hits hitComponent={Hit} />

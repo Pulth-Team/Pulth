@@ -5,7 +5,7 @@ import { unstable_getServerSession as getServerSession } from "next-auth";
 import { authOptions as nextAuthOptions } from "./auth/[...nextauth]";
 
 import { S3 } from "aws-sdk";
-import { env } from "../../server/env.mjs";
+import { env } from "../../env/server.mjs";
 
 const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, nextAuthOptions);

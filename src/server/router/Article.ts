@@ -1,7 +1,7 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { env } from "../env.mjs";
+import { env } from "../../env/server.mjs";
 import algoliasearch from "algoliasearch";
 
 import slugify from "slugify";
@@ -115,7 +115,7 @@ export const ArticleRouter = createRouter()
         },
       });
       client
-        .initIndex("article_name")
+        .initIndex(env.ALGOLIA_INDEX_NAME)
         .saveObject({
           objectID: article?.id,
           title: article?.title,
@@ -184,7 +184,7 @@ export const ArticleRouter = createRouter()
       });
 
       client
-        .initIndex("article_name")
+        .initIndex(env.ALGOLIA_INDEX_NAME)
         .deleteObject(article?.id)
         .then((res) => {
           console.log(res);
@@ -280,7 +280,7 @@ export const ArticleRouter = createRouter()
         },
       });
 
-      client.initIndex("article_name").saveObject({
+      client.initIndex(env.ALGOLIA_INDEX_NAME).saveObject({
         objectID: article?.id,
         title: article?.title,
         description: article?.description,
