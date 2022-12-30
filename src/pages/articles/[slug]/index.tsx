@@ -42,11 +42,11 @@ const Articles: NextPage = () => {
     <DashboardLayout>
       <Head>
         <title>{articleData.data?.title} - Pulth App</title>
-        <meta
-          name="description"
-          content="articles dor your usage of pulth. join our community now!"
-        />
+        <meta name="description" content={articleData.data?.description} />
+        <meta name="author" content={articleData.data?.author?.name!} />
+        <meta name="generator" content="Pulth Engine" />
         <link rel="icon" href="/favicon.ico" />
+        {/* Add keywords */}
       </Head>
       {/* read article container for our article renderer with media queries */}
       <div className="p-4 container max-w-2xl mx-auto">
@@ -55,6 +55,7 @@ const Articles: NextPage = () => {
         ) : (
           <DocumentRenderer blocks={blocks} />
         )}
+        {/* Add Comments, Tags, AuthorBox, Action Button */}
       </div>
     </DashboardLayout>
   );
