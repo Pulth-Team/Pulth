@@ -16,6 +16,7 @@ import {
   ArrowUturnLeftIcon,
   CheckCircleIcon,
   XCircleIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { string } from "zod";
 import { Stringifier } from "postcss";
@@ -137,10 +138,17 @@ const Inspect: NextPage = () => {
   let keywordList = (
     <div className="gap-4 flex flex-wrap">
       {keywords.map((keyword) => (
-        <div className="flex" key={keyword}>
-          <p className="bg-indigo-500 text-white rounded-full px-2 py-1 ">
-            {keyword}
-          </p>
+        <div
+          className="group flex bg-indigo-500 text-white rounded-full p-2 gap-x-2 justify-between items-center"
+          key={keyword}
+        >
+          <p className="min-h-0 leading-none text-sm">{keyword}</p>
+          <XMarkIcon
+            className="h-4 w-4 cursor-pointer opacity-0 group-hover:opacity-100"
+            onClick={() => {
+              setKeywords((prev) => prev.filter((k) => k !== keyword));
+            }}
+          />
         </div>
       ))}
       <div className="flex gap-x-4 gap-y-1 align-middle w-full flex-wrap">
@@ -186,6 +194,9 @@ const Inspect: NextPage = () => {
           {keywordError}
         </label>
       </div>
+      <button className="flex items-center gap-x-2 bg-indigo-500 p-2 rounded-md text-white">
+        <p>Save Changes</p>
+      </button>
     </div>
   );
 
