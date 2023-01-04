@@ -15,6 +15,8 @@ import { Fragment, useEffect, useState } from "react";
 import {
   ArrowUturnLeftIcon,
   CheckCircleIcon,
+  PencilIcon,
+  PencilSquareIcon,
   XCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -113,18 +115,18 @@ const Inspect: NextPage = () => {
   );
 
   useEffect(() => {
+    if (
+      typeof saveArticle.data !== "undefined" &&
+      "message" in saveArticle.data
+    )
+      return;
+
     if (saveArticle.isFetched && saveArticle.data?.slug) {
       setDescResetButton(false);
       setTitleResetButton(false);
       router.replace(`/articles/${saveArticle.data?.slug}/inspect`);
     }
-  }, [
-    saveArticle.isFetched,
-    saveArticle.data?.title,
-    saveArticle.data?.slug,
-    saveArticle.data?.description,
-    router,
-  ]);
+  }, [saveArticle.isFetched, saveArticle.data, router]);
 
   useEffect(() => {
     setIsPublishEvent(!articleData.data?.isPublished);
@@ -194,7 +196,10 @@ const Inspect: NextPage = () => {
           {keywordError}
         </label>
       </div>
-      <button className="flex items-center gap-x-2 bg-indigo-500 p-2 rounded-md text-white">
+      <button
+        className="flex items-center gap-x-2 bg-indigo-500 p-2 rounded-md text-white"
+        onClick={() => saveArticle.refetch()}
+      >
         <p>Save Changes</p>
       </button>
     </div>

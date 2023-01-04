@@ -5,6 +5,8 @@ import { env } from "../../env/server.mjs";
 import algoliasearch from "algoliasearch";
 
 import slugify from "slugify";
+import { type } from "os";
+import { json } from "stream/consumers";
 
 const client = algoliasearch(env.ALGOLIA_APP_ID, env.ALGOLIA_API_KEY);
 
@@ -244,11 +246,16 @@ export const ArticleRouter = createRouter()
   .query("updateArticleCredidantials", {
     input: z.object({
       slug: z.string(),
-      title: z.string(),
-      description: z.string(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+      keywords: z.array(z.string()).optional(),
     }),
     async resolve({ input, ctx }) {
       // check if user is the author of the article
+      if (!input.title && !input.description) {
+        return { message: "No data to update" };
+      }
+
       const isArticle = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
@@ -259,19 +266,39 @@ export const ArticleRouter = createRouter()
         },
       });
       // if with the slug and authorId there is no article
+
       if (!isArticle) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      let updateBody: {
+        title: string | undefined;
+        slug: string | undefined;
+        description: string | undefined;
+        keywords: string[] | undefined;
+      } = {
+        title: undefined,
+        slug: undefined,
+        description: undefined,
+        keywords: undefined,
+      };
+      if (input.title) {
+        updateBody.title = input.title;
+        updateBody.slug = slugified(input.title) + "-" + makeid(5);
+      }
+      if (input.description) {
+        updateBody.description = input.description;
+      }
+
+      if (input.keywords) {
+        updateBody.keywords = input.keywords;
       }
 
       const article = await ctx.prisma?.article.update({
         where: {
           id: isArticle.id,
         },
-        data: {
-          title: input.title,
-          description: input.description,
-          slug: slugified(input.title) + "-" + makeid(5),
-        },
+        data: updateBody,
         select: {
           id: true,
           title: true,
