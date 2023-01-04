@@ -51,6 +51,7 @@ const Explore: NextPage = () => {
                   // Title: article.author.title,
                   Name: article.author.name!,
                   Image: article.author.image!,
+                  UserId: article.author.id,
                 }}
                 createdAt={article.createdAt}
                 isRecommended={false}

@@ -69,6 +69,7 @@ export const ArticleRouter = createRouter()
             select: {
               name: true,
               image: true,
+              id: true,
             },
           },
           createdAt: true,

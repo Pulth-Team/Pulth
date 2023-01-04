@@ -19,6 +19,7 @@ interface ArticleCardProps {
     Name: string;
     Title?: string;
     Image?: string;
+    UserId: string;
   };
   isRecommended?: boolean;
   slug: string;
@@ -68,17 +69,21 @@ const ArticleCard: NextPage<
       <p className=" line-clamp-4 mb-4">{children}</p>
 
       <div className="mt-auto flex gap-2">
-        <div className="w-9 h-9 relative">
-          <Image
-            src={Author?.Image || "/default-profile.png"}
-            alt="profile"
-            height={64}
-            width={64}
-            className="rounded-full aspect-square"
-          ></Image>
-        </div>
+        <Link href={`/user/${Author?.UserId}`}>
+          <div className="w-9 h-9 relative cursor-pointer">
+            <Image
+              src={Author?.Image || "/default-profile.png"}
+              alt="profile"
+              height={64}
+              width={64}
+              className="rounded-full aspect-square"
+            ></Image>
+          </div>
+        </Link>
         <div>
-          <p className="text-sm">{Author?.Name}</p>
+          <Link href={`/user/${Author?.UserId}`}>
+            <p className="text-sm cursor-pointer">{Author?.Name}</p>
+          </Link>
           <p className="text-xs text-black/70">
             {/* {Author?.Title} */}
             {dayjs(createdAt).fromNow()}
