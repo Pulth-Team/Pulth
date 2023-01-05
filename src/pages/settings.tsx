@@ -16,6 +16,7 @@ import { Tab } from "@headlessui/react";
 import { Switch } from "@headlessui/react";
 import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
 import { trpc } from "../utils/trpc";
+import Loading from "../components/Loading";
 
 const Settings: NextPage = () => {
   const router = useRouter();
@@ -26,8 +27,23 @@ const Settings: NextPage = () => {
   });
   const user = data?.user;
 
+  const userData = trpc.useQuery(["user.getUserById", { id: user?.id! }], {
+    refetchOnWindowFocus: false,
+  });
+
+  console.log(userData);
+  console.log(user?.id);
+  console.log(userData.data?.description);
+
   const [userName, setUserName] = useState(data?.user?.name || "");
-  const [textareaCount, setTextareaCount] = useState(0);
+
+  const [textDescription, setTextDescription] = useState(
+    userData.data?.description || "aa"
+  );
+
+  const [textareaCount, setTextareaCount] = useState(
+    userData.data?.description?.length || 0
+  );
   const [recomEnabled, setRecomEnabled] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const {
@@ -36,8 +52,22 @@ const Settings: NextPage = () => {
     status: settingsStatus,
     isSuccess,
   } = trpc.useQuery(
-    ["auth.updateSettings", { userId: user?.id!, data: { name: userName } }],
+    [
+      "auth.updateSettings",
+      {
+        userId: user?.id!,
+        data: { name: userName, description: textDescription },
+      },
+    ],
     { refetchOnWindowFocus: false, enabled: false }
+  );
+
+  const updateUser = trpc.useQuery(
+    [
+      "user.updateUserById",
+      { id: user?.id!, data: { name: userName, description: textDescription } },
+    ],
+    { enabled: false, refetchOnWindowFocus: false }
   );
 
   useEffect(() => {
@@ -53,8 +83,18 @@ const Settings: NextPage = () => {
 
     if (status == "authenticated") setUserName(data?.user?.name || "");
   }, [status, data]);
+  useEffect(() => {
+    setTextDescription(userData.data?.description || "");
+    setTextareaCount(userData.data?.description?.length || 0);
+  }, [userData.data?.description, userData.isFetching]);
 
   if (status == "loading") return <p>Loading</p>;
+  if (userData.isFetching)
+    return (
+      <DashboardLayout>
+        <Loading className="w-12 h-12 border-2 m-10"></Loading>
+      </DashboardLayout>
+    );
   console.log(user);
   return (
     <DashboardLayout>
@@ -79,20 +119,6 @@ const Settings: NextPage = () => {
               }  translate-y-px w-1/3 border-b-2`}
             >
               General
-            </Tab>
-            <Tab
-              className={`${
-                selectedIndex == 1 ? "border-indigo-600 text-indigo-700" : ""
-              }  translate-y-px w-1/3 border-b-2`}
-            >
-              Security
-            </Tab>
-            <Tab
-              className={`${
-                selectedIndex == 2 ? "border-indigo-600 text-indigo-700" : ""
-              }  translate-y-px w-1/3 border-b-2`}
-            >
-              Billing
             </Tab>
           </Tab.List>
           <Tab.Panels className="py-5">
@@ -201,8 +227,8 @@ const Settings: NextPage = () => {
                 </div>
               </div>
             </Tab.Panel>
-            <Tab.Panel>Security</Tab.Panel>
-            <Tab.Panel>Billing</Tab.Panel>
+            {/* <Tab.Panel>Security</Tab.Panel>
+            <Tab.Panel>Billing</Tab.Panel> */}
           </Tab.Panels>
         </Tab.Group>
       </div>
@@ -218,10 +244,10 @@ const Settings: NextPage = () => {
           <div className="border-b-2 border-indigo-600 pb-2 px-2 text-indigo-700 box-border translate-y-[1.5px] cursor-pointer">
             General
           </div>
-          <div className="pb-2 px-2 translate-y-px cursor-pointer">
+          {/* <div className="pb-2 px-2 translate-y-px cursor-pointer">
             Security
           </div>
-          <div className="pb-2 px-2 translate-y-px cursor-pointer">Billing</div>
+          <div className="pb-2 px-2 translate-y-px cursor-pointer">Billing</div> */}
         </div>
         <div className="flex flex-col">
           <div>
@@ -237,7 +263,7 @@ const Settings: NextPage = () => {
                 <p>Name</p>
                 <input
                   className="border-2 rounded-lg p-2 w-full focus:outline-none focus:border-indigo-600"
-                  defaultValue={userName?.toString()}
+                  value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
               </div>
@@ -271,20 +297,51 @@ const Settings: NextPage = () => {
               <p>About</p>
               <textarea
                 className="border-2 rounded-lg w-full p-1 h-32 min-h-[44px] max-h-56"
-                onChange={(e) => setTextareaCount(e.target.value.length)}
+                onChange={(e) => {
+                  setTextareaCount(e.target.value.length);
+                  setTextDescription(e.target.value);
+                }}
+                value={textDescription}
                 maxLength={350}
               ></textarea>
               <p className="text-gray-500 text-xs italic ml-1">
                 {textareaCount} / 350
               </p>
             </div>
-            <div>
+            {/* <div>
               <p>Title</p>
               <input className="border-2 rounded-lg p-2" />
               <p className="text-gray-500 text-xs italic ml-1">Teachers Only</p>
-            </div>
+            </div> */}
           </div>
-          <div>
+          <div className="mt-5 flex gap-x-2">
+            <button
+              className="bg-indigo-500 text-white rounded-md p-2 flex gap-x-2 items-center"
+              onClick={() => updateUser.refetch()}
+            >
+              <Loading
+                className={`${
+                  updateUser.isFetching ? "" : "hidden"
+                } w-4 h-4 border-2`}
+              />
+              Save Changes
+            </button>
+            <button
+              className={`${
+                userData.data?.description === textDescription &&
+                userData.data?.name === userName
+                  ? "text-red-500 cursor-default"
+                  : "bg-red-500 text-white cursor-pointer"
+              }  rounded-md p-2 transition-colors border border-red-500`}
+              onClick={() => {
+                setTextDescription(userData.data?.description || "");
+                setUserName(userData.data?.name || "");
+              }}
+            >
+              Reset Changes
+            </button>
+          </div>
+          {/* <div>
             <h3 className="font-semibold text-xl mt-10">Management</h3>
             <p className=" text-gray-500">
               You can manage your account with this section. Nothing here will
@@ -317,7 +374,7 @@ const Settings: NextPage = () => {
                 </Switch>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </DashboardLayout>

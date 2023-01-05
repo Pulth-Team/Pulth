@@ -14,7 +14,7 @@ export const authRouter = createRouter()
 
       data: z.object({
         name: z.string().optional(),
-
+        description: z.string().optional(),
         // todo Add Photo Change
         // "photo": z.string().optional()
 
@@ -29,6 +29,7 @@ export const authRouter = createRouter()
         },
         data: {
           name: input.data.name ?? undefined,
+          description: input.data.description ?? undefined,
         },
       });
 
