@@ -34,6 +34,20 @@ export const ArticleRouter = createRouter()
             },
           },
           isPublished: true,
+          Comments: {
+            select: {
+              id: true,
+              content: true,
+              rating: true,
+              author: {
+                select: {
+                  name: true,
+                  image: true,
+                },
+              },
+              parentId: true,
+            },
+          },
         },
       });
       if (!article?.isPublished) {
@@ -47,6 +61,7 @@ export const ArticleRouter = createRouter()
           description: article.description,
           bodyData: article.bodyData,
           author: article.author,
+          Comments: article.Comments,
         };
       }
     },

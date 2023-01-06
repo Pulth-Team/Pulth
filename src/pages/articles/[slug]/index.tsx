@@ -5,26 +5,16 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import DashboardLayout from "../../../components/layouts/dashboard";
-import ArticleError from "../../../components/responses/ArticleError";
-import dynamic from "next/dynamic";
+
 import DocumentRenderer, {
   OutputBlockType,
 } from "../../../components/editor/renderer/DocumentRenderer";
-
-// this component's experience is not good
-// the code itself is not good
-// but it works
-// so I will leave it as it is for now
-// and I will fix it later
+import { useEffect } from "react";
+import Image from "next/image";
 
 // TODO: fix this component
 // bad parts:
-// - the channel between backend and frontend is not good
-// - the code is not good
-// - the experience is not good
 // - the not supporting SSG
-// - the not supporting SSR (maybe, I don't know)
-
 const Articles: NextPage = () => {
   const router = useRouter();
   const { slug } = router.query;
@@ -38,10 +28,26 @@ const Articles: NextPage = () => {
   if (articleData.data?.bodyData) {
     blocks = articleData.data.bodyData as unknown as OutputBlockType[];
   }
+
+  useEffect(() => {
+    console.log(articleData.data?.Comments);
+  }, [articleData.data]);
+
+  let body = (
+    <>
+      <DocumentRenderer blocks={blocks} />
+      <div className="py-4 ">
+        <p className="text-lg font-semibold">Comments</p>
+        <hr />
+        <br />
+        <CommentList comments={articleData.data?.Comments} />
+      </div>
+    </>
+  );
   return (
     <DashboardLayout>
       <Head>
-        <title>{articleData.data?.title} - Pulth App</title>
+        <title>{articleData.data?.title || "unnamed"} - Pulth App</title>
         <meta name="description" content={articleData.data?.description} />
         <meta name="author" content={articleData.data?.author?.name!} />
         <meta name="generator" content="Pulth Engine" />
@@ -50,11 +56,7 @@ const Articles: NextPage = () => {
       </Head>
       {/* read article container for our article renderer with media queries */}
       <div className="p-4 container max-w-2xl mx-auto">
-        {articleData.data?.error ? (
-          <p>{articleData.data.error}</p>
-        ) : (
-          <DocumentRenderer blocks={blocks} />
-        )}
+        {articleData.data?.error ? <p>{articleData.data.error}</p> : body}
         {/* Add Comments, Tags, AuthorBox, Action Button */}
       </div>
     </DashboardLayout>
@@ -62,3 +64,128 @@ const Articles: NextPage = () => {
 };
 
 export default Articles;
+
+const CommentList = ({ comments }: { comments?: Comment[] }) => {
+  // group comments by parentId in a object because of recursive comments
+  // if parentId is null, then it is a top level comment
+  // if parentId is not null, then it is a sub comment
+  const commentsByParentId: {
+    [key: string]: { comments: Comment[]; childrenIds: string[] };
+  } = {};
+
+  comments?.forEach((comment) => {
+    if (comment.parentId) {
+      if (commentsByParentId[comment.parentId]) {
+        commentsByParentId[comment.parentId]!.comments.push(comment);
+        commentsByParentId[comment.parentId]!.childrenIds.push(comment.id);
+      } else {
+        commentsByParentId[comment.parentId] = {
+          comments: [comment],
+          childrenIds: [comment.id],
+        };
+      }
+    } else {
+      if (commentsByParentId["root"]) {
+        commentsByParentId["root"].comments.push(comment);
+        commentsByParentId["root"].childrenIds.push(comment.id);
+      } else {
+        commentsByParentId["root"] = {
+          comments: [comment],
+          childrenIds: [comment.id],
+        };
+      }
+    }
+  });
+
+  console.log(commentsByParentId);
+
+  return (
+    <div>
+      {comments ? (
+        <div>
+          {commentsByParentId["root"]?.comments.map((comment) => (
+            <Comment
+              comment={comment}
+              subComments={
+                commentsByParentId[comment.id]
+                  ? comments.filter((childComment) =>
+                      commentsByParentId[comment.id]!.childrenIds.includes(
+                        childComment.id
+                      )
+                    )
+                  : []
+              }
+              allComments={comments}
+              commentsByParentId={commentsByParentId}
+              key={comment.id}
+            />
+          ))}
+        </div>
+      ) : (
+        <p>No comments yet</p>
+      )}
+    </div>
+  );
+};
+
+interface Comment {
+  id: string;
+  author: {
+    image: string | null;
+    name: string | null;
+  };
+  content: string;
+  rating: number;
+  parentId: string | null;
+}
+interface CommentProps {
+  comment: Comment;
+  subComments: Comment[];
+  allComments: Comment[];
+  commentsByParentId?: {
+    [key: string]: { comments: Comment[]; childrenIds: string[] };
+  };
+}
+
+const Comment = ({
+  comment,
+  subComments,
+  allComments,
+  commentsByParentId,
+}: CommentProps) => {
+  console.log(subComments, comment.content);
+  return (
+    <div>
+      <div className="flex items-center">
+        <div className="relative w-8 h-8">
+          <Image
+            alt="avatar"
+            layout="fill"
+            src={comment.author.image || "/images/default-avatar.png"}
+            className="w-8 h-8 rounded-full"
+          />
+        </div>
+        <p className="ml-2 my-2">{comment.author.name}</p>
+      </div>
+      <p className="ml-10">{comment.content}</p>
+      <div className="ml-10">
+        {subComments?.map((comment) => (
+          <Comment
+            comment={comment}
+            allComments={allComments}
+            subComments={
+              commentsByParentId && commentsByParentId[comment.id]
+                ? allComments.filter((childComment) =>
+                    commentsByParentId[comment.id]!.childrenIds.includes(
+                      childComment.id
+                    )
+                  )
+                : []
+            }
+            key={comment.id}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};

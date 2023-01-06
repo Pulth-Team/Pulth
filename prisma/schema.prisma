@@ -110,12 +110,12 @@ model Comment {
     content String
 
     rating     Int
-    ratedbyIds String[] @db.ObjectId
+    ratedbyIds String[] @default([]) @db.ObjectId
     ratedby    User[]   @relation("RatedUser", fields: [ratedbyIds], references: [id])
 
     // NoAction might be a problem in the future :FUTURE_PROBLEM:
     parent   Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    Comment  Comment[] @relation("ParentChild")
+    children Comment[] @relation("ParentChild")
     parentId String?   @db.ObjectId
 
     createdAt DateTime
