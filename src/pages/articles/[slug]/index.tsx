@@ -29,10 +29,6 @@ const Articles: NextPage = () => {
     blocks = articleData.data.bodyData as unknown as OutputBlockType[];
   }
 
-  useEffect(() => {
-    console.log(articleData.data?.Comments);
-  }, [articleData.data]);
-
   let body = (
     <>
       <DocumentRenderer blocks={blocks} />
@@ -70,18 +66,27 @@ const CommentList = ({ comments }: { comments?: Comment[] }) => {
   // if parentId is null, then it is a top level comment
   // if parentId is not null, then it is a sub comment
   const commentsByParentId: {
-    [key: string]: { comments: Comment[]; childrenIds: string[] };
+    [key: string]: {
+      comments: Comment[];
+      childrenIds: string[];
+      depth: number;
+    };
   } = {};
 
   comments?.forEach((comment) => {
+    // if comment has a parentId, then it is a sub comment
     if (comment.parentId) {
+      // if the parentId is already in the object, then add the comment to the array
       if (commentsByParentId[comment.parentId]) {
+        // add the comment to the array
         commentsByParentId[comment.parentId]!.comments.push(comment);
         commentsByParentId[comment.parentId]!.childrenIds.push(comment.id);
       } else {
+        // if the parentId is not in the object, then create a new object
         commentsByParentId[comment.parentId] = {
           comments: [comment],
           childrenIds: [comment.id],
+          depth: -1,
         };
       }
     } else {
@@ -92,11 +97,41 @@ const CommentList = ({ comments }: { comments?: Comment[] }) => {
         commentsByParentId["root"] = {
           comments: [comment],
           childrenIds: [comment.id],
+          depth: 0,
         };
       }
     }
   });
 
+  // calculates depth of a comment recursively by checking the depth of the parent
+  const calculateDepth = (parentId: string, comment: Comment) => {
+    if (typeof commentsByParentId[comment.id] === "undefined") return;
+
+    // if the parentId is not null, then it is a sub comment
+    if (parentId) {
+      // if the parentid is not null, then it is a sub comment
+      // if the depth of the parent is not calculated, then calculate it
+      if (commentsByParentId[parentId]!.depth === -1) {
+        // get the parent comment
+        const parentComment = comments?.find(
+          (comment) => comment.id === parentId
+        );
+        // if the parent comment is not null, then calculate the depth
+        if (parentComment) {
+          calculateDepth(parentComment.parentId!, parentComment);
+        }
+      }
+      // if the depth of the parent is calculated, then calculate the depth of the comment
+      commentsByParentId[comment.id]!.depth =
+        commentsByParentId[parentId]!.depth + 1;
+    } else {
+      // if the parentId is null, then it is a top level comment
+      commentsByParentId[comment.id]!.depth = 0;
+    }
+  };
+  comments?.forEach((comment) => {
+    calculateDepth(comment.parentId!, comment);
+  });
   console.log(commentsByParentId);
 
   return (
@@ -142,8 +177,12 @@ interface CommentProps {
   comment: Comment;
   subComments: Comment[];
   allComments: Comment[];
-  commentsByParentId?: {
-    [key: string]: { comments: Comment[]; childrenIds: string[] };
+  commentsByParentId: {
+    [key: string]: {
+      comments: Comment[];
+      childrenIds: string[];
+      depth: number;
+    };
   };
 }
 
@@ -153,7 +192,16 @@ const Comment = ({
   allComments,
   commentsByParentId,
 }: CommentProps) => {
-  console.log(subComments, comment.content);
+  let shouldShown: boolean = false;
+  const requestedSubComments = 2;
+
+  shouldShown =
+    commentsByParentId[comment.id] &&
+    commentsByParentId[comment.id]!.depth < requestedSubComments
+      ? true
+      : false;
+
+  if (!shouldShown) console.log(shouldShown, comment);
   return (
     <div>
       <div className="flex items-center">
@@ -169,22 +217,25 @@ const Comment = ({
       </div>
       <p className="ml-10">{comment.content}</p>
       <div className="ml-10">
-        {subComments?.map((comment) => (
-          <Comment
-            comment={comment}
-            allComments={allComments}
-            subComments={
-              commentsByParentId && commentsByParentId[comment.id]
-                ? allComments.filter((childComment) =>
-                    commentsByParentId[comment.id]!.childrenIds.includes(
-                      childComment.id
-                    )
-                  )
-                : []
-            }
-            key={comment.id}
-          />
-        ))}
+        {shouldShown
+          ? subComments?.map((comment) => (
+              <Comment
+                comment={comment}
+                allComments={allComments}
+                commentsByParentId={commentsByParentId}
+                subComments={
+                  commentsByParentId && commentsByParentId[comment.id]
+                    ? allComments.filter((childComment) =>
+                        commentsByParentId[comment.id]!.childrenIds.includes(
+                          childComment.id
+                        )
+                      )
+                    : []
+                }
+                key={comment.id}
+              />
+            ))
+          : null}
       </div>
     </div>
   );

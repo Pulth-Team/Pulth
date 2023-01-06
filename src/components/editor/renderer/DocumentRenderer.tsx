@@ -55,8 +55,6 @@ export type OutputBlockType =
 const DocumentRenderer: NextPage<{
   blocks: OutputBlockType[];
 }> = ({ blocks }) => {
-  console.log(blocks);
-
   let keySeed = "document-renderer-";
   return (
     <div>
