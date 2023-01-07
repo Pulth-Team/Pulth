@@ -5,7 +5,12 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import DashboardLayout from "../../../components/layouts/dashboard";
-import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUturnLeftIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ArrowUturnRightIcon,
+} from "@heroicons/react/24/outline";
 
 import DocumentRenderer, {
   OutputBlockType,
@@ -213,14 +218,25 @@ const Comment = ({
   const requestedSubComments = 2;
 
   shouldShown =
-    commentsByParentId[comment.id] &&
-    commentsByParentId[comment.id]!.depth < requestedSubComments
+    !comment.parentId ||
+    (commentsByParentId[comment.id] &&
+      commentsByParentId[comment.id]?.depth < requestedSubComments)
       ? true
       : false;
 
   return (
-    <div className="py-2">
-      <div className="flex items-center mb-2">
+    <div className="">
+      <div className="flex items-center relative">
+        {/* Rating count and arrows beside that*/}
+        <div className="flex flex-col self-stretch mr-2 items-center absolute -translate-x-8 -translate-y-3">
+          <button>
+            <ChevronUpIcon className="h-5 self-stretch aspect-square stroke-black/60 hover:stroke-black/100" />
+          </button>
+          <p className="leading-3 text-sm">{comment.rating} </p>
+          <button>
+            <ChevronDownIcon className="h-5 self-stretch aspect-square stroke-black/60 hover:stroke-black/100" />
+          </button>
+        </div>
         <div className="relative w-8 h-8">
           <Image
             alt="avatar"
@@ -229,7 +245,32 @@ const Comment = ({
             className="w-8 h-8 rounded-full"
           />
         </div>
-        <p className="ml-2  font-semibold text-lg">{comment.author.name}</p>
+        <p className="ml-2  font-medium ">{comment.author.name}</p>
+        {shouldShown ? (
+          <button
+            className="ml-auto font-normal text-sm flex gap-x-2 items-center"
+            onClick={() => OnClick(comment)}
+          >
+            Reply
+            <ArrowUturnLeftIcon className="h-4" />
+          </button>
+        ) : (
+          ""
+        )}
+        {/* Todo add comment date */}
+      </div>
+      <p className="ml-10 mb-4 ">{comment.content}</p>
+
+      {/* <div className="flex items-start mb-2">
+        <div className="relative w-8 h-8">
+          <Image
+            alt="avatar"
+            layout="fill"
+            src={comment.author.image || "/images/default-avatar.png"}
+            className="w-8 h-8 rounded-full"
+          />
+        </div>
+        <p className="ml-2  font-semibold ">{comment.author.name}</p>
         <button
           className="ml-auto font-medium text-base flex gap-x-2"
           onClick={() => OnClick(comment)}
@@ -239,7 +280,8 @@ const Comment = ({
         </button>
       </div>
       <hr className="ml-10" />
-      <p className="ml-10">{comment.content}</p>
+      <p className="ml-10">{comment.content}</p> */}
+
       <div className="ml-10">
         {shouldShown
           ? subComments?.map((comment) => (
