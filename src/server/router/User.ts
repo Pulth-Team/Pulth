@@ -17,6 +17,23 @@ export const UserRouter = createRouter()
           image: true,
           id: true,
           description: true,
+          Articles: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              slug: true,
+              createdAt: true,
+              updatedAt: true,
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
         },
       });
       return user;

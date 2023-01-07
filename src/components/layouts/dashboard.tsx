@@ -154,6 +154,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               image={user?.image!}
               name={user?.name!}
               path={router.pathname}
+              id={user?.id!}
             />
           ) : (
             <div className="mt-auto">
@@ -236,10 +237,12 @@ const AccountBox = ({
   image,
   name,
   path,
+  id,
 }: {
   image: string;
   name: string;
   path: string;
+  id: string;
 }) => {
   return (
     <div className="p-2 bg-gray-700 flex rounded-md mt-auto">
@@ -297,7 +300,7 @@ const AccountBox = ({
       </Menu>
       <div className="flex flex-col ml-2">
         <p className="text-gray-200 font-semibold">{name}</p>
-        <Link href="/profile">
+        <Link href={`/user/${id}`}>
           <button className="text-gray-400 text-sm text-left hover:text-gray-100 ">
             View Profile
           </button>
