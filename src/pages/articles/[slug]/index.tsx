@@ -220,7 +220,7 @@ const Comment = ({
   shouldShown =
     !comment.parentId ||
     (commentsByParentId[comment.id] &&
-      commentsByParentId[comment.id]?.depth < requestedSubComments)
+      commentsByParentId[comment.id]?.depth! < requestedSubComments)
       ? true
       : false;
 
