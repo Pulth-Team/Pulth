@@ -5,11 +5,11 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import DashboardLayout from "../../../components/layouts/dashboard";
+import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import DocumentRenderer, {
   OutputBlockType,
 } from "../../../components/editor/renderer/DocumentRenderer";
-import { useEffect } from "react";
 import Image from "next/image";
 
 // TODO: fix this component
@@ -28,6 +28,10 @@ const Articles: NextPage = () => {
   if (articleData.data?.bodyData) {
     blocks = articleData.data.bodyData as unknown as OutputBlockType[];
   }
+  const OnClick = (comment: Comment) => {
+    // todo open a modal  for the comment
+    console.log(comment);
+  };
 
   let body = (
     <>
@@ -36,7 +40,12 @@ const Articles: NextPage = () => {
         <p className="text-lg font-semibold">Comments</p>
         <hr />
         <br />
-        <CommentList comments={articleData.data?.Comments} />
+        <div className="flex flex-col ">
+          <CommentList
+            comments={articleData.data?.Comments}
+            OnClick={OnClick}
+          />
+        </div>
       </div>
     </>
   );
@@ -61,7 +70,13 @@ const Articles: NextPage = () => {
 
 export default Articles;
 
-const CommentList = ({ comments }: { comments?: Comment[] }) => {
+const CommentList = ({
+  comments,
+  OnClick,
+}: {
+  comments?: Comment[];
+  OnClick: (comment: Comment) => void;
+}) => {
   // group comments by parentId in a object because of recursive comments
   // if parentId is null, then it is a top level comment
   // if parentId is not null, then it is a sub comment
@@ -132,13 +147,12 @@ const CommentList = ({ comments }: { comments?: Comment[] }) => {
   comments?.forEach((comment) => {
     calculateDepth(comment.parentId!, comment);
   });
-  console.log(commentsByParentId);
 
   return (
-    <div>
+    <>
       {comments ? (
-        <div>
-          {commentsByParentId["root"]?.comments.map((comment) => (
+        commentsByParentId["root"]?.comments.map((comment) => (
+          <>
             <Comment
               comment={comment}
               subComments={
@@ -152,14 +166,15 @@ const CommentList = ({ comments }: { comments?: Comment[] }) => {
               }
               allComments={comments}
               commentsByParentId={commentsByParentId}
+              OnClick={OnClick}
               key={comment.id}
             />
-          ))}
-        </div>
+          </>
+        ))
       ) : (
         <p>No comments yet</p>
       )}
-    </div>
+    </>
   );
 };
 
@@ -184,6 +199,7 @@ interface CommentProps {
       depth: number;
     };
   };
+  OnClick: (comment: Comment) => void;
 }
 
 const Comment = ({
@@ -191,6 +207,7 @@ const Comment = ({
   subComments,
   allComments,
   commentsByParentId,
+  OnClick,
 }: CommentProps) => {
   let shouldShown: boolean = false;
   const requestedSubComments = 2;
@@ -201,10 +218,9 @@ const Comment = ({
       ? true
       : false;
 
-  if (!shouldShown) console.log(shouldShown, comment);
   return (
-    <div>
-      <div className="flex items-center">
+    <div className="py-2">
+      <div className="flex items-center mb-2">
         <div className="relative w-8 h-8">
           <Image
             alt="avatar"
@@ -213,8 +229,16 @@ const Comment = ({
             className="w-8 h-8 rounded-full"
           />
         </div>
-        <p className="ml-2 my-2">{comment.author.name}</p>
+        <p className="ml-2  font-semibold text-lg">{comment.author.name}</p>
+        <button
+          className="ml-auto font-medium text-base flex gap-x-2"
+          onClick={() => OnClick(comment)}
+        >
+          Reply
+          <ArrowUturnLeftIcon className="w-6 h-6" />
+        </button>
       </div>
+      <hr className="ml-10" />
       <p className="ml-10">{comment.content}</p>
       <div className="ml-10">
         {shouldShown
@@ -232,6 +256,7 @@ const Comment = ({
                       )
                     : []
                 }
+                OnClick={OnClick}
                 key={comment.id}
               />
             ))
