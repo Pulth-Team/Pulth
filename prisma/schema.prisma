@@ -104,12 +104,12 @@ model Comment {
     authorId String @db.ObjectId
     author   User   @relation("AuthorUser", fields: [authorId], references: [id], onDelete: Cascade)
 
-    articleId String?  @db.ObjectId
-    Article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    articleId String  @db.ObjectId
+    Article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
     content String
 
-    rating     Int
+    rating     Int      @default(0)
     ratedbyIds String[] @default([]) @db.ObjectId
     ratedby    User[]   @relation("RatedUser", fields: [ratedbyIds], references: [id])
 

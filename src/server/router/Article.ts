@@ -369,6 +369,38 @@ export const ArticleRouter = createRouter()
         isPublished: article?.isPublished,
       };
     },
+  })
+  .query("createComment", {
+    input: z.object({
+      slug: z.string(),
+      content: z.string(),
+      parentId: z.string().optional(),
+    }),
+    async resolve({ input, ctx }) {
+      const article = await ctx.prisma?.article.findFirst({
+        where: {
+          slug: input.slug,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!article) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const comment = await ctx.prisma?.comment.create({
+        data: {
+          content: input.content,
+          articleId: article.id,
+          authorId: ctx.session?.user?.id!,
+          parentId: input.parentId,
+        },
+      });
+
+      return comment;
+    },
   });
 
 const makeid = (length: number) => {
