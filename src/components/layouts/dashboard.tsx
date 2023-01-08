@@ -83,10 +83,10 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           onClick={() => setSearchModal(false)}
         >
           <div className="flex flex-col gap-y-2">
-            <p className="text-xl line-clamp-1 text-white font-bold">
+            <p className="text-lg md:text-xl line-clamp-1 text-white font-bold">
               {hit.title}
             </p>
-            <p className="text-gray-400 italic text-sm line-clamp-1 font-semibold">
+            <p className="text-gray-400 italic text-sm line-clamp-2 md:line-clamp-1 font-semibold">
               {hit.description}
             </p>
             <Link href="/profile">
@@ -213,7 +213,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Dialog.Panel className="bg-gray-800 rounded-md p-4 flex flex-col gap-y-4 w-1/2">
+                <Dialog.Panel className="bg-gray-800 rounded-md p-4 flex flex-col gap-y-4 md:w-1/2 w-11/12">
                   <InstantSearch
                     searchClient={searchClient}
                     indexName={env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME}
