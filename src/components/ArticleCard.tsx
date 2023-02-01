@@ -40,7 +40,6 @@ const ArticleCard: NextPage<
   createdAt,
 }) => {
   dayjs.extend(relativeTime);
-  console.log(Author?.Image);
   return (
     <div
       className={`${

@@ -5,8 +5,6 @@ import { env } from "../../env/server.mjs";
 import algoliasearch from "algoliasearch";
 
 import slugify from "slugify";
-import { type } from "os";
-import { json } from "stream/consumers";
 
 const client = algoliasearch(env.ALGOLIA_APP_ID, env.ALGOLIA_API_KEY);
 
