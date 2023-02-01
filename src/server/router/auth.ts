@@ -8,6 +8,12 @@ export const authRouter = createRouter()
       return ctx.session;
     },
   })
+
+  // WARNING: This should be moved after the authMiddleware is added
+  //          because it is a public route and we are not checking
+  //          if the user is logged in or not and even if they are
+  //          logged in, they should be able change someone else's
+  //          settings
   .query("updateSettings", {
     input: z.object({
       userId: z.string(),
