@@ -8,6 +8,16 @@ export const authRouter = createRouter()
       return ctx.session;
     },
   })
+
+  .middleware(async ({ ctx, next }) => {
+    // Any queries or mutations after this middleware will
+    // raise an error unless there is a current session
+    if (!ctx.session) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next();
+  })
+
   .query("updateSettings", {
     input: z.object({
       userId: z.string(),
@@ -25,7 +35,7 @@ export const authRouter = createRouter()
     async resolve({ input, ctx }) {
       const updatedUser = await ctx.prisma?.user.update({
         where: {
-          id: input.userId,
+          id: ctx.session?.user?.id,
         },
         data: {
           name: input.data.name ?? undefined,
@@ -35,14 +45,6 @@ export const authRouter = createRouter()
 
       return updatedUser ? "Updated" : "Something went wrong while updating";
     },
-  })
-  .middleware(async ({ ctx, next }) => {
-    // Any queries or mutations after this middleware will
-    // raise an error unless there is a current session
-    if (!ctx.session) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-    return next();
   })
   .query("getSecretMessage", {
     async resolve({ ctx }) {
