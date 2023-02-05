@@ -1,9 +1,6 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../utils/trpc";
 import Head from "next/head";
-import Link from "next/link";
-
 import { useSession } from "next-auth/react";
 
 import DashboardLayout from "../components/layouts/dashboard";
@@ -28,10 +25,10 @@ const Courses: NextPage = () => {
         type="button"
         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
-          throw new Error("Sentry Frontend Error");
+          throw new Error("Not-Sentry Frontend Error");
         }}
       >
-        Throw error to Sentry
+        Throw error to nothing there is no sentry
       </button>
     </DashboardLayout>
   );
