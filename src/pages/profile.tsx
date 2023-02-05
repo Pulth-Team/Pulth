@@ -53,6 +53,8 @@ const Articles: NextPage = () => {
       });
   };
 
+  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <p>Loading...</p>;
   return (
     <DashboardLayout>
       <Head>
