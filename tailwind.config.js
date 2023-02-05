@@ -8,6 +8,9 @@ module.exports = {
         "safe-area": "env(safe-area-inset)",
       },
     },
+    fontFamily: {
+      slab: ["Roboto Slab", "sans-serif"],
+    },
   },
   plugins: [
     require("@tailwindcss/line-clamp"),
