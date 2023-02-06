@@ -5,6 +5,9 @@ import Image from "next/image";
 import { trpc } from "../utils/trpc";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import FacebookIcon from "../components/icons/FacebookIcon";
+import TwitterIcon from "../components/icons/TwitterIcon";
+import { MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 const Home: NextPage = () => {
   const ref = useRef(null);
@@ -222,6 +225,48 @@ const Home: NextPage = () => {
           </div>
         </div>
       </main>
+      <footer className="bg-gradient-to-b from-gray-900 via-black to-black flex justify-between p-12 px-24 pt-64 font-slab">
+        <div className="flex flex-col w-1/3 justify-center gap-y-5">
+          <h3 className="text-white text-2xl font-bold">
+            <span className="text-indigo-600">Pulth</span>App
+          </h3>
+          <p className="text-white">
+            PulthApp is the new way of learning with free and priced options.
+            You can read articles for free that made by our community. Second
+            option is you can buy courses that made in a predetermined
+            curriculum by verified teachers from our community.
+          </p>
+          <div className="flex flex-col text-white gap-y-6">
+            <div className="flex items-center gap-x-4">
+              <FacebookIcon className="fill-white" />
+              <p className="font-semibold">@pulthappfacebook</p>
+            </div>
+            <div className="flex items-center gap-x-4">
+              <TwitterIcon className="fill-white" />
+              <p className="font-semibold">@pulthapptwitter</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col w-1/3 items-center text-white gap-y-6">
+          <h3 className="text-2xl font-medium">Useful Links</h3>
+          <a className="cursor-pointer text-lg">Explore</a>
+          <a className="cursor-pointer text-lg">Courses</a>
+          <a className="cursor-pointer text-lg">Articles</a>
+        </div>
+        <div className="flex flex-col w-1/3 items-center text-white gap-y-6">
+          <h3 className="text-white text-2xl font-medium">Contact</h3>
+          <div className="flex gap-x-2 items-center">
+            <MapPinIcon className="w-6 h-6" />
+            <p className="text-lg">
+              26985 Brighton Lane, Lake Forest, CA 92630.
+            </p>
+          </div>
+          <div className="flex gap-x-2 items-center">
+            <PhoneIcon className="w-6 h-6" />
+            <p className="text-lg">+90 538 865 01 98</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
