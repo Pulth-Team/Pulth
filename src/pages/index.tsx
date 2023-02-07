@@ -28,22 +28,30 @@ const Home: NextPage = () => {
           PulthApp
         </span>
         <div className="sm:flex items-center hidden gap-x-8">
-          <button className="text-white p-2 text-xl font-semibold">
-            Explore
-          </button>
-          <button className="text-white p-2 text-xl font-semibold">
-            Courses
-          </button>
-          <button className="text-white p-2 text-xl font-semibold">
-            Articles
-          </button>
-          <button className="text-indigo-500 p-2 rounded text-xl font-bold">
-            Join Now!
-          </button>
+          <Link href={"/explore"}>
+            <button className="text-white p-2 text-xl font-semibold">
+              Explore
+            </button>
+          </Link>
+          <Link href={"/courses"}>
+            <button className="text-white p-2 text-xl font-semibold">
+              Courses
+            </button>
+          </Link>
+          <Link href={"/articles"}>
+            <button className="text-white p-2 text-xl font-semibold">
+              Articles
+            </button>
+          </Link>
+          <Link href="/api/auth/signin">
+            <button className="text-indigo-500 p-2 rounded text-xl font-bold">
+              Join Now!
+            </button>
+          </Link>
         </div>
       </nav>
       <main className="flex flex-col overflow-x-hidden">
-        <div className="flex flex-col lg:flex-row lg:justify-between justify-center sm:px-28 lg:px-16 sm:pt-8 lg:pt-0 pt-0 items-center bg-gray-900 h-screen">
+        <div className="flex flex-col lg:flex-row lg:justify-between justify-center sm:px-28 lg:px-16 sm:pt-8 lg:pt-0 items-center bg-gray-900 h-screen">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -71,9 +79,11 @@ const Home: NextPage = () => {
                 <span className="text-indigo-500">learn</span> with quality!
               </p>
               <div className="w-fit lg:w-full">
-                <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
-                  Join for free
-                </button>
+                <Link href="/api/auth/signin">
+                  <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
+                    Join for free
+                  </button>
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -132,7 +142,7 @@ const Home: NextPage = () => {
         </div>
         <div className="lg:mb-0 mb-12 flex sm:gap-y-12 gap-y-0 lg:gap-y-0 flex-col lg:flex-row-reverse justify-center lg:justify-between sm:px-28 lg:px-16 lg:pt-16 items-center bg-gray-900 h-screen snap-center">
           <div
-            className="transition-all ease-in-out duration-200 lg:duration-500 lg:delay-500 flex flex-col lg:h-full h-full p-4 lg:p-8 gap-y-5 font-slab tracking-tighter w-full lg:w-3/4 justify-center lg:items-start items-center sm:h-fit"
+            className="opacity-60 transition-all ease-in-out duration-200 lg:duration-500 lg:delay-500 flex flex-col lg:h-full h-full p-4 lg:p-8 gap-y-5 font-slab tracking-tighter w-full lg:w-3/4 justify-center lg:items-start items-center sm:h-fit"
             style={{
               transform: isInView ? "none" : "translateX(200px)",
               opacity: isInView ? 1 : 0,
@@ -144,13 +154,15 @@ const Home: NextPage = () => {
               by reading articles written by our community!
             </p>
             <div>
-              <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
-                View Articles
-              </button>
+              <Link href="/articles">
+                <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
+                  View Articles
+                </button>
+              </Link>
             </div>
           </div>
           <div
-            className="transition-all delay-200 duration-500 lg:delay-700 lg:duration-700 ease-in-out lg:block sm:hidden block"
+            className="transition-all delay-200 duration-500 lg:delay-700 lg:duration-700 ease-in-out"
             ref={ref}
             style={{
               transform: isInView ? "none" : "translateX(-200px)",
@@ -162,27 +174,11 @@ const Home: NextPage = () => {
               height={800}
               width={800}
               alt="learning"
-              className="-translate-x-6 lg:mr-0 lg:block sm:hidden block"
-            />
-          </div>
-          <div
-            className="transition-all delay-200 duration-500 lg:delay-700 lg:duration-700 ease-in-out lg:hidden sm:block hidden"
-            ref={ref}
-            style={{
-              transform: isInView ? "none" : "translateX(-200px)",
-              opacity: isInView ? 1 : 0,
-            }}
-          >
-            <Image
-              src="/undraw_knowledge_re_5v9l.svg"
-              height={600}
-              width={600}
-              alt="learning"
               className="-translate-x-6 lg:mr-0"
             />
           </div>
         </div>
-        <div className="flex flex-col gap-y-12 lg:gap-y-0 lg:flex-row justify-center lg:justify-between sm:px-28 lg:px-16 lg:pt-16 items-center bg-gray-900 h-screen">
+        <div className="flex flex-col gap-y-12 lg:gap-y-0 lg:flex-row justify-center lg:justify-between sm:px-28 lg:px-16 lg:pt-16 sm:pt-0 pt-16 items-center bg-gray-900 h-screen">
           <div
             className="transition-all ease-in-out duration-200 lg:duration-500 lg:delay-500 flex flex-col h-full sm:h-fit lg:h-full p-4 lg:p-8 gap-y-5 font-slab tracking-tighter w-full lg:w-3/4 justify-center lg:items-start items-center"
             style={{
@@ -197,9 +193,11 @@ const Home: NextPage = () => {
               chosen by our algorithm!
             </p>
             <div>
-              <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
-                View Courses
-              </button>
+              <Link href={"/courses"}>
+                <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
+                  View Courses
+                </button>
+              </Link>
             </div>
           </div>
           <div
@@ -231,9 +229,11 @@ const Home: NextPage = () => {
               what we offer to you!
             </p>
             <div>
-              <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
-                Explore
-              </button>
+              <Link href={"/explore"}>
+                <button className="text-white lg:text-3xl p-3 bg-indigo-500 font-semibold rounded-lg">
+                  Explore
+                </button>
+              </Link>
             </div>
           </div>
           <div
@@ -277,9 +277,15 @@ const Home: NextPage = () => {
         </div>
         <div className="flex flex-col lg:w-1/3 lg:items-center text-white gap-y-6">
           <h3 className="text-2xl font-semibold">Useful Links</h3>
-          <a className="cursor-pointer text-sm">Explore</a>
-          <a className="cursor-pointer text-sm">Courses</a>
-          <a className="cursor-pointer text-sm">Articles</a>
+          <Link href={"/explore"}>
+            <a className="cursor-pointer text-sm">Explore</a>
+          </Link>
+          <Link href={"/courses"}>
+            <a className="cursor-pointer text-sm">Courses</a>
+          </Link>
+          <Link href={"/articles"}>
+            <a className="cursor-pointer text-sm">Articles</a>
+          </Link>
         </div>
         <div className="flex flex-col lg:w-1/3 lg:items-center text-white gap-y-6">
           <h3 className="text-white text-2xl font-semibold">Contact</h3>
