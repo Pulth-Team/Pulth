@@ -15,6 +15,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
 import Loading from "../components/Loading";
 
+// TODO: switch to mutation for creating article
 const Articles: NextPage = () => {
   const { data, status } = useSession({ required: true });
   const user = data?.user;

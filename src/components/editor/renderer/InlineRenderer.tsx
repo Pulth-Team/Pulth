@@ -8,8 +8,6 @@ type InlineRendererProps = {
 };
 
 const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
-  console.count("InlineRenderer");
-
   const InlineASTMemo = useMemo(() => {
     let ast = getASTfromHTML(text);
 

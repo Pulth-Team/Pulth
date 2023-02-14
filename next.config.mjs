@@ -8,7 +8,7 @@
 
 /** @type {import("next").NextConfig} */
 const config = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   images: {
     // lh3.googleusercontent.com is used for Google OAuth profile pictures
     domains: [

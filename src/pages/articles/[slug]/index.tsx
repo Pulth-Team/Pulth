@@ -17,9 +17,8 @@ import { signIn, useSession } from "next-auth/react";
 import CommentList from "../../../components/editor/CommentList";
 import { useMemo } from "react";
 
-// TODO: fix this component
-// bad parts:
-// - The Article Renderer  not supporting SSG
+// TODO: Add support for SSG
+// TODO: Add support for Loading State in CSR
 const Articles: NextPage = () => {
   const router = useRouter();
   const { data: userData, status } = useSession();

@@ -55,15 +55,14 @@ export type OutputBlockType =
 //
 // Document renderer takes in a list of blocks and renders them
 //
-// TODO:
-// - Add support for React Suspense
+// TODO: Add support for React Suspense
 //    - Suspense is neded because rendering the document is a heavy task
 //    - and we need to render it on suspense (in the client side)
 //    - so we can show a loading indicator. In the server side,
 //    - we are already rendering the document so we don't need to use suspense.
 //    - https://reactjs.org/docs/concurrent-mode-suspense.html
 //
-// - Add support for React Error Boundaries
+// TODO: Add support for React Error Boundaries
 //    - https://reactjs.org/docs/error-boundaries.html
 
 const DocumentRenderer: NextPage<{
@@ -71,7 +70,6 @@ const DocumentRenderer: NextPage<{
 }> = ({ blocks }) => {
   let keySeed = "document-renderer-";
 
-  console.count("document Renderer Call");
   return (
     <div>
       {blocks.map((block) => {
