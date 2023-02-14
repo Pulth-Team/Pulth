@@ -4,6 +4,8 @@ const HeaderRenderer: NextPage<{ level: number; text: string }> = ({
   level,
   text,
 }) => {
+  console.count("HeaderRenderer " + level);
+
   switch (level) {
     case 1:
       return <h1 className="m-0 p-0 mb-2 font-bold text-3xl">{text}</h1>;

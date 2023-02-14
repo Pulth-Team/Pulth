@@ -70,6 +70,8 @@ const DocumentRenderer: NextPage<{
   blocks: OutputBlockType[];
 }> = ({ blocks }) => {
   let keySeed = "document-renderer-";
+
+  console.count("document Renderer Call");
   return (
     <div>
       {blocks.map((block) => {

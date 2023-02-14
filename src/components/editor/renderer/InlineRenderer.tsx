@@ -19,6 +19,8 @@ const InlineRenderer: NextPage<InlineRendererProps> = ({
   ast,
   keySeed = "inline-renderer-",
 }) => {
+  console.count("InlineRenderer");
+
   if (ast)
     return (
       <>
