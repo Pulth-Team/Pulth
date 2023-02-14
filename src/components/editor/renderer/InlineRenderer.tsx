@@ -1,76 +1,53 @@
 import { NextPage } from "next";
-import type { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { getASTfromHTML, PureNodeAST } from "../../../utils/editorHelpers";
 
-type InlineRendererProps =
-  | {
-      text?: never;
-      ast: PureNodeAST[];
-      keySeed?: string;
-    }
-  | {
-      text: string;
-      ast?: never;
-      keySeed?: string;
-    };
+type InlineRendererProps = {
+  text: string;
+  keySeed?: string;
+};
 
-const InlineRenderer: NextPage<InlineRendererProps> = ({
-  text,
-  ast,
-  keySeed = "inline-renderer-",
-}) => {
+const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
   console.count("InlineRenderer");
 
-  if (ast)
-    return (
-      <>
-        {ast.map((node, index) => {
-          switch (node.type) {
-            case "text":
-              return <span key={keySeed + index}>{node.value}</span>;
-            case "element":
-              switch (node.tagName) {
-                case "b":
-                  keySeed += "-bold-" + index;
-                  return (
-                    <span key={index} className="font-bold">
-                      <InlineRenderer ast={node.children} keySeed={keySeed} />
-                    </span>
-                  );
-                case "i":
-                  keySeed += "-italic-" + index;
+  const InlineASTMemo = useMemo(() => {
+    let ast = getASTfromHTML(text);
 
-                  return (
-                    <span key={index} className="italic">
-                      <InlineRenderer ast={node.children} keySeed={keySeed} />
-                    </span>
-                  );
-                case "br":
-                  keySeed += "-br-" + index;
-                  return (
-                    <span key={index} className="text-gray-500 text-sm">
-                      <br />
-                    </span>
-                  );
-
-                default:
-                  return (
-                    <span
-                      key={index}
-                      className="bg-red-700 text-white p-1 rounded"
-                    >
-                      unknown inline tool {node.tagName}
-                    </span>
-                  );
-              }
-          }
-        })}
-      </>
+    ast = ast.filter(
+      (node) =>
+        (node.type == "element" && node.tagName !== "br") || node.type == "text"
     );
-  else {
-    ast = getASTfromHTML(text);
-    return <InlineRenderer ast={ast} />;
-  }
+
+    function InlineRendererAST({ ast }: { ast: PureNodeAST[] }) {
+      const elementArray = ast.map((node, index) => {
+        switch (node.type) {
+          case "text":
+            return <span key={index}>{node.value}</span>;
+          case "element":
+            switch (node.tagName) {
+              case "b":
+                return (
+                  <span key={index} className="font-bold">
+                    <InlineRendererAST ast={node.children} />
+                  </span>
+                );
+              case "i":
+                return (
+                  <span key={index} className="italic">
+                    <InlineRendererAST ast={node.children} />
+                  </span>
+                );
+            }
+        }
+      });
+
+      return <>{elementArray}</>;
+    }
+
+    return <InlineRendererAST ast={ast} />;
+  }, [text]);
+
+  return <span>{InlineASTMemo}</span>;
 };
 
 export default InlineRenderer;
