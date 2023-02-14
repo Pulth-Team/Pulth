@@ -15,6 +15,7 @@ import DocumentRenderer, {
 } from "../../../components/editor/renderer/DocumentRenderer";
 import { signIn, useSession } from "next-auth/react";
 import CommentList from "../../../components/editor/CommentList";
+import { useMemo } from "react";
 
 // TODO: fix this component
 // bad parts:
@@ -50,9 +51,18 @@ const Articles: NextPage = () => {
   let userImage = userData?.user?.image;
   if (userImage === null) userImage = undefined;
 
+  // memoize the document renderer
+  // if the blocks don't change
+  // so that it doesn't re-render on every re-render
+  // this is a performance optimization technique called memoization or memoization caching
+  const RenderedDocument = useMemo(
+    () => <DocumentRenderer blocks={blocks} />,
+    [blocks]
+  );
+
   let body = (
     <>
-      <DocumentRenderer blocks={blocks} />
+      {RenderedDocument}
       <div className="py-4 ">
         <p className="text-lg font-semibold">
           <span className="font-medium">
@@ -100,7 +110,9 @@ const Articles: NextPage = () => {
   return (
     <DashboardLayout>
       <Head>
-        <title>{articleData.data?.title || "unnamed"} - Pulth App</title>
+        <title>
+          {(articleData.data?.title || "unnamed").toString()} - Pulth App
+        </title>
         <meta name="description" content={articleData.data?.description} />
         <meta name="author" content={articleData.data?.author?.name!} />
         <meta name="generator" content="Pulth Engine" />
