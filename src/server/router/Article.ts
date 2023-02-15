@@ -177,7 +177,7 @@ export const ArticleRouter = createRouter()
       return article;
     },
   })
-  .query("deleteArticleBySlug", {
+  .mutation("deleteArticleBySlug", {
     input: z.object({
       slug: z.string(),
     }),

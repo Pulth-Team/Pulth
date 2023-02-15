@@ -47,17 +47,8 @@ const Inspect: NextPage = () => {
     !articleData.data?.isPublished
   );
 
-  const deleteArticle = trpc.useQuery(
-    [
-      "article.deleteArticleBySlug",
-      {
-        slug: slug as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+  const deleteArticle = trpc.useMutation("article.deleteArticleBySlug");
+
   const publishArticleQuery = trpc.useQuery(
     ["article.publishArticle", { slug: slug as string, isPublishEvent }],
     {
@@ -71,7 +62,7 @@ const Inspect: NextPage = () => {
 
   const handleDeleteButton = () => {
     if (deleteTitleInput == articleData.data?.title) {
-      deleteArticle.refetch();
+      deleteArticle.mutate({ slug: slug as string });
       setDeleteArticleModal(false);
       router.push("/profile");
     } else {
