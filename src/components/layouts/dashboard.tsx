@@ -37,7 +37,7 @@ import {
   Hits,
 } from "react-instantsearch-dom";
 
-import { env } from "../../env/client.mjs";
+import { env } from "../../env.mjs";
 
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   const { data } = useSession();

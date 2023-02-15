@@ -9,7 +9,7 @@ import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Script from "next/script";
 
-import { env } from "../env/server.mjs";
+import { env } from "../env.mjs";
 
 const MyApp: AppType<{ session: Session }> = ({
   Component,
