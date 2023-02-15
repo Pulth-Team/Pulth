@@ -18,10 +18,15 @@ const MyApp: AppType<{ session: Session }> = ({
   const isLocal = typeof process.env.VERCEL_ENV === "undefined";
   const isDevelopment = process.env.NODE_ENV === "development" && !isLocal;
   const isProduction = process.env.NODE_ENV === "production";
+  const isServer = typeof window === "undefined";
+
+  let GOOOGLE_ANALYTICS_ID;
+
+  if (isServer) GOOOGLE_ANALYTICS_ID = env.GOOOGLE_ANALYTICS_ID;
+  else GOOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID;
 
   // show analytics only in production and development (not in preview mode)
-  const showAnalytics =
-    (isProduction || isDevelopment) && env.GOOOGLE_ANALYTICS_ID;
+  const showAnalytics = (isProduction || isDevelopment) && GOOOGLE_ANALYTICS_ID;
 
   return (
     <>
