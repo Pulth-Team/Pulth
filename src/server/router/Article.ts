@@ -258,7 +258,7 @@ export const ArticleRouter = createRouter()
       };
     },
   })
-  .query("updateArticleCredidantials", {
+  .mutation("updateArticleCredidantials", {
     input: z.object({
       slug: z.string(),
       title: z.string().optional(),
@@ -281,9 +281,11 @@ export const ArticleRouter = createRouter()
         },
       });
       // if with the slug and authorId there is no article
-
       if (!isArticle) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized no article",
+        });
       }
 
       let updateBody: {

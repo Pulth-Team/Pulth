@@ -91,33 +91,7 @@ const Inspect: NextPage = () => {
     isEventUpdated,
   ]);
 
-  const saveArticle = trpc.useQuery(
-    [
-      "article.updateArticleCredidantials",
-      {
-        slug: slug as string,
-        title: titleValue || "",
-        description: descValue || "",
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
-
-  useEffect(() => {
-    if (
-      typeof saveArticle.data !== "undefined" &&
-      "message" in saveArticle.data
-    )
-      return;
-
-    if (saveArticle.isFetched && saveArticle.data?.slug) {
-      setDescResetButton(false);
-      setTitleResetButton(false);
-      router.replace(`/articles/${saveArticle.data?.slug}/inspect`);
-    }
-  }, [saveArticle.isFetched, saveArticle.data, router]);
+  const saveArticle = trpc.useMutation("article.updateArticleCredidantials");
 
   useEffect(() => {
     setIsPublishEvent(!articleData.data?.isPublished);
@@ -189,7 +163,24 @@ const Inspect: NextPage = () => {
       </div>
       <button
         className="flex items-center gap-x-2 bg-indigo-500 p-2 rounded-md text-white"
-        onClick={() => saveArticle.refetch()}
+        onClick={() => {
+          saveArticle.mutate(
+            {
+              slug: slug as string,
+              title: titleValue || "",
+              description: descValue || "",
+            },
+            {
+              onSuccess: (data) => {
+                if ("slug" in data) {
+                  setDescResetButton(false);
+                  setTitleResetButton(false);
+                  router.replace(`/articles/${data.slug}/inspect`);
+                }
+              },
+            }
+          );
+        }}
       >
         <p>Save Changes</p>
       </button>
@@ -293,8 +284,23 @@ const Inspect: NextPage = () => {
                   <button
                     disabled={!descResetButton && !titleResetButton}
                     className="flex gap-2 bg-indigo-500 text-white text-lg rounded-md px-2 py-1 ml-auto disabled:bg-transparent disabled:border disabled:border-gray-700 disabled:text-gray-700 transition-colors duration-200"
-                    onClick={() => {
-                      saveArticle.refetch();
+                    onClick={async () => {
+                      saveArticle.mutate(
+                        {
+                          slug: slug as string,
+                          title: titleValue || "",
+                          description: descValue || "",
+                        },
+                        {
+                          onSuccess: (data) => {
+                            if ("slug" in data) {
+                              setDescResetButton(false);
+                              setTitleResetButton(false);
+                              router.replace(`/articles/${data.slug}/inspect`);
+                            }
+                          },
+                        }
+                      );
                     }}
                   >
                     {saveArticle.isLoading && (
