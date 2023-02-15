@@ -43,22 +43,8 @@ const Inspect: NextPage = () => {
   const [deleteTitleInput, setDeleteTitleInput] = useState("");
   const [inputError, setInputError] = useState(false);
 
-  const [isPublishEvent, setIsPublishEvent] = useState(
-    !articleData.data?.isPublished
-  );
-
   const deleteArticle = trpc.useMutation("article.deleteArticleBySlug");
-
-  const publishArticleQuery = trpc.useQuery(
-    ["article.publishArticle", { slug: slug as string, isPublishEvent }],
-    {
-      enabled: false,
-      onSuccess: (data) => {
-        console.log("onsuccess", data.isPublished);
-        setIsPublishEvent(!data.isPublished);
-      },
-    }
-  );
+  const publishArticleMutation = trpc.useMutation("article.publishArticle");
 
   const handleDeleteButton = () => {
     if (deleteTitleInput == articleData.data?.title) {
@@ -69,6 +55,7 @@ const Inspect: NextPage = () => {
       setInputError(true);
     }
   };
+
   useEffect(() => {
     setTitleValue(articleData.data?.title);
     setDescValue(articleData.data?.description);
@@ -78,24 +65,7 @@ const Inspect: NextPage = () => {
     articleData.data?.description,
   ]);
 
-  const [isEventUpdated, setIsEventUpdated] = useState(false);
-  useEffect(() => {
-    if (publishArticleQuery.isFetched && !isEventUpdated) {
-      setIsPublishEvent(!isPublishEvent);
-      setIsEventUpdated(true);
-    }
-  }, [
-    publishArticleQuery.isFetched,
-    publishArticleQuery.data?.isPublished,
-    isPublishEvent,
-    isEventUpdated,
-  ]);
-
   const saveArticle = trpc.useMutation("article.updateArticleCredidantials");
-
-  useEffect(() => {
-    setIsPublishEvent(!articleData.data?.isPublished);
-  }, [articleData.data?.isPublished]);
 
   let body;
 
@@ -329,13 +299,23 @@ const Inspect: NextPage = () => {
             <button
               className="px-2 p-1 rounded bg-indigo-500 text-white flex gap-2"
               onClick={() => {
-                publishArticleQuery.refetch();
+                publishArticleMutation.mutate(
+                  {
+                    slug: slug as string,
+                    isPublishEvent: !articleData.data?.isPublished,
+                  },
+                  {
+                    onSuccess: (data) => {
+                      articleData.refetch();
+                    },
+                  }
+                );
               }}
             >
-              {publishArticleQuery.isFetching ? (
+              {publishArticleMutation.isLoading ? (
                 <Loading className="h-6 w-6 border-2" />
               ) : null}
-              {isPublishEvent ? "Publish" : "Unpublish"}
+              {!articleData.data?.isPublished ? "Publish" : "Unpublish"}
             </button>
             <div>{updatedDate}</div>
           </div>

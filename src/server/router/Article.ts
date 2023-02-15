@@ -105,7 +105,7 @@ export const ArticleRouter = createRouter()
     }
     return next();
   })
-  .query("publishArticle", {
+  .mutation("publishArticle", {
     input: z.object({
       slug: z.string(),
       isPublishEvent: z.boolean().optional().default(true),
@@ -123,6 +123,7 @@ export const ArticleRouter = createRouter()
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
+      // update the article with the new isPublished value
       const article = await ctx.prisma?.article.update({
         where: {
           slug: input.slug,
@@ -131,18 +132,27 @@ export const ArticleRouter = createRouter()
           isPublished: input.isPublishEvent,
         },
       });
-      client
-        .initIndex(env.ALGOLIA_INDEX_NAME)
-        .saveObject({
-          objectID: article?.id,
-          title: article?.title,
-          description: article?.description,
-          author: ctx.session?.user?.name,
-          slug: article?.slug,
-        })
-        .catch((err) => {
-          console.log("Failed to create article in algolia", err);
-        });
+
+      // if the new isPublished state is true
+      if (input.isPublishEvent) {
+        // then add the article to algolia
+        client
+          .initIndex(env.ALGOLIA_INDEX_NAME)
+          .saveObject({
+            objectID: article?.id,
+            title: article?.title,
+            description: article?.description,
+            author: ctx.session?.user?.name,
+            slug: article?.slug,
+          })
+          .catch((err) => {
+            console.log("Failed to create article in algolia", err);
+          });
+      } else {
+        // else remove the article from algolia
+        client.initIndex(env.ALGOLIA_INDEX_NAME).deleteObject(article?.id);
+      }
+
       return article;
     },
   })
