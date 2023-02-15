@@ -55,43 +55,18 @@ const Articles: NextPage = ({}) => {
       },
     }
   );
-  const publishArticleQuery = trpc.useQuery(
-    ["article.publishArticle", { slug: slug as string }],
-    {
-      enabled: false,
-    }
-  );
-  const articleUpdateBodyFetch = trpc.useQuery(
-    [
-      "article.updateArticleBody",
-      {
-        slug: slug as string,
-        bodyData,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
-  const deleteArticleFetch = trpc.useQuery(
-    [
-      "article.deleteArticleBySlug",
-      {
-        slug: slug as string,
-      },
-    ],
-    {
-      enabled: false,
-    }
-  );
+
+  const publishArticleMutation = trpc.useMutation("article.publishArticle");
+  const deleteArticleMutation = trpc.useMutation("article.deleteArticleBySlug");
+  const updateArticleMutation = trpc.useMutation("article.updateArticleBody");
 
   const handleDeleteButton = () => {
     if (titleInput == articleAuthorFetch.data?.title) {
-      deleteArticleFetch.refetch();
+      deleteArticleMutation.mutate({ slug: slug as string });
       setDeleteModal(false);
       router.push("/profile");
     } else {
-      // todo add error message more than just an alert
+      // TODO: add error message more than just an alert
 
       alert("Wrong Title Name");
     }
@@ -102,9 +77,14 @@ const Articles: NextPage = ({}) => {
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
 
+  // TODO: find a better way to update the body data (without using useEffect)
+  // FIXME: is this really working? (it seems to be working) (not sure)
   useEffect(() => {
     if (bodyData) {
-      articleUpdateBodyFetch.refetch();
+      updateArticleMutation.mutate({
+        slug: slug as string,
+        bodyData,
+      });
     }
   }, [bodyData]);
 
@@ -112,7 +92,11 @@ const Articles: NextPage = ({}) => {
     editor?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
       setBodyData(outputData.blocks);
-      articleUpdateBodyFetch.refetch();
+      // articleUpdateBodyFetch.refetch();
+      updateArticleMutation.mutate({
+        slug: slug as string,
+        bodyData: outputData.blocks as any, // TODO: fix this type
+      });
     });
   };
 
@@ -151,23 +135,26 @@ const Articles: NextPage = ({}) => {
                 onPublish={async () => {
                   const currentData = await editor?.save();
 
+                  // TODO: add a better way to check if the data has changed
+                  // check if the data has changed
+                  // if changed save the data
                   if (
                     JSON.stringify(currentData?.blocks) !==
                     JSON.stringify(bodyData)
                   ) {
-                    console.log("Changes");
-                    articleUpdateBodyFetch.refetch().then(() => {
-                      publishArticleQuery.refetch();
-                    });
-                  } else {
-                    publishArticleQuery.refetch();
+                    // we can update the body data and the publish the article
+                    // the order of the mutation is not important
+                    // because the article will be published regardless of the data
+                    // and the data will be updated regardless of the publish status
+                    articleAuthorFetch.refetch();
                   }
+                  publishArticleMutation.mutate({ slug: slug as string });
                 }}
                 onMenuClick={(type) => {
                   OnMenuClick(type);
                 }}
-                saveLoading={articleUpdateBodyFetch.isLoading}
-                publishLoading={publishArticleQuery.isLoading}
+                saveLoading={updateArticleMutation.isLoading}
+                publishLoading={publishArticleMutation.isLoading}
               />
               <Editor
                 readonly={false}

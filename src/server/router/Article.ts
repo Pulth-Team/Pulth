@@ -8,7 +8,7 @@ import slugify from "slugify";
 
 const client = algoliasearch(env.ALGOLIA_APP_ID, env.ALGOLIA_API_KEY);
 
-// returns a router with the batch data route
+// TODO: `getArticleByslug` and `getArticleBySlugAuthor` makes no sense, they should be merged into one function.
 export const ArticleRouter = createRouter()
   .query("getArticleBySlug", {
     input: z.object({
@@ -156,7 +156,7 @@ export const ArticleRouter = createRouter()
       return article;
     },
   })
-  .query("updateArticleBody", {
+  .mutation("updateArticleBody", {
     input: z.object({
       slug: z.string(),
       bodyData: z.array(
@@ -171,7 +171,8 @@ export const ArticleRouter = createRouter()
           authorId: ctx.session?.user?.id,
         },
       });
-      // if with the slug and authorId there is no article
+
+      // check is there a article with the slug and authorId provided
       if (!isArticle) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
