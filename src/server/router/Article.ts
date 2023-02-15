@@ -337,7 +337,7 @@ export const ArticleRouter = createRouter()
       };
     },
   })
-  .query("createArticle", {
+  .mutation("createArticle", {
     input: z.object({
       title: z.string(),
       description: z.string(),
@@ -361,6 +361,9 @@ export const ArticleRouter = createRouter()
           bodyData: input.bodyData,
         },
       });
+      // we are not indexing the article in algolia
+      // if the article is not published
+      // in this case the default value is false
 
       return {
         id: article?.id,

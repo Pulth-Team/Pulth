@@ -28,30 +28,25 @@ const Articles: NextPage = () => {
     "article.getUserArticleInfos",
     { userId: user?.id },
   ]);
-  const createQuery = trpc.useQuery(
-    [
-      "article.createArticle",
-      { title: dialogTitle, description: dialogDescription, bodyData: [] },
-    ],
-    {
-      enabled: false,
-    }
-  );
+
+  const createQuery = trpc.useMutation("article.createArticle");
 
   const onSubmitDialog = () => {
-    createQuery
-      .refetch()
-      .then(() => {
-        // refresh "My articles" data
-        articleData.refetch();
+    createQuery.mutate({
+      title: dialogTitle,
+      description: dialogDescription,
+      bodyData: [],
+    });
 
-        setDialogDescription("");
-        setDialogTitle("");
-        setIsOpen(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // refresh "My articles" data
+    articleData.refetch();
+
+    // reset dialog
+    setDialogDescription("");
+    setDialogTitle("");
+
+    // close dialog
+    setIsOpen(false);
   };
 
   return (
