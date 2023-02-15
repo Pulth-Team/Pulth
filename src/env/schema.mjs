@@ -12,6 +12,7 @@ export const serverSchema = z.object({
 
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  GOOOGLE_ANALYTICS_ID: z.string().optional(),
 
   ALGOLIA_APP_ID: z.string(),
   ALGOLIA_API_KEY: z.string(),

@@ -9,25 +9,41 @@ import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Script from "next/script";
 
+import { env } from "../env/server.mjs";
+
 const MyApp: AppType<{ session: Session }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const isLocal = typeof process.env.VERCEL_ENV === "undefined";
+  const isDevelopment = process.env.NODE_ENV === "development" && !isLocal;
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // show analytics only in production and development (not in preview mode)
+  const showAnalytics =
+    (isProduction || isDevelopment) && env.GOOOGLE_ANALYTICS_ID;
+
   return (
     <>
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-D5PY4EFWHL"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
+      {showAnalytics ? (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOOGLE_ANALYTICS_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', 'G-D5PY4EFWHL');
+          gtag('config', '${env.GOOOGLE_ANALYTICS_ID}');
         `}
-      </Script>
+          </Script>
+        </>
+      ) : (
+        <></>
+      )}
       <SessionProvider session={session}>
         <Component {...pageProps} />
       </SessionProvider>
