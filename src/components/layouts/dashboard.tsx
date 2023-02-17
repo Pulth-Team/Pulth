@@ -106,7 +106,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed flex w-screen bg-gray-800 p-2  gap-2  ">
+      <div className="md:hidden fixed flex w-screen bg-gray-800 p-2  gap-2  z-20">
         <span className="text-indigo-500 text-xl font-bold mr-auto self-stretch my-auto">
           PulthApp
         </span>
