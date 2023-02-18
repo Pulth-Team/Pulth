@@ -15,8 +15,8 @@ const ImageRenderer: NextPage<{ url: string; caption: string }> = ({
           src={url}
           alt={caption}
           className="aspect-square"
-          loading="eager"
-          priority
+          loading="lazy"
+          priority={false}
         />
       </div>
       <div className="text-center text-sm italic">
