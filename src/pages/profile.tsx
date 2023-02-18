@@ -109,7 +109,7 @@ const Articles: NextPage = () => {
                   }}
                 />
                 <div className="fixed inset-0 flex items-center justify-center  ">
-                  <Dialog.Panel className="bg-white p-4 rounded-2xl w-2/5">
+                  <Dialog.Panel className="bg-white p-4 rounded-2xl lg:w-2/5 w-11/12">
                     <Dialog.Title className="text-xl font-bold">
                       Create new article
                     </Dialog.Title>
@@ -136,7 +136,7 @@ const Articles: NextPage = () => {
                       value={dialogDescription}
                       onChange={(e) => setDialogDescription(e.target.value)}
                     ></textarea>
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row justify-between mt-4">
                       <button
                         className="mr-auto"
                         onClick={() => {
