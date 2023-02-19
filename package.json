@@ -40,8 +40,6 @@
     "react-instantsearch-dom": "^6.38.1",
     "react-query": "^3.39.2",
     "rehype-parse": "^8.0.4",
-    "slate": "^0.81.1",
-    "slate-react": "^0.81.0",
     "slugify": "^1.6.5",
     "superjson": "^1.9.1",
     "unified": "^10.1.2",
