@@ -43,8 +43,9 @@ const Dashboard: NextPage = () => {
             "#courses-menu-item",
             "#articles-menu-item",
             "#current-account-box",
+            "button#search-button",
           ]}
-          directions={["right", "right", "right", "right", "top"]}
+          directions={["right", "right", "right", "right", "top", "bottom"]}
           // TODO: add good messages
           messages={[
             "This is the dashboard. You can see your recommended courses and articles here",
@@ -52,8 +53,17 @@ const Dashboard: NextPage = () => {
             "This is the courses page. You can see all the courses here",
             "This is the articles page. You can see all the articles here",
             "This is your account action box. You can click to your profile picture open the menu. Then you can navigate to your profile, settings, and logout",
+            "This is the search button. You can click to open the search bar. Then you can search for courses, articles or users here",
           ]}
-          tourClassNames={["mx-4", "mx-4", "mx-4", "mx-4", "-translate-y-20"]}
+          aligns={["start", "start", "start", "start", "center", "end"]}
+          tourClassNames={[
+            "mx-4",
+            "mx-4",
+            "mx-4",
+            "mx-4",
+            "-translate-y-4",
+            "translate-y-2",
+          ]}
           className={"w-64"}
           onFinished={(e) => {
             setTour(false);

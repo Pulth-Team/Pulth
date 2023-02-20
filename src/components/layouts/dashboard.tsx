@@ -115,7 +115,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           PulthApp
         </span>
 
-        <SearchButton onClick={onSearchClick} onMobile={true} />
+        <SearchButton onClick={onSearchClick} />
         {!user ? (
           <MobileLogin className="" />
         ) : (
@@ -178,11 +178,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
         {/* https://stackoverflow.com/questions/36230944/prevent-flex-items-from-overflowing-a-container */}
         <div className="flex flex-col  flex-grow max-h-[stretch] h-screen min-w-0 ">
           <div className="flex  bg-gray-800 p-2  gap-2 flex-shrink-0 top-0 text-white  ">
-            <SearchButton
-              onClick={onSearchClick}
-              onMobile={true}
-              className="ml-auto"
-            />
+            <SearchButton onClick={onSearchClick} className="ml-auto" />
           </div>
           {/* Laptop Content */}
           <div className="overflow-scroll h-full  ">{children}</div>
@@ -408,19 +404,21 @@ const MobilePhoto = ({ image }: { image: string }) => {
 const SearchButton = ({
   className,
   onClick,
-  onMobile,
 }: {
-  onMobile?: boolean;
   className?: string;
   onClick: () => void;
 }) => {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2 gap-2 hover:bg-gray-500 active:bg-gray-700  ${className}`}
+      className={`flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2 gap-2 hover:bg-gray-500 active:bg-gray-700  ${
+        className || ""
+      } `}
+      id="search-button"
     >
       <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
-      <p className={` ${onMobile ? "hidden" : ""}`}>Search</p>
+
+      <p className="sr-only">Search</p>
     </button>
   );
 };
