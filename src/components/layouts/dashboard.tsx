@@ -57,21 +57,25 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
     {
       name: "Dashboard",
       path: "/dashboard",
+      id: "dashboard-menu-item",
       icon: HomeIcon,
     },
     {
       name: "Explore",
       path: "/explore",
+      id: "explore-menu-item",
       icon: MapIcon,
     },
     {
       name: "Courses",
       path: "/courses",
+      id: "courses-menu-item",
       icon: PhotoIcon,
     },
     {
       name: "Articles",
       path: "/articles",
+      id: "articles-menu-item",
       icon: DocumentTextIcon,
     },
   ];
@@ -136,6 +140,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
               icon={<item.icon className="w-6 h-6" />}
               text={item.name}
               path={item.path}
+              id={item.id}
               currentPath={router.pathname}
             />
           ))}
@@ -245,7 +250,10 @@ const AccountBox = ({
   id: string;
 }) => {
   return (
-    <div className="p-2 bg-gray-700 flex rounded-md mt-auto">
+    <div
+      className="p-2 bg-gray-700 flex rounded-md mt-auto"
+      id="current-account-box"
+    >
       <Menu>
         <Menu.Button className="relative w-12 h-12 rounded-full overflow-hidden">
           <Image
@@ -315,15 +323,18 @@ const MenuItem = ({
   text,
   path,
   currentPath,
+  id,
 }: {
   icon: React.ReactNode;
   text: string;
   path: string;
   currentPath: string;
+  id: string;
 }) => {
   return (
     <Link href={path}>
       <div
+        id={id}
         className={`flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer ${
           currentPath === path
             ? "bg-gray-700 text-white"
