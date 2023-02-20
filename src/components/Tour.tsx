@@ -68,6 +68,20 @@ function calculatePositionTop(
   }
 }
 
+///
+/// Tour Component
+///  - This component is used to create a tour for the new users of the app
+///  - This component is used in the dashboard.tsx page
+///
+/// TODOs:
+///  [ ] - add event based next action
+///  [ ]   - for example if user clicks to highlighted target then go to next step
+///  [ ] - add indicator for the current step
+///  [ ] - add indicator for the total steps
+///  [ ] - give handler to the parent component to handle the tour
+///  [ ]   - for example parent may want to skip some steps according to the user's knowledge
+///  [ ] - add MultiPage support
+
 // creates a NextFunctionComponent
 const Tour: NextPage<{
   start: boolean;
