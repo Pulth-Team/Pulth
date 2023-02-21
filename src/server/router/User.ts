@@ -39,7 +39,7 @@ export const UserRouter = createRouter()
       return user;
     },
   })
-  .query("updateUserById", {
+  .mutation("updateUserById", {
     input: z.object({
       id: z.string(),
       data: z.object({

@@ -62,13 +62,22 @@ const Settings: NextPage = () => {
     { refetchOnWindowFocus: false, enabled: false }
   );
 
-  const updateUser = trpc.useQuery(
-    [
-      "user.updateUserById",
-      { id: user?.id!, data: { name: userName, description: textDescription } },
-    ],
-    { enabled: false, refetchOnWindowFocus: false }
-  );
+  // const updateUser = trpc.useQuery(
+  //   [
+  //     "user.updateUserById",
+  //     { id: user?.id!, data: { name: userName, description: textDescription } },
+  //   ],
+  //   { enabled: false, refetchOnWindowFocus: false }
+  // );
+
+  const updateUserMutation = trpc.useMutation("user.updateUserById");
+
+  const useMutation = () => {
+    updateUserMutation.mutateAsync({
+      id: user?.id!,
+      data: { name: userName, description: textDescription },
+    });
+  };
 
   useEffect(() => {
     if (isSuccess)
@@ -317,11 +326,11 @@ const Settings: NextPage = () => {
           <div className="mt-5 flex gap-x-2">
             <button
               className="bg-indigo-500 text-white rounded-md p-2 flex gap-x-2 items-center"
-              onClick={() => updateUser.refetch()}
+              onClick={useMutation}
             >
               <Loading
                 className={`${
-                  updateUser.isFetching ? "" : "hidden"
+                  updateUserMutation.isLoading ? "" : "hidden"
                 } w-4 h-4 border-2`}
               />
               Save Changes
