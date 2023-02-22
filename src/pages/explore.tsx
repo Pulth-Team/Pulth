@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import DragScrollContainer from "../components/DragScrollContainer";
 import ArticleCard from "../components/ArticleCard";
 import DashboardLayout from "../components/layouts/dashboard";
+import Tour from "../components/Tour";
 
 const Explore: NextPage = () => {
   const { data } = useSession();
@@ -72,6 +73,22 @@ const Explore: NextPage = () => {
               cover nearly 4 (Four) error which is nearly all(102) of them.
             </ArticleCard> */}
           </DragScrollContainer>
+
+          <div id="some-tour-item" className="bg-white p-2">
+            Some TEXT
+          </div>
+
+          <Tour
+            start={"redirect"}
+            onFinished={(e) => {}}
+            tours={[
+              {
+                targetQuery: "#some-tour-item",
+                message: "This is a tour item with a enought long text",
+                className: "my-2",
+              },
+            ]}
+          />
         </div>
       </div>
     </DashboardLayout>

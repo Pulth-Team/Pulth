@@ -35,6 +35,7 @@ const Dashboard: NextPage = () => {
         <button onClick={showTour}>start Tour</button>
         <Tour
           start={tour}
+          className="mx-4 w-64"
           tours={[
             {
               targetQuery: "#dashboard-menu-item",
@@ -42,7 +43,6 @@ const Dashboard: NextPage = () => {
               align: "start",
               message:
                 "This is the dashboard. You can see your recommended courses and articles here",
-              className: "mx-4",
             },
             {
               targetQuery: "#explore-menu-item",
@@ -50,7 +50,7 @@ const Dashboard: NextPage = () => {
               align: "start",
               message:
                 "This is the explore page. You can see all the courses and articles here",
-              className: "mx-4",
+              redirect: "/explore",
             },
             {
               targetQuery: "#courses-menu-item",
@@ -58,7 +58,6 @@ const Dashboard: NextPage = () => {
               align: "start",
               message:
                 "This is the courses page. You can see all the courses here",
-              className: "mx-4",
             },
             {
               targetQuery: "#articles-menu-item",
@@ -66,7 +65,6 @@ const Dashboard: NextPage = () => {
               align: "start",
               message:
                 "This is the articles page. You can see all the articles here",
-              className: "mx-4",
             },
             {
               targetQuery: "#current-account-box",
@@ -80,12 +78,15 @@ const Dashboard: NextPage = () => {
               align: "end",
               message:
                 "This is the search button. You can click to open the search bar. Then you can search for courses, articles or users here",
-              className: "translate-y-4",
+              className: "translate-y-4 mx-auto",
             },
           ]}
-          className={"w-64"}
-          onFinished={(e) => {
+          onFinished={(e, message) => {
             setTour(false);
+            if (e === "error")
+              console.log("Error happened while Touring", {
+                message: message,
+              });
           }}
         />
       </div>
