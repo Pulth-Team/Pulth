@@ -1,7 +1,14 @@
 // imports GetServerSideProps from nextjs
 import { NextPage } from "next";
 import Link from "next/link";
-import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
+import { useRouter } from "next/router";
+import React, {
+  useRef,
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from "react";
 
 import {
   isHidden,
@@ -25,30 +32,59 @@ import {
 
 // creates a NextFunctionComponent
 const Tour: NextPage<{
-  start: boolean;
+  start: boolean | "redirect";
   className?: string;
   tours: {
     targetQuery: string;
-    direction?: "top" | "bottom" | "left" | "right";
-    align?: "start" | "center" | "end";
     message: string;
+
+    //optionals
+    skip?: boolean;
+    redirect?: string;
+
+    // default is bottom
+    direction?: "top" | "bottom" | "left" | "right";
+    // default is center
+    align?: "start" | "center" | "end";
     className?: string;
   }[];
   onFinished: (
-    e: "success" | "backdrop" | "skipped" | "error",
+    e: "success" | "backdrop" | "skipped" | "error" | "redirect",
     message?: string
   ) => void;
 }> = ({ start, className, tours, onFinished }) => {
   const tourRef = useRef<HTMLDivElement>(null);
   const [tourIndex, setTourIndex] = useState(0);
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (start === "redirect") {
+      if (router.isReady) {
+        if (router.query.tour === "true" && tourIndex === 0) {
+          setIsRunning(true);
+        } else {
+          setIsRunning(false);
+        }
+      } else {
+        setIsRunning(false);
+      }
+    } else {
+      setIsRunning(start);
+    }
+  }, [router.isReady, router.query, start, tourIndex]);
 
   function setZIndex(target: HTMLElement, zIndex: number | "auto") {
     target.style.setProperty("z-index", zIndex.toString());
   }
 
   const clearTour = useCallback(
-    (e: "success" | "backdrop" | "skipped" | "error", message?: string) => {
+    (
+      e: "success" | "backdrop" | "skipped" | "error" | "redirect",
+      message?: string
+    ) => {
       if (lastTarget) {
         setZIndex(lastTarget, "auto");
       }
@@ -56,13 +92,22 @@ const Tour: NextPage<{
       setTourIndex(0);
       setLastTarget(null);
       onFinished(e, message);
+      setIsRunning(false);
+      // delete router.query.tour;
+      if (
+        start === "redirect" &&
+        router.isReady &&
+        router.query.tour === "true" &&
+        e === "success"
+      )
+        router.replace(router.pathname, router.pathname, { shallow: true });
     },
-    [onFinished, lastTarget]
+    [onFinished, lastTarget, router, start]
   );
 
   useLayoutEffect(() => {
     // if tour is not started then return
-    if (!start) return;
+    if (!isRunning) return;
     // if tour is finished then clear the tour
     if (tourIndex >= tours.length) {
       clearTour("success");
@@ -173,15 +218,17 @@ const Tour: NextPage<{
 
     // set the last target
     setLastTarget(visibleTarget);
-  }, [tourIndex, start, tours, clearTour, lastTarget]);
+  }, [tourIndex, isRunning, tours, clearTour, lastTarget]);
 
+  const showSkip =
+    typeof tours[tourIndex]?.skip === "undefined" ? "" : "hidden";
   return (
     <>
       <div
         className={`
         bg-white rounded shadow-md z-50 p-2 
         ${className}
-        ${tours[tourIndex]?.className}  ${start || "hidden"}
+        ${tours[tourIndex]?.className}  ${isRunning || "hidden"}
         absolute `}
         ref={tourRef}
       >
@@ -192,25 +239,48 @@ const Tour: NextPage<{
           <button
             onClick={() => {
               clearTour("skipped");
+              setIsRunning(false);
             }}
-            className="text-black/70"
+            className={"text-black/70 " + showSkip}
           >
             Skip
           </button>
-          <button
-            onClick={() => {
-              setTourIndex(tourIndex + 1);
-            }}
-            className="font-semibold"
-          >
-            Next Tour
-          </button>
+
+          {tours[tourIndex]?.redirect ? (
+            <Link
+              href={{
+                pathname: tours[tourIndex]?.redirect,
+                query: { tour: true },
+              }}
+              shallow={true}
+              passHref
+            >
+              <a
+                className={
+                  "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+                }
+              >
+                Next Tour
+              </a>
+            </Link>
+          ) : (
+            <button
+              onClick={() => {
+                setTourIndex(tourIndex + 1);
+              }}
+              className={
+                "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+              }
+            >
+              Next Tour
+            </button>
+          )}
         </div>
       </div>
       <div
         id="backdrop-shadow"
         className={`w-screen h-screen backdrop-blur-sm backdrop-brightness-50 absolute top-0 left-0 z-40 ${
-          start || "hidden"
+          isRunning || "hidden"
         }`}
         onClick={() => clearTour("backdrop")}
       ></div>
