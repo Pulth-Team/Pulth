@@ -1,7 +1,5 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../utils/trpc";
-import { getASTfromHTML, ValidateTree } from "../utils/editorHelpers";
 import Head from "next/head";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -37,32 +35,53 @@ const Dashboard: NextPage = () => {
         <button onClick={showTour}>start Tour</button>
         <Tour
           start={tour}
-          targetQueries={[
-            "#dashboard-menu-item",
-            "#explore-menu-item",
-            "#courses-menu-item",
-            "#articles-menu-item",
-            "#current-account-box",
-            "button#search-button",
-          ]}
-          directions={["right", "right", "right", "right", "top", "bottom"]}
-          // TODO: add good messages
-          messages={[
-            "This is the dashboard. You can see your recommended courses and articles here",
-            "This is the explore page. You can see all the courses and articles here",
-            "This is the courses page. You can see all the courses here",
-            "This is the articles page. You can see all the articles here",
-            "This is your account action box. You can click to your profile picture open the menu. Then you can navigate to your profile, settings, and logout",
-            "This is the search button. You can click to open the search bar. Then you can search for courses, articles or users here",
-          ]}
-          aligns={["start", "start", "start", "start", "center", "end"]}
-          tourClassNames={[
-            "mx-4",
-            "mx-4",
-            "mx-4",
-            "mx-4",
-            "-translate-y-4",
-            "translate-y-2",
+          tours={[
+            {
+              targetQuery: "#dashboard-menu-item",
+              direction: "right",
+              align: "start",
+              message:
+                "This is the dashboard. You can see your recommended courses and articles here",
+              className: "mx-4",
+            },
+            {
+              targetQuery: "#explore-menu-item",
+              direction: "right",
+              align: "start",
+              message:
+                "This is the explore page. You can see all the courses and articles here",
+              className: "mx-4",
+            },
+            {
+              targetQuery: "#courses-menu-item",
+              direction: "right",
+              align: "start",
+              message:
+                "This is the courses page. You can see all the courses here",
+              className: "mx-4",
+            },
+            {
+              targetQuery: "#articles-menu-item",
+              direction: "right",
+              align: "start",
+              message:
+                "This is the articles page. You can see all the articles here",
+              className: "mx-4",
+            },
+            {
+              targetQuery: "#current-account-box",
+              direction: "top",
+              message:
+                "This is your account action box. You can click to your profile picture open the menu. Then you can navigate to your profile, settings, and logout",
+              className: "-translate-y-4",
+            },
+            {
+              targetQuery: "button#search-button",
+              align: "end",
+              message:
+                "This is the search button. You can click to open the search bar. Then you can search for courses, articles or users here",
+              className: "translate-y-4",
+            },
           ]}
           className={"w-64"}
           onFinished={(e) => {

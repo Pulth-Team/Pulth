@@ -3,63 +3,11 @@ import { NextPage } from "next";
 import Link from "next/link";
 import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
 
-function isHidden(el: HTMLElement) {
-  //   var style = window.getComputedStyle(el);
-  //   return style.display === "none";
-  return el.offsetParent === null;
-}
-
-function calculatePositionLeft(
-  targetPosition: DOMRect,
-  direction: "top" | "bottom" | "left" | "right",
-  align: "start" | "center" | "end",
-  tourWidth: number
-) {
-  if (direction === "bottom" || direction === "top") {
-    switch (align) {
-      case "start":
-        return targetPosition.left;
-      case "center":
-        return targetPosition.left - tourWidth / 2 + targetPosition.width / 2;
-      case "end":
-        return targetPosition.left - tourWidth + targetPosition.width;
-    }
-  }
-
-  if (direction === "left") {
-    return targetPosition.left - tourWidth;
-  }
-
-  if (direction === "right") {
-    return targetPosition.left + targetPosition.width;
-  }
-}
-
-function calculatePositionTop(
-  targetPosition: DOMRect,
-  direction: "top" | "bottom" | "left" | "right",
-  align: "start" | "center" | "end",
-  tourHeight: number
-) {
-  if (direction === "left" || direction === "right") {
-    switch (align) {
-      case "start":
-        return targetPosition.top;
-      case "center":
-        return targetPosition.top - tourHeight / 2 + targetPosition.height / 2;
-      case "end":
-        return targetPosition.top - tourHeight + targetPosition.height;
-    }
-  }
-
-  if (direction === "top") {
-    return targetPosition.top - tourHeight;
-  }
-
-  if (direction === "bottom") {
-    return targetPosition.top + targetPosition.height;
-  }
-}
+import {
+  isHidden,
+  calculatePositionLeft,
+  calculatePositionTop,
+} from "./helpers/Tour";
 
 ///
 /// Tour Component
@@ -78,180 +26,154 @@ function calculatePositionTop(
 // creates a NextFunctionComponent
 const Tour: NextPage<{
   start: boolean;
-  tourClassNames?: string[];
   className?: string;
-
-  targetQueries: string[];
-  directions: ("top" | "bottom" | "left" | "right")[];
-  aligns: ("start" | "center" | "end")[];
-  messages: string[];
-
-  onFinished: (e: "success" | "backdrop" | "skipped" | "error") => void;
-}> = ({
-  start,
-
-  tourClassNames,
-  className,
-
-  targetQueries,
-  directions,
-  aligns,
-  messages,
-
-  onFinished,
-}) => {
+  tours: {
+    targetQuery: string;
+    direction?: "top" | "bottom" | "left" | "right";
+    align?: "start" | "center" | "end";
+    message: string;
+    className?: string;
+  }[];
+  onFinished: (
+    e: "success" | "backdrop" | "skipped" | "error",
+    message?: string
+  ) => void;
+}> = ({ start, className, tours, onFinished }) => {
   const tourRef = useRef<HTMLDivElement>(null);
-  const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [tourIndex, setTourIndex] = useState(0);
+  const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
 
-  const setZIndex = useCallback(
-    (target: HTMLElement, zIndex: number | "auto") => {
-      target.style.setProperty("z-index", zIndex.toString());
-    },
-    []
-  );
+  function setZIndex(target: HTMLElement, zIndex: number | "auto") {
+    target.style.setProperty("z-index", zIndex.toString());
+  }
 
   const clearTour = useCallback(
-    (e: "success" | "backdrop" | "skipped" | "error") => {
-      // lastTarget?.style.setProperty("z-index", "auto");
-      // setZIndex(lastTarget, 0);
-
+    (e: "success" | "backdrop" | "skipped" | "error", message?: string) => {
       if (lastTarget) {
         setZIndex(lastTarget, "auto");
       }
+
       setTourIndex(0);
       setLastTarget(null);
-      onFinished(e);
+      onFinished(e, message);
     },
-    [onFinished, lastTarget, setZIndex]
+    [onFinished, lastTarget]
   );
 
   useLayoutEffect(() => {
-    if (!start) return clearTour("error");
-    // checks if the length of the targetQueries, directions, messages and aligns are equal
-    if (
-      targetQueries.length !== directions.length ||
-      directions.length !== messages.length ||
-      messages.length !== aligns.length
-    ) {
-      console.error(
-        "targetQueries, directions, messages and aligns must have the same length"
-      );
+    // if tour is not started then return
+    if (!start) return;
+    // if tour is finished then clear the tour
+    if (tourIndex >= tours.length) {
+      clearTour("success");
+      return;
+    }
+    // if tour data is not valid then clear the tour with error code
+    // if there is no tour element then return
+    if (!tourRef.current) return;
 
-      return clearTour("error");
+    const currentTour = tours[tourIndex];
+    if (!currentTour) {
+      console.log(currentTour);
+      clearTour("error", "Tour data is not valid");
+      return;
     }
 
-    // gets the first query and direction
-    const currentQuery = targetQueries[tourIndex];
-    const currentDirection = directions[tourIndex];
-    const currentAlign = aligns[tourIndex];
-
-    if (!currentQuery || !currentDirection || !currentAlign) {
-      console.error("Query, direction or Align are null");
-
-      return clearTour("error");
+    // if alignment is not set then set it to center
+    if (!currentTour.align) {
+      currentTour.align = "center";
+    }
+    // if direction is not set then set it to bottom
+    if (!currentTour.direction) {
+      currentTour.direction = "bottom";
     }
 
-    // gets the target element
-    const targetAll = document.querySelectorAll<HTMLElement>(currentQuery);
+    // if tour is started then
+    //  - get the target element
+    //  - calculate the position of the tour element according to alignment and direction
+    //  - set the position of the tour element
+    //  - set the z-index of the target element
+    //  - if tour is finished then clear the tour
 
-    // checks if the target is null
-    if (!targetAll) {
-      console.error("target is null");
+    // - get the target element
+    const QueryTargets = document.querySelectorAll<HTMLElement>(
+      currentTour.targetQuery
+    );
 
-      return clearTour("error");
+    // if there is no target then clear the tour with error code
+    if (QueryTargets.length === 0) {
+      clearTour("error", "There is no target element");
+      return;
     }
 
-    let visibleTarget: HTMLElement | null = null;
-    if (targetAll.length > 1) {
-      // checks if the target is an array
-
-      const targetArray = Array.from(targetAll);
-      console.log("target is an array calculating the first visible element");
-
-      // loops through the array
-      const filteredVisibleTargets = targetArray.filter((target) => {
+    if (!QueryTargets[0]) {
+      clearTour("error", "There is no target element");
+      return;
+    }
+    let visibleTarget: HTMLElement;
+    // if there is more than one target then clear try to find the target which is not hidden
+    if (QueryTargets.length > 1) {
+      const visibleTargetArray = Array.from(QueryTargets).filter((target) => {
         return !isHidden(target);
       });
 
-      if (filteredVisibleTargets.length > 0)
-        visibleTarget =
-          filteredVisibleTargets[0] === undefined
-            ? null
-            : filteredVisibleTargets[0];
-    }
-    const target = visibleTarget || targetAll[0];
+      // if there is no visible target then clear the tour with error code
+      if (visibleTargetArray.length === 0) {
+        clearTour("error", "There is no visible target");
+        return;
+      }
 
-    if (!target) {
-      console.error("target is null");
+      if (!visibleTargetArray[0]) {
+        clearTour("error", "There is no visible target");
+        return;
+      }
+      if (visibleTargetArray.length > 1) {
+        // if there is more than one visible target then warn the user and use the first one
+        console.warn(
+          "There is more than one visible target, using the first one"
+        );
+      }
 
-      return clearTour("error");
-    }
-
-    // calculates the position of the target element
-    const targetPosition = target?.getBoundingClientRect();
-
-    if (!targetPosition) {
-      console.error("target position is null");
-      return clearTour("error");
-    }
-
-    // calculates tours height and width
-    const tourHeight = tourRef.current?.getBoundingClientRect().height;
-    const tourWidth = tourRef.current?.getBoundingClientRect().width;
-
-    // checks if tour height or width is null
-    if (typeof tourHeight !== "number" || typeof tourWidth !== "number") {
-      console.error("tour height or width is null", tourHeight, tourWidth);
-
-      return clearTour("error");
+      visibleTarget = visibleTargetArray[0];
+    } else {
+      visibleTarget = QueryTargets[0];
     }
 
-    tourRef.current?.style.setProperty(
-      "left",
-      `${calculatePositionLeft(
-        targetPosition,
-        currentDirection,
-        currentAlign,
-        tourWidth
-      )}px`
+    // now we have the target element in the visibleTarget variable
+    // - calculate the position of the tour element according to alignment and direction
+
+    const targetBounding = visibleTarget.getBoundingClientRect();
+    const { width, height } = tourRef.current.getBoundingClientRect();
+
+    const left = calculatePositionLeft(
+      targetBounding,
+      currentTour.direction,
+      currentTour.align,
+      width
+    );
+    const top = calculatePositionTop(
+      targetBounding,
+      currentTour.direction,
+      currentTour.align,
+      height
     );
 
-    tourRef.current?.style.setProperty(
-      "top",
-      `${calculatePositionTop(
-        targetPosition,
-        currentDirection,
-        currentAlign,
-        tourHeight
-      )}px`
-    );
+    // - set the position of the tour element
+    tourRef.current.style.setProperty("left", left.toString() + "px");
+    tourRef.current.style.setProperty("top", top.toString() + "px");
 
-    // desets the z-index of the last target
-    if (lastTarget) setZIndex(lastTarget, "auto");
-
-    // sets the z-index of the tour element
-    if (tourRef.current) setZIndex(tourRef.current, 50);
-    setZIndex(target, 50);
-
-    // sets the last target
-    setLastTarget(target);
-
-    // checks if the tour index is equal to the length of the target queries
-    if (tourIndex === targetQueries.length) {
-      clearTour("success");
+    // resets the z-index of the last target
+    if (lastTarget) {
+      setZIndex(lastTarget, "auto");
     }
-  }, [
-    tourIndex,
-    start,
-    aligns,
-    directions,
-    messages.length,
-    targetQueries,
-    setZIndex,
-    lastTarget,
-    clearTour,
-  ]);
+
+    // - set the z-index of the target element
+    setZIndex(visibleTarget, 50);
+    setZIndex(tourRef.current, 50);
+
+    // set the last target
+    setLastTarget(visibleTarget);
+  }, [tourIndex, start, tours, clearTour, lastTarget]);
 
   return (
     <>
@@ -259,11 +181,11 @@ const Tour: NextPage<{
         className={`
         bg-white rounded shadow-md z-50 p-2 
         ${className}
-        ${tourClassNames && tourClassNames[tourIndex]}  ${start || "hidden"}
+        ${tours[tourIndex]?.className}  ${start || "hidden"}
         absolute `}
         ref={tourRef}
       >
-        {messages[tourIndex]}
+        {tours[tourIndex]?.message}
 
         <hr className="mb-1 mt-2" />
         <div className="flex justify-between my-1 mx-4">
