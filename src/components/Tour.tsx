@@ -10,6 +10,8 @@ import React, {
   useEffect,
 } from "react";
 
+import { twMerge } from "tailwind-merge";
+
 import {
   isHidden,
   calculatePositionLeft,
@@ -28,7 +30,7 @@ import {
 ///  [ ] - add indicator for the total steps
 ///  [ ] - give handler to the parent component to handle the tour
 ///  [ ]   - for example parent may want to skip some steps according to the user's knowledge
-///  [ ] - add MultiPage support
+///  [X] - add MultiPage support
 
 // creates a NextFunctionComponent
 const Tour: NextPage<{
@@ -62,43 +64,58 @@ const Tour: NextPage<{
 
   useEffect(() => {
     if (start === "redirect") {
-      if (router.isReady) {
-        if (router.query.tour === "true" && tourIndex === 0) {
-          setIsRunning(true);
-        } else {
-          setIsRunning(false);
-        }
-      } else {
+      if (!router.isReady) {
         setIsRunning(false);
+        return;
       }
+
+      if (router.query.tour === "true" && tourIndex === 0) {
+        setIsRunning(true);
+        return;
+      }
+
+      if (router.query.tour !== "true") {
+        setIsRunning(false);
+        return;
+      }
+
+      // if()
+      console.log({ tourIndex, tour: router.query.tour });
+      // setIsRunning(false);
     } else {
       setIsRunning(start);
     }
   }, [router.isReady, router.query, start, tourIndex]);
 
-  function setZIndex(target: HTMLElement, zIndex: number | "auto") {
-    target.style.setProperty("z-index", zIndex.toString());
+  function setZIndex(
+    target: HTMLElement,
+    zIndex: number | undefined = undefined
+  ) {
+    console.log(target);
+    target.style.setProperty("z-index", zIndex ? zIndex.toString() : "");
   }
 
   const clearTour = useCallback(
     (
       e: "success" | "backdrop" | "skipped" | "error" | "redirect",
-      message?: string
+      message?: string,
+      report: boolean = true
     ) => {
       if (lastTarget) {
-        setZIndex(lastTarget, "auto");
+        setZIndex(lastTarget);
       }
 
       setTourIndex(0);
       setLastTarget(null);
-      onFinished(e, message);
+      if (report) onFinished(e, message);
       setIsRunning(false);
+
       // delete router.query.tour;
       if (
         start === "redirect" &&
         router.isReady &&
         router.query.tour === "true" &&
-        e === "success"
+        e !== "error"
       )
         router.replace(router.pathname, router.pathname, { shallow: true });
     },
@@ -107,11 +124,10 @@ const Tour: NextPage<{
 
   useLayoutEffect(() => {
     // if tour is not started then return
-    if (!isRunning) return;
+    if (!isRunning) return clearTour("error", "Tour is not started", false);
     // if tour is finished then clear the tour
     if (tourIndex >= tours.length) {
-      clearTour("success");
-      return;
+      return clearTour("success");
     }
     // if tour data is not valid then clear the tour with error code
     // if there is no tour element then return
@@ -120,8 +136,11 @@ const Tour: NextPage<{
     const currentTour = tours[tourIndex];
     if (!currentTour) {
       console.log(currentTour);
-      clearTour("error", "Tour data is not valid");
-      return;
+      return clearTour("error", "Tour data is not valid");
+    }
+    // resets the z-index of the last target
+    if (lastTarget) {
+      setZIndex(lastTarget);
     }
 
     // if alignment is not set then set it to center
@@ -147,13 +166,11 @@ const Tour: NextPage<{
 
     // if there is no target then clear the tour with error code
     if (QueryTargets.length === 0) {
-      clearTour("error", "There is no target element");
-      return;
+      return clearTour("error", "There is no target element", false);
     }
 
     if (!QueryTargets[0]) {
-      clearTour("error", "There is no target element");
-      return;
+      return clearTour("error", "The first target element is null");
     }
     let visibleTarget: HTMLElement;
     // if there is more than one target then clear try to find the target which is not hidden
@@ -164,19 +181,18 @@ const Tour: NextPage<{
 
       // if there is no visible target then clear the tour with error code
       if (visibleTargetArray.length === 0) {
-        clearTour("error", "There is no visible target");
-        return;
+        return clearTour("error", "There is no visible target");
       }
 
       if (!visibleTargetArray[0]) {
-        clearTour("error", "There is no visible target");
-        return;
+        return clearTour("error", "There is no visible target");
       }
       if (visibleTargetArray.length > 1) {
         // if there is more than one visible target then warn the user and use the first one
         console.warn(
           "There is more than one visible target, using the first one"
         );
+        console.log(visibleTargetArray);
       }
 
       visibleTarget = visibleTargetArray[0];
@@ -202,34 +218,44 @@ const Tour: NextPage<{
       currentTour.align,
       height
     );
+    console.log({ top, left });
 
     // - set the position of the tour element
     tourRef.current.style.setProperty("left", left.toString() + "px");
     tourRef.current.style.setProperty("top", top.toString() + "px");
 
-    // resets the z-index of the last target
-    if (lastTarget) {
-      setZIndex(lastTarget, "auto");
-    }
-
     // - set the z-index of the target element
-    setZIndex(visibleTarget, 50);
+    setZIndex(visibleTarget, 43);
     setZIndex(tourRef.current, 50);
 
     // set the last target
     setLastTarget(visibleTarget);
-  }, [tourIndex, isRunning, tours, clearTour, lastTarget]);
+
+    const lastTourRef = tourRef.current;
+    return () => {
+      if (lastTarget) {
+        setZIndex(lastTarget);
+      }
+      if (lastTourRef) setZIndex(lastTourRef, 50);
+    };
+
+    // HACK: this dependency array is not correct
+    // FIXME: eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tourIndex, isRunning]);
+  //  lastTarget, clearTour, tours,
 
   const showSkip =
     typeof tours[tourIndex]?.skip === "undefined" ? "" : "hidden";
   return (
     <>
       <div
-        className={`
-        bg-white rounded shadow-md z-50 p-2 
-        ${className}
-        ${tours[tourIndex]?.className}  ${isRunning || "hidden"}
-        absolute `}
+        className={twMerge(
+          "bg-white rounded shadow-md z-50 p-2",
+          className,
+          tours[tourIndex]?.className,
+          !isRunning && "hidden",
+          "absolute"
+        )}
         ref={tourRef}
       >
         {tours[tourIndex]?.message}

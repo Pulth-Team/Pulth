@@ -74,18 +74,25 @@ const Explore: NextPage = () => {
             </ArticleCard> */}
           </DragScrollContainer>
 
-          <div id="some-tour-item" className="bg-white p-2">
-            Some TEXT
-          </div>
-
           <Tour
+            className="w-96"
             start={"redirect"}
-            onFinished={(e) => {}}
+            onFinished={(e, message) => {
+              if (e === "error") console.error(message);
+            }}
             tours={[
               {
-                targetQuery: "#some-tour-item",
-                message: "This is a tour item with a enought long text",
+                targetQuery: ".drag-scroll > div:first-child",
+                message:
+                  'This is a article recommendation for you. You can click "Go to Article" button to read the article.',
                 className: "my-2",
+              },
+              {
+                targetQuery: "#current-account-box",
+                message: "This is your current account's informations.",
+                direction: "top",
+                align: "center",
+                className: "-translate-y-2 w-64",
               },
             ]}
           />
