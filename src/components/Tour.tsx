@@ -1,14 +1,7 @@
 // imports GetServerSideProps from nextjs
 import { NextPage } from "next";
 import Link from "next/link";
-import React, {
-  Children,
-  useMemo,
-  useRef,
-  useState,
-  useLayoutEffect,
-} from "react";
-import { BatchElement } from "../types/renderer";
+import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
 
 function isHidden(el: HTMLElement) {
   //   var style = window.getComputedStyle(el);
@@ -111,28 +104,42 @@ const Tour: NextPage<{
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [tourIndex, setTourIndex] = useState(0);
 
-  const clearTour = (e: "success" | "backdrop" | "skipped" | "error") => {
-    lastTarget?.style.setProperty("z-index", "auto");
-    setTourIndex(0);
-    setLastTarget(null);
-    onFinished(e);
-  };
+  const setZIndex = useCallback(
+    (target: HTMLElement, zIndex: number | "auto") => {
+      target.style.setProperty("z-index", zIndex.toString());
+    },
+    []
+  );
 
-  // checks if the length of the targetQueries, directions, messages and aligns are equal
-  if (
-    targetQueries.length !== directions.length ||
-    directions.length !== messages.length ||
-    messages.length !== aligns.length
-  ) {
-    console.error(
-      "targetQueries, directions, messages and aligns must have the same length"
-    );
+  const clearTour = useCallback(
+    (e: "success" | "backdrop" | "skipped" | "error") => {
+      // lastTarget?.style.setProperty("z-index", "auto");
+      // setZIndex(lastTarget, 0);
 
-    return null;
-  }
+      if (lastTarget) {
+        setZIndex(lastTarget, "auto");
+      }
+      setTourIndex(0);
+      setLastTarget(null);
+      onFinished(e);
+    },
+    [onFinished, lastTarget, setZIndex]
+  );
 
   useLayoutEffect(() => {
     if (!start) return clearTour("error");
+    // checks if the length of the targetQueries, directions, messages and aligns are equal
+    if (
+      targetQueries.length !== directions.length ||
+      directions.length !== messages.length ||
+      messages.length !== aligns.length
+    ) {
+      console.error(
+        "targetQueries, directions, messages and aligns must have the same length"
+      );
+
+      return clearTour("error");
+    }
 
     // gets the first query and direction
     const currentQuery = targetQueries[tourIndex];
@@ -221,11 +228,11 @@ const Tour: NextPage<{
     );
 
     // desets the z-index of the last target
-    lastTarget?.style.setProperty("z-index", "auto");
+    if (lastTarget) setZIndex(lastTarget, "auto");
 
     // sets the z-index of the tour element
-    tourRef.current?.style.setProperty("z-index", "50");
-    target?.style.setProperty("z-index", "50");
+    if (tourRef.current) setZIndex(tourRef.current, 50);
+    setZIndex(target, 50);
 
     // sets the last target
     setLastTarget(target);
@@ -234,7 +241,17 @@ const Tour: NextPage<{
     if (tourIndex === targetQueries.length) {
       clearTour("success");
     }
-  }, [tourIndex, start]);
+  }, [
+    tourIndex,
+    start,
+    aligns,
+    directions,
+    messages.length,
+    targetQueries,
+    setZIndex,
+    lastTarget,
+    clearTour,
+  ]);
 
   return (
     <>
