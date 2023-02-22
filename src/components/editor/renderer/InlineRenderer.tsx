@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { NextPage } from "next";
 import { ReactNode, useMemo } from "react";
 import { getASTfromHTML, PureNodeAST } from "../../../utils/editorHelpers";
@@ -10,6 +11,7 @@ type InlineRendererProps = {
 const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
   const InlineASTMemo = useMemo(() => {
     let ast = getASTfromHTML(text);
+    console.log(ast);
 
     ast = ast.filter(
       (node) =>
@@ -33,6 +35,21 @@ const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
                 return (
                   <span key={index} className="italic">
                     <InlineRendererAST ast={node.children} />
+                  </span>
+                );
+              case "a":
+                return (
+                  <Link href={node.properties.href as string}>
+                    <span className="underline cursor-pointer">
+                      <InlineRendererAST ast={node.children} />
+                    </span>
+                  </Link>
+                );
+              default:
+                console.log(node);
+                return (
+                  <span className="p-1 bg-gray-700 text-white ">
+                    Unsupported element type {node.tagName}
                   </span>
                 );
             }

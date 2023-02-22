@@ -20,6 +20,7 @@ interface PureElement extends AST {
   tagName: string;
   properties: {
     className?: string[];
+    href?: string;
   };
   children: PureNodeAST[];
 }
