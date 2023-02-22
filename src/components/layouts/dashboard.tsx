@@ -129,7 +129,10 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
 
       {/* Laptop Sidebar */}
       <div className="hidden md:flex ">
-        <div className="flex flex-col flex-shrink-0 p-2 bg-gray-800 w-72 max-h-[stretch] top-0 bottom-0">
+        <div
+          className="flex flex-col flex-shrink-0 p-2 bg-gray-800 w-72 max-h-[stretch] top-0 bottom-0"
+          id="dashboard-sidebar"
+        >
           <div className="flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer bg-gray-800 text-gray-400 mb-8">
             <span className="text-indigo-500 text-xl font-bold">PulthApp</span>
           </div>

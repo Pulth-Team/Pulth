@@ -1,12 +1,10 @@
-// imports GetServerSideProps from nextjs
 import { NextPage } from "next";
 import Link from "next/link";
 import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
 
 function isHidden(el: HTMLElement) {
-  //   var style = window.getComputedStyle(el);
-  //   return style.display === "none";
-  return el.offsetParent === null;
+  var style = window.getComputedStyle(el);
+  return el.offsetParent === null || style.display === "none";
 }
 
 function calculatePositionLeft(
