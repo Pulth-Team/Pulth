@@ -308,7 +308,10 @@ const AccountBox = ({
       <div className="flex flex-col ml-2">
         <p className="text-gray-200 font-semibold">{name}</p>
         <Link href={`/user/${id}`}>
-          <button className="text-gray-400 text-sm text-left hover:text-gray-100 ">
+          <button
+            className="text-gray-400 text-sm text-left hover:text-gray-100"
+            id="view-profile-btn"
+          >
             View Profile
           </button>
         </Link>

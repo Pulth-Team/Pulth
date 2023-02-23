@@ -10,6 +10,7 @@ import React from "react";
 import Loading from "../../../components/Loading";
 import ArticleCard from "../../../components/ArticleCard";
 import DragScrollContainer from "../../../components/DragScrollContainer";
+import Tour from "../../../components/Tour";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
@@ -31,7 +32,10 @@ const ProfileIndex: NextPage = () => {
     <Dashboard>
       <div className="flex flex-col p-8 px-16 gap-y-8">
         <div className="flex justify-between">
-          <div className="flex items-center gap-x-5">
+          <div
+            className="flex items-center gap-x-5 bg-white p-3 rounded-lg"
+            id="info-box"
+          >
             <div className="h-36 w-36 relative">
               <Image
                 src={profileData.data?.image || "/default_profile.jpg"}
@@ -52,7 +56,7 @@ const ProfileIndex: NextPage = () => {
             {profileData.data?.description}
           </p>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col bg-white p-3 rounded-lg" id="my-articles">
           <h3 className="text-3xl font-bold mb-5">My Articles</h3>
           <DragScrollContainer>
             {profileData.data?.Articles.map((article) => (
@@ -74,6 +78,32 @@ const ProfileIndex: NextPage = () => {
           </DragScrollContainer>
         </div>
       </div>
+      <Tour
+        className="w-96"
+        start={"redirect"}
+        onFinished={(e, message) => {
+          if (e === "error") console.error(message);
+        }}
+        tours={[
+          {
+            targetQuery: "#info-box",
+            message:
+              "This is your info box. You can see your profile picture, name.",
+            direction: "bottom",
+            align: "start",
+            className: "my-6",
+          },
+          {
+            targetQuery: "#my-articles",
+            message:
+              "This is your articles. You can see your articles and you can click to read them.",
+            direction: "bottom",
+            align: "start",
+            className: "my-6",
+            redirect: "/profile",
+          },
+        ]}
+      />
     </Dashboard>
   );
 };

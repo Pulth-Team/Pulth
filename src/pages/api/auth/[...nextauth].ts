@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error", // Error code passed in query string as ?error=
-    newUser: "/auth/new-user", // New users will be directed here on first sign in (leave the property out if not of interest)
+    newUser: "/dashboard?tour=true", // New users will be directed here on first sign in (leave the property out if not of interest)
   },
 
   // Include user.id on session
