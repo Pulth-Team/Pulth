@@ -12,6 +12,8 @@ import ArticleCard from "../../../components/ArticleCard";
 import DragScrollContainer from "../../../components/DragScrollContainer";
 import Tour from "../../../components/Tour";
 
+import { UserPlusIcon } from "@heroicons/react/24/outline";
+
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
@@ -47,6 +49,22 @@ const ProfileIndex: NextPage = () => {
             <div className="flex flex-col">
               <p className="text-2xl font-semibold">{profileData.data?.name}</p>
               <p className="text-gray-600">{profileData.data?.email}</p>
+            </div>
+          </div>
+          <div className="w-5/12 flex items-center gap-x-16 justify-end">
+            <div className="flex flex-col items-center">
+              <p className="text-2xl font-semibold">1.56k</p>
+              <p>followers</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-2xl font-semibold">1.56k</p>
+              <p>follows</p>
+            </div>
+            <div>
+              <button className="flex text-white bg-black py-1.5 px-5 rounded-lg font-semibold gap-x-2 text-lg items-center">
+                <UserPlusIcon className="h-6 w-6 stroke-white" />
+                Follow
+              </button>
             </div>
           </div>
         </div>
