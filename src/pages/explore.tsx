@@ -94,6 +94,14 @@ const Explore: NextPage = () => {
                 align: "center",
                 className: "-translate-y-2 w-64",
               },
+              {
+                targetQuery: "#view-profile-btn",
+                message: "You can view your profile by clicking this button.",
+                direction: "right",
+                align: "end",
+                className: "translate-y-2 w-64",
+                redirect: `/user/${user?.id}`,
+              },
             ]}
           />
         </div>

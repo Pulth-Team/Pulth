@@ -4,12 +4,14 @@ import { trpc } from "../utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
 import DashboardLayout from "../components/layouts/dashboard";
 import MyArticleCard from "../components/editor/MyArticleCard";
+const Tour = dynamic(() => import("../components/Tour"), { ssr: false });
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
@@ -81,6 +83,7 @@ const Articles: NextPage = () => {
               <button
                 className="py-6 col-span-1 group bg-white border-dashed border-2 rounded-md hover:border-solid hover:border-indigo-500 flex flex-col justify-center items-center"
                 onClick={() => setIsOpen(true)}
+                id="create-article-button"
               >
                 <PlusIcon className="w-6 h-6 group-hover:text-indigo-500"></PlusIcon>
                 <p className="group-hover:text-indigo-500 text-sm leading-6 font-medium">
@@ -163,6 +166,23 @@ const Articles: NextPage = () => {
           </>
         )}
       </div>
+      <Tour
+        className="w-96"
+        start={"redirect"}
+        onFinished={(e, message) => {
+          if (e === "error") console.error(message);
+        }}
+        tours={[
+          {
+            targetQuery: "#create-article-button",
+            message:
+              "Click here to create a new article. You can also create a new article by clicking the 'New Article' button in the top right corner.",
+            direction: "bottom",
+            align: "start",
+            className: "my-5",
+          },
+        ]}
+      />
     </DashboardLayout>
   );
 };

@@ -59,6 +59,7 @@ const Tour: NextPage<{
   const [tourIndex, setTourIndex] = useState(0);
   const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isDone, setIsDone] = useState(false);
 
   const router = useRouter();
 
@@ -69,7 +70,7 @@ const Tour: NextPage<{
         return;
       }
 
-      if (router.query.tour === "true" && tourIndex === 0) {
+      if (router.query.tour === "true" && tourIndex === 0 && !isDone) {
         setIsRunning(true);
         return;
       }
@@ -110,14 +111,10 @@ const Tour: NextPage<{
       if (report) onFinished(e, message);
       setIsRunning(false);
 
-      // delete router.query.tour;
-      if (
-        start === "redirect" &&
-        router.isReady &&
-        router.query.tour === "true" &&
-        e !== "error"
-      )
-        router.replace(router.pathname, router.pathname, { shallow: true });
+      if (start === "redirect" && e !== "error") {
+        setIsDone(true);
+        // router.replace(router.pathname, undefined, { shallow: true });
+      }
     },
     [onFinished, lastTarget, router, start]
   );
