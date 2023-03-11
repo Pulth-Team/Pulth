@@ -11,7 +11,10 @@ export const UserRouter = createRouter()
     }),
     async resolve({ input, ctx }) {
       if (!ObjectId.isValid(input.id))
-        return new TRPCError({ message: "BAD_REQUEST" });
+        return new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User id is not valid",
+        });
 
       const user = await ctx.prisma?.user.findUnique({
         where: {
