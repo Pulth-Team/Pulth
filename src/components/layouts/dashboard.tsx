@@ -122,7 +122,8 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           <MobilePhoto image={user.image ?? "/default_profile.jpg"} />
         )}
       </div>
-      <div className="pt-14 pb-20 md:hidden ">{children}</div>
+      {/* Mobile Content */}
+      <div className="pt-14 pb-20 md:hidden overflow-y-hidden">{children}</div>
 
       {/* Mobile Bottom Bar */}
       <MobileBottombar path={router.pathname} />
