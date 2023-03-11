@@ -17,20 +17,32 @@ export const authRouter = createRouter()
     }
     return next();
   })
-
-  .query("updateSettings", {
+  .query("getSettings", {
+    async resolve({ ctx }) {
+      const user = await ctx.prisma?.user.findUnique({
+        where: {
+          id: ctx.session?.user?.id,
+        },
+        select: {
+          name: true,
+          description: true,
+          image: true,
+          id: true,
+          email: true,
+        },
+      });
+      return user;
+    },
+  })
+  .mutation("updateSettings", {
     input: z.object({
-      userId: z.string(),
+      name: z.string().optional(),
+      description: z.string().optional(),
+      // todo Add Photo Change
+      // "photo": z.string().optional()
 
-      data: z.object({
-        name: z.string().optional(),
-        description: z.string().optional(),
-        // todo Add Photo Change
-        // "photo": z.string().optional()
-
-        // Todo Add change Email
-        // "email": z.string().optional()
-      }),
+      // Todo Add change Email
+      // "email": z.string().optional()
     }),
     async resolve({ input, ctx }) {
       const updatedUser = await ctx.prisma?.user.update({
@@ -38,8 +50,8 @@ export const authRouter = createRouter()
           id: ctx.session?.user?.id,
         },
         data: {
-          name: input.data.name ?? undefined,
-          description: input.data.description ?? undefined,
+          name: input.name ?? undefined,
+          description: input.description ?? undefined,
         },
       });
 

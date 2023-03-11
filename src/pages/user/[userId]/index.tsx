@@ -13,28 +13,30 @@ import DragScrollContainer from "../../../components/DragScrollContainer";
 import Tour from "../../../components/Tour";
 
 import { UserPlusIcon } from "@heroicons/react/24/outline";
+import { TRPCError } from "@trpc/server";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
 
-  const profileData = trpc.useQuery([
+  const { data: profileData, status } = trpc.useQuery([
     "user.getUserById",
-    { id: userId as string },
+    { id: userId?.toString() || "" },
   ]);
 
-  if (profileData.isFetching)
+  if (status === "loading")
     return (
       <Dashboard>
         <Loading className="border-2 w-16 h-16 m-16" />;
       </Dashboard>
     );
-  if (!profileData.error)
+  if (status === "error" || !profileData || profileData instanceof TRPCError)
     return (
       <Dashboard>
         <div className="p-4">User Not Found</div>
       </Dashboard>
     );
+
   return (
     <Dashboard>
       <div className="flex flex-col p-8 px-16 gap-y-8">
@@ -45,15 +47,15 @@ const ProfileIndex: NextPage = () => {
           >
             <div className="h-36 w-36 relative">
               <Image
-                src={profileData.data?.image || "/default_profile.jpg"}
+                src={profileData.image || "/default_profile.jpg"}
                 layout="fill"
                 className="rounded-full"
                 alt="Profile Picture"
               />
             </div>
             <div className="flex flex-col">
-              <p className="text-2xl font-semibold">{profileData.data?.name}</p>
-              <p className="text-gray-600">{profileData.data?.email}</p>
+              <p className="text-2xl font-semibold">{profileData.name}</p>
+              <p className="text-gray-600">{profileData.email}</p>
             </div>
           </div>
           <div className="w-5/12 flex items-center gap-x-16 justify-end">
@@ -75,14 +77,12 @@ const ProfileIndex: NextPage = () => {
         </div>
         <div className="flex flex-col gap-y-3">
           <h3 className="text-3xl font-bold">About Me</h3>
-          <p className="text-lg text-black/80">
-            {profileData.data?.description}
-          </p>
+          <p className="text-lg text-black/80">{profileData.description}</p>
         </div>
         <div className="flex flex-col bg-white p-3 rounded-lg" id="my-articles">
           <h3 className="text-3xl font-bold mb-5">My Articles</h3>
           <DragScrollContainer>
-            {profileData.data?.Articles.map((article) => (
+            {profileData.Articles.map((article) => (
               <ArticleCard
                 Title={article.title}
                 Author={{

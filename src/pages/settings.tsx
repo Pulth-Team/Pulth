@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { prisma } from "../server/db/client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
@@ -21,90 +21,67 @@ import Loading from "../components/Loading";
 const Settings: NextPage = () => {
   const router = useRouter();
 
-  const { data, status } = useSession({
+  const { data: userData, status } = useSession({
     required: true,
     onUnauthenticated: () => signIn(),
   });
-  const user = data?.user;
 
-  const userData = trpc.useQuery(["user.getUserById", { id: user?.id! }], {
-    refetchOnWindowFocus: false,
-  });
-
-  console.log(userData);
-  console.log(user?.id);
-  console.log(userData.data?.description);
-
-  const [userName, setUserName] = useState(data?.user?.name || "");
-
-  const [textDescription, setTextDescription] = useState(
-    userData.data?.description || "aa"
-  );
-
-  const [textareaCount, setTextareaCount] = useState(
-    userData.data?.description?.length || 0
-  );
-  const [recomEnabled, setRecomEnabled] = useState(false);
+  const [textareaCount, setTextareaCount] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const {
-    data: settingsData,
-    refetch,
-    status: settingsStatus,
-    isSuccess,
-  } = trpc.useQuery(
-    [
-      "auth.updateSettings",
-      {
-        userId: user?.id!,
-        data: { name: userName, description: textDescription },
-      },
-    ],
-    { refetchOnWindowFocus: false, enabled: false }
-  );
+  interface userState {
+    name: string;
+    email: string;
+    image: string;
+    description: string;
+  }
 
-  // const updateUser = trpc.useQuery(
-  //   [
-  //     "user.updateUserById",
-  //     { id: user?.id!, data: { name: userName, description: textDescription } },
-  //   ],
-  //   { enabled: false, refetchOnWindowFocus: false }
-  // );
+  interface userAction {
+    payload: Partial<userState>;
+  }
 
-  const updateUserMutation = trpc.useMutation("user.updateUserById");
-
-  const useMutation = () => {
-    updateUserMutation.mutateAsync({
-      id: user?.id!,
-      data: { name: userName, description: textDescription },
-    });
+  const userReducer = (state: userState, action: userAction): userState => {
+    const { payload } = action;
+    console.log(payload);
+    return { ...state, ...payload };
   };
 
-  useEffect(() => {
-    if (isSuccess)
-      if (settingsStatus == "success" && settingsData == "Updated") {
-        const event = new Event("visibilitychange");
-        document.dispatchEvent(event);
-      }
-  }, [settingsStatus, isSuccess, settingsData]);
+  const [state, dispatch] = useReducer(userReducer, {
+    name: "",
+    email: "",
+    image: "",
+    description: "",
+  });
+
+  const { data: settingsData, refetch: settingsDataRefetch } = trpc.useQuery([
+    "auth.getSettings",
+  ]);
+  const currentDesc = settingsData?.description;
+
+  const updateUserMutation = trpc.useMutation("auth.updateSettings");
 
   useEffect(() => {
-    // todo type checks data.user.name
+    if (status == "authenticated" && userData.user) {
+      const { name, email, image } = userData.user;
+      console.log(email);
+      const payload = {
+        name: name || undefined,
+        email: email || undefined,
+        image: image || undefined,
+        description: currentDesc || undefined,
+      };
+      dispatch({
+        payload: payload,
+      });
+    }
+  }, [status, userData, currentDesc]);
 
-    if (status == "authenticated") setUserName(data?.user?.name || "");
-  }, [status, data]);
-  useEffect(() => {
-    setTextDescription(userData.data?.description || "");
-    setTextareaCount(userData.data?.description?.length || 0);
-  }, [userData.data?.description, userData.isFetching]);
-
-  if (status == "loading") return <p>Loading</p>;
-  if (userData.isFetching)
+  if (status == "loading")
     return (
       <DashboardLayout>
         <Loading className="w-12 h-12 border-2 m-10"></Loading>
       </DashboardLayout>
     );
-  console.log(user);
+
   return (
     <DashboardLayout>
       <Head>
@@ -141,7 +118,8 @@ const Settings: NextPage = () => {
               </div>
               <div className="flex flex-col gap-y-3">
                 <Image
-                  src={user?.image || "/default_profile.jpg"}
+                  // src={user?.image || "/default_profile.jpg"}
+                  src={state.image || "/default_profile.jpg"}
                   alt="profilePic"
                   width={135}
                   height={135}
@@ -156,8 +134,11 @@ const Settings: NextPage = () => {
                   <p>Name</p>
                   <input
                     className="border-2 rounded-lg p-2 w-full focus:outline-none focus:border-indigo-600"
-                    defaultValue={userName?.toString()}
-                    onChange={(e) => setUserName(e.target.value)}
+                    defaultValue={state.name}
+                    value={state.name}
+                    onChange={(e) =>
+                      dispatch({ payload: { name: e.target.value } })
+                    }
                   />
                 </div>
                 <div>
@@ -165,17 +146,27 @@ const Settings: NextPage = () => {
                   <input
                     className="border-2 rounded-lg p-2 w-full disabled:bg-gray-200/50"
                     disabled
-                    value={user?.email?.toString()}
+                    defaultValue={state.email}
+                    value={state.email}
+                    // value={user?.email?.toString()}
+                    onChange={(e) =>
+                      dispatch({ payload: { email: e.target.value } })
+                    }
                   />
                   <p className="text-gray-500 text-xs italic ml-1">
-                    Disabled because of via login
+                    Disabled because of sign up method
                   </p>
                 </div>
                 <div className="w-full">
                   <p>About</p>
                   <textarea
                     className="border-2 rounded-lg w-full p-1 h-32 min-h-[44px] max-h-56"
-                    onChange={(e) => setTextareaCount(e.target.value.length)}
+                    onChange={(e) => {
+                      setTextareaCount(e.target.value.length);
+                      dispatch({ payload: { description: e.target.value } });
+                    }}
+                    defaultValue={state.description}
+                    value={state.description}
                     maxLength={350}
                   ></textarea>
                   <p className="text-gray-500 text-xs italic ml-1">
@@ -192,45 +183,44 @@ const Settings: NextPage = () => {
                   </p>
                 </div>
                 <div className="flex flex-col w-full">
-                  <h4 className="text-lg font-medium">Recom Engine</h4>
-                  <div className="flex align-middle">
-                    <p className="text-gray-500 w-3/4">
-                      Allow Recom Engine to collect my data for personal
-                      recomendations
-                    </p>
-                    <div className="w-1/4 flex justify-end items-center">
-                      <Switch
-                        checked={recomEnabled}
-                        onChange={() => setRecomEnabled(!recomEnabled)}
-                        className={`${
-                          recomEnabled ? "bg-indigo-600" : "bg-slate-400"
-                        }
-                          relative flex h-7 w-14 cursor-pointer rounded-full border-2 transition-colors duration-200 box-content ease-in-out 
-                        `}
-                      >
-                        <span className="sr-only">Toggle Recom Engine</span>
-                        <span
-                          aria-hidden="true"
-                          className={`${
-                            recomEnabled ? "translate-x-full" : "translate-x-0"
-                          }
-                      pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-sm border-2 ring-0 transition duration-200 ease-in-out`}
-                        />
-                      </Switch>
-                    </div>
-                  </div>
                   <div className="flex gap-x-5 mt-8 justify-center">
                     <button
-                      onClick={async () => {
-                        await refetch();
-                        console.log(settingsData);
+                      onClick={() => {
+                        updateUserMutation.mutate({
+                          name: state.name,
+                          // TODO: add email change
+                          // email: state.email,
+                          description: state.description,
+                          // TODO: add image change
+                          // image: state.image,
+                        });
+                        settingsDataRefetch();
                       }}
                       className="rounded-lg p-2 font-semibold bg-indigo-600 text-white"
                     >
                       Save Settings
                     </button>
-                    <button className="rounded-lg p-2 font-semibold bg-red-500 text-white">
-                      Delete Profile
+                    <button
+                      // className={`${
+                      //   userData.data?.description === textDescription &&
+                      //   userData.data?.name === userName
+                      //     ? "text-red-500 cursor-default"
+                      //     : "bg-red-500 text-white cursor-pointer"
+                      // }  rounded-md p-2 transition-colors border border-red-500`}
+                      className={`bg-red-500 text-white cursor-pointer   rounded-md p-2 transition-colors border border-red-500`}
+                      onClick={() => {
+                        dispatch({
+                          payload: {
+                            name: userData.user?.name!,
+                            email: userData.user?.email!,
+                            description: currentDesc!,
+                            image: userData.user?.image!,
+                          },
+                        });
+                        settingsDataRefetch();
+                      }}
+                    >
+                      Reset Changes
                     </button>
                   </div>
                 </div>
@@ -272,8 +262,11 @@ const Settings: NextPage = () => {
                 <p>Name</p>
                 <input
                   className="border-2 rounded-lg p-2 w-full focus:outline-none focus:border-indigo-600"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  defaultValue={state.name}
+                  value={state.name}
+                  onChange={(e) =>
+                    dispatch({ payload: { name: e.target.value } })
+                  }
                 />
               </div>
               <div>
@@ -281,10 +274,14 @@ const Settings: NextPage = () => {
                 <input
                   className="border-2 rounded-lg p-2 w-full disabled:bg-gray-200/50"
                   disabled
-                  value={user?.email?.toString()}
+                  defaultValue={state.email}
+                  value={state.email}
+                  onChange={(e) =>
+                    dispatch({ payload: { email: e.target.value } })
+                  }
                 />
                 <p className="text-gray-500 text-xs italic ml-1">
-                  Disabled because of via login
+                  Disabled because of sign up method
                 </p>
               </div>
             </div>
@@ -293,7 +290,7 @@ const Settings: NextPage = () => {
                 Change Image
               </div>
               <Image
-                src={user?.image || "/default_profile.jpg"}
+                src={state.image || "/default_profile.jpg"}
                 alt="profilePic"
                 width={176}
                 height={176}
@@ -305,12 +302,14 @@ const Settings: NextPage = () => {
             <div className="w-full">
               <p>About</p>
               <textarea
-                className="border-2 rounded-lg w-full p-1 h-32 min-h-[44px] max-h-56"
+                className="border-2 rounded-lg w-full p-2 h-32 min-h-[44px] max-h-56 focus:outline-none focus:border-indigo-600"
                 onChange={(e) => {
                   setTextareaCount(e.target.value.length);
-                  setTextDescription(e.target.value);
+
+                  dispatch({ payload: { description: e.target.value } });
                 }}
-                value={textDescription}
+                defaultValue={state.description}
+                value={state.description}
                 maxLength={350}
               ></textarea>
               <p className="text-gray-500 text-xs italic ml-1">
@@ -326,7 +325,16 @@ const Settings: NextPage = () => {
           <div className="mt-5 flex gap-x-2">
             <button
               className="bg-indigo-500 text-white rounded-md p-2 flex gap-x-2 items-center"
-              onClick={useMutation}
+              onClick={() => {
+                updateUserMutation.mutate({
+                  name: state.name,
+                  // TODO: add email change
+                  // email: state.email,
+                  description: state.description,
+                  // TODO: add image change
+                  // image: state.image,
+                });
+              }}
             >
               <Loading
                 className={`${
@@ -336,15 +344,23 @@ const Settings: NextPage = () => {
               Save Changes
             </button>
             <button
-              className={`${
-                userData.data?.description === textDescription &&
-                userData.data?.name === userName
-                  ? "text-red-500 cursor-default"
-                  : "bg-red-500 text-white cursor-pointer"
-              }  rounded-md p-2 transition-colors border border-red-500`}
+              // className={`${
+              //   userData.data?.description === textDescription &&
+              //   userData.data?.name === userName
+              //     ? "text-red-500 cursor-default"
+              //     : "bg-red-500 text-white cursor-pointer"
+              // }  rounded-md p-2 transition-colors border border-red-500`}
+              className={`bg-red-500 text-white cursor-pointer   rounded-md p-2 transition-colors border border-red-500`}
               onClick={() => {
-                setTextDescription(userData.data?.description || "");
-                setUserName(userData.data?.name || "");
+                dispatch({
+                  payload: {
+                    name: userData.user?.name!,
+                    email: userData.user?.email!,
+                    description: currentDesc!,
+                    image: userData.user?.image!,
+                  },
+                });
+                settingsDataRefetch();
               }}
             >
               Reset Changes

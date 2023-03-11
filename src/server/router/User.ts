@@ -58,7 +58,11 @@ export const UserRouter = createRouter()
       }),
     }),
     async resolve({ input, ctx }) {
-      if (!ObjectId.isValid(input.id)) throw new Error("User id is not valid");
+      if (!ObjectId.isValid(input.id))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User id is not valid",
+        });
 
       const updatedUser = await ctx.prisma?.user.update({
         where: {
