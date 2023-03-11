@@ -29,7 +29,12 @@ const ProfileIndex: NextPage = () => {
         <Loading className="border-2 w-16 h-16 m-16" />;
       </Dashboard>
     );
-
+  if (!profileData.error)
+    return (
+      <Dashboard>
+        <div className="p-4">User Not Found</div>
+      </Dashboard>
+    );
   return (
     <Dashboard>
       <div className="flex flex-col p-8 px-16 gap-y-8">

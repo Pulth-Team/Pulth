@@ -1,5 +1,8 @@
 import { createRouter } from "./context";
 import { z } from "zod";
+import { ObjectId } from "bson";
+import { TRPCAbortError } from "@trpc/client";
+import { TRPCError } from "@trpc/server";
 
 export const UserRouter = createRouter()
   .query("getUserById", {
@@ -7,6 +10,9 @@ export const UserRouter = createRouter()
       id: z.string(),
     }),
     async resolve({ input, ctx }) {
+      if (!ObjectId.isValid(input.id))
+        return new TRPCError({ message: "BAD_REQUEST" });
+
       const user = await ctx.prisma?.user.findUnique({
         where: {
           id: input.id,
@@ -49,9 +55,11 @@ export const UserRouter = createRouter()
       }),
     }),
     async resolve({ input, ctx }) {
+      if (!ObjectId.isValid(input.id)) throw new Error("User id is not valid");
+
       const updatedUser = await ctx.prisma?.user.update({
         where: {
-          id: input.id,
+          id: input.id.toString(),
         },
         data: {
           name: input.data.name ?? undefined,
