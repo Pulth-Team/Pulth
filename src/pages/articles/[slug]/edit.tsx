@@ -19,7 +19,7 @@ import { Transition, Dialog } from "@headlessui/react";
 import TwitterIcon from "../../../components/icons/TwitterIcon";
 import FacebookIcon from "../../../components/icons/FacebookIcon";
 
-const Editor = dynamic(() => import("../../../components/Editor"), {
+const Editor = dynamic(() => import("../../../components/editor/Editor"), {
   ssr: false,
 });
 
@@ -33,11 +33,12 @@ const Articles: NextPage = ({}) => {
   const router = useRouter();
   const { slug } = router.query;
 
-  const [editor, setEditor] = useState<EditorJS | null>(null);
+  // const [editor, setEditor] = useState<EditorJS | null>(null);
+  const editor = useRef<EditorJS | null>(null);
 
-  const handleInit = useCallback((instance: EditorJS) => {
-    setEditor(instance);
-  }, []);
+  // const handleInit = useCallback((instance: EditorJS) => {
+  //   setEditor(instance);
+  // }, []);
 
   const articleAuthorFetch = trpc.useQuery(
     ["article.getArticleBySlugAuthor", { slug: slug as string }],
@@ -77,27 +78,30 @@ const Articles: NextPage = ({}) => {
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
 
-  // TODO: find a better way to update the body data (without using useEffect)
-  // FIXME: is this really working? (it seems to be working) (not sure)
-  useEffect(() => {
-    if (bodyData) {
-      updateArticleMutation.mutate({
-        slug: slug as string,
-        bodyData,
-      });
-    }
-  }, [bodyData]);
+  // // TODO: find a better way to update the body data (without using useEffect)
+  // // FIXME: is this really working? (it seems to be working) (not sure)
+  // useEffect(() => {
+  //   if (bodyData) {
+  //     updateArticleMutation.mutate({
+  //       slug: slug as string,
+  //       bodyData,
+  //     });
+  //   }
+  // }, [bodyData]);
 
   const OnSave = () => {
-    editor?.save().then((outputData) => {
+    editor.current?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
-      setBodyData(outputData.blocks);
-      // articleUpdateBodyFetch.refetch();
-      updateArticleMutation.mutate({
-        slug: slug as string,
-        bodyData: outputData.blocks as any, // TODO: fix this type
-      });
     });
+    // editor?.save().then((outputData) => {
+    //   console.log("Saved Article Data", outputData);
+    //   setBodyData(outputData.blocks);
+    //   // articleUpdateBodyFetch.refetch();
+    //   updateArticleMutation.mutate({
+    //     slug: slug as string,
+    //     bodyData: outputData.blocks as any, // TODO: fix this type
+    //   });
+    // });
   };
 
   const OnMenuClick = (menuType: string) => {
@@ -133,7 +137,7 @@ const Articles: NextPage = ({}) => {
                 title={articleAuthorFetch.data.title}
                 onSave={OnSave}
                 onPublish={async () => {
-                  const currentData = await editor?.save();
+                  const currentData = await editor.current?.save();
 
                   // TODO: add a better way to check if the data has changed
                   // check if the data has changed
@@ -163,7 +167,9 @@ const Articles: NextPage = ({}) => {
                   blocks: articleAuthorFetch.data.bodyData,
                   version: articleAuthorFetch.data.editorVersion,
                 }}
-                OnInit={handleInit}
+                editorRef={editor}
+                // OnInit={handleInit}
+                OnChange={(api) => {}}
               />
             </div>
           ) : (

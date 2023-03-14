@@ -10,7 +10,9 @@ import DashboardLayout from "../components/layouts/dashboard";
 
 // load editor only on client side
 import dynamic from "next/dynamic";
-const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
+const Editor = dynamic(() => import("../components/editor/Editor"), {
+  ssr: false,
+});
 
 const Articles: NextPage = () => {
   const { data } = useSession();

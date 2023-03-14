@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700;800;900&display=swap");
-
-::-webkit-scrollbar {
+@ap:: -webkit-scrollbar {
   height: 4px;
   width: 5px;
 }
@@ -59,3 +58,17 @@ h6.ce-header {
   padding: 0;
   margin-bottom: 0.5rem;
 }
+
+/* .ce-popover {
+  z-index: 100;
+  position: fixed;
+  transform: translateY(-72px);
+} */
+.ce-popover--opened {
+  /* transform: translateY(-72px); */
+  bottom: 77px;
+}
+
+/* .ce-popover .ce-popover--opened {
+  transform: translateY(-72px);
+} */

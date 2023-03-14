@@ -432,7 +432,7 @@ const SearchButton = ({
 
 const MobileBottombar = ({ path }: { path: string }) => {
   return (
-    <div className="md:hidden fixed flex bottom-0 w-screen bg-gray-800 justify-evenly py-3 text-white/60">
+    <div className="md:hidden fixed z-10 flex bottom-0 w-screen bg-gray-800 justify-evenly py-3 text-white/60">
       <Link href={`/dashboard`}>
         <button
           className={`flex flex-col items-center ${
