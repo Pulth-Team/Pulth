@@ -13,7 +13,6 @@ import DragScrollContainer from "../../../components/DragScrollContainer";
 import Tour from "../../../components/Tour";
 
 import { UserPlusIcon } from "@heroicons/react/24/outline";
-import { TRPCError } from "@trpc/server";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
@@ -30,7 +29,7 @@ const ProfileIndex: NextPage = () => {
         <Loading className="border-2 w-16 h-16 m-16" />;
       </Dashboard>
     );
-  if (status === "error" || !profileData || profileData instanceof TRPCError)
+  if (status === "error" || !profileData || profileData instanceof Error)
     return (
       <Dashboard>
         <div className="p-4">User Not Found</div>
