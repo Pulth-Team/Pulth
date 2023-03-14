@@ -23,7 +23,7 @@ import {
 ///  - This component is used to create a tour for the new users of the app
 ///  - This component is used in the dashboard.tsx page
 ///
-/// TODOs:
+/// TODO:
 ///  [ ] - add event based next action
 ///  [ ]   - for example if user clicks to highlighted target then go to next step
 ///  [ ] - add indicator for the current step
