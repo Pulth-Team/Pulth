@@ -10,6 +10,7 @@ import "../styles/globals.css";
 import Script from "next/script";
 
 import { env } from "../env.mjs";
+import Head from "next/head";
 
 const MyApp: AppType<{ session: Session }> = ({
   Component,
@@ -29,7 +30,11 @@ const MyApp: AppType<{ session: Session }> = ({
   const showAnalytics = (isProduction || isDevelopment) && GOOOGLE_ANALYTICS_ID;
 
   return (
-    <>
+    <div className="bg-white">
+      <Head>
+        {/* used for safari tab color */}
+        <meta name="theme-color" content="#ecd96f"></meta>
+      </Head>
       {showAnalytics ? (
         <>
           <Script
@@ -52,7 +57,7 @@ const MyApp: AppType<{ session: Session }> = ({
       <SessionProvider session={session}>
         <Component {...pageProps} />
       </SessionProvider>
-    </>
+    </div>
   );
 };
 

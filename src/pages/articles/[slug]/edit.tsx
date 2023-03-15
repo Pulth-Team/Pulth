@@ -8,7 +8,8 @@ import ArticleError from "../../../components/responses/ArticleError";
 import Loading from "../../../components/Loading";
 import EditorTopbar from "../../../components/editor/EditorTopbar";
 // import DashboardLayout from "../../../components/layouts/dashboard";
-import DashboardLayout from "../../../components/layouts/newDashboard";
+// import DashboardLayout from "../../../components/layouts/newDashboard";
+import DashboardLayout from "../../../components/layouts/gridDashboard";
 
 // load editor only on client side
 import { useSession } from "next-auth/react";

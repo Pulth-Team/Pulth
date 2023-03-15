@@ -64,7 +64,10 @@ const Editor: NextPage<{
 
   return (
     <div className="flex justify-center">
-      <div id={id} className={className ?? "" + "flex-shrink z-0"}></div>
+      <div
+        id={id}
+        className={className ?? "" + "flex-shrink z-0 flex-grow mx-16"}
+      ></div>
     </div>
   );
 };

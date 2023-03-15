@@ -59,16 +59,12 @@ h6.ce-header {
   margin-bottom: 0.5rem;
 }
 
-/* .ce-popover {
-  z-index: 100;
-  position: fixed;
-  transform: translateY(-72px);
-} */
-.ce-popover--opened {
-  /* transform: translateY(-72px); */
-  bottom: 77px;
+@media screen and (max-width: 650px, min-width: 0px) {
+  .ce-popover--opened {
+    /* transform: translateY(-72px); */
+    bottom: 77px;
+  }
 }
-
-/* .ce-popover .ce-popover--opened {
-  transform: translateY(-72px);
-} */
+html {
+  background-color: rgb(31 41 55);
+}
