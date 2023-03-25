@@ -168,9 +168,9 @@ const MenuItem = ({
       <div
         id={id}
         className={twMerge(
-          "flex  flex-col md:flex-row items-center  md:gap-2 p-2 rounded-md cursor-pointer",
+          "flex bg-transparent flex-col md:flex-row items-center md:self-stretch md:gap-2 p-2 rounded-md cursor-pointer",
           currentPath === path
-            ? "bg-gray-700 text-white"
+            ? "md:bg-gray-700 text-white"
             : "bg-gray-800 text-gray-400",
           className
         )}

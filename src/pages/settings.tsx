@@ -9,7 +9,7 @@ import { useEffect, useReducer, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import DashboardLayout from "../components/layouts/dashboard";
+import DashboardLayout from "../components/layouts/gridDashboard";
 import Image from "next/image";
 
 import { Tab } from "@headlessui/react";

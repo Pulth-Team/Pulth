@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/dashboard";
+import DashboardLayout from "../components/layouts/gridDashboard";
 
 const Courses: NextPage = () => {
   // const batchFetch = trpc.useQuery(["article.batch-data"]);

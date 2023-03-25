@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/dashboard";
+import DashboardLayout from "../components/layouts/gridDashboard";
 import MyArticleCard from "../components/editor/MyArticleCard";
 const Tour = dynamic(() => import("../components/Tour"), { ssr: false });
 

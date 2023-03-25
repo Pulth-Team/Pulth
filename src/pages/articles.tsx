@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/dashboard";
+import DashboardLayout from "../components/layouts/gridDashboard";
 
 // load editor only on client side
 import dynamic from "next/dynamic";

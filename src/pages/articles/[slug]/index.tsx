@@ -4,7 +4,7 @@ import { trpc } from "../../../utils/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import DashboardLayout from "../../../components/layouts/dashboard";
+import DashboardLayout from "../../../components/layouts/gridDashboard";
 import Comment, { CommentData } from "../../../components/editor/comment";
 import CommentAdd, {
   AddCommentData,

@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import Dashboard from "../../../components/layouts/dashboard";
+import DashboardLayout from "../../../components/layouts/gridDashboard";
 
 import Image from "next/image";
 
@@ -25,19 +25,19 @@ const ProfileIndex: NextPage = () => {
 
   if (status === "loading")
     return (
-      <Dashboard>
+      <DashboardLayout>
         <Loading className="border-2 w-16 h-16 m-16" />;
-      </Dashboard>
+      </DashboardLayout>
     );
   if (status === "error" || !profileData || profileData instanceof Error)
     return (
-      <Dashboard>
+      <DashboardLayout>
         <div className="p-4">User Not Found</div>
-      </Dashboard>
+      </DashboardLayout>
     );
 
   return (
-    <Dashboard>
+    <DashboardLayout>
       <div className="flex flex-col p-8 px-16 gap-y-8">
         <div className="flex justify-between">
           <div
@@ -126,7 +126,7 @@ const ProfileIndex: NextPage = () => {
           },
         ]}
       />
-    </Dashboard>
+    </DashboardLayout>
   );
 };
 

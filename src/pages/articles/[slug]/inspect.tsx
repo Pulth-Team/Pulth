@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import DashboardLayout from "../../../components/layouts/dashboard";
+import DashboardLayout from "../../../components/layouts/gridDashboard";
 import Loading from "../../../components/Loading";
 import { trpc } from "../../../utils/trpc";
 
@@ -20,8 +20,6 @@ import {
   XCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { string } from "zod";
-import { Stringifier } from "postcss";
 
 const Inspect: NextPage = () => {
   const { data, status } = useSession({ required: true });

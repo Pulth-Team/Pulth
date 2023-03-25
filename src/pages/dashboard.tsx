@@ -8,7 +8,7 @@ const Tour = dynamic(() => import("../components/Tour"), { ssr: false });
 
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/dashboard";
+import DashboardLayout from "../components/layouts/gridDashboard";
 import { useState } from "react";
 
 const Dashboard: NextPage = () => {
