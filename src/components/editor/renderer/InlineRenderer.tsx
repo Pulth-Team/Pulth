@@ -11,7 +11,6 @@ type InlineRendererProps = {
 const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
   const InlineASTMemo = useMemo(() => {
     let ast = getASTfromHTML(text);
-    console.log(ast);
 
     ast = ast.filter(
       (node) =>
