@@ -1,20 +1,18 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "~/utils/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import DashboardLayout from "../../../components/layouts/gridDashboard";
-import Comment, { CommentData } from "../../../components/editor/comment";
-import CommentAdd, {
-  AddCommentData,
-} from "../../../components/editor/addComment";
+import DashboardLayout from "~/components/layouts/gridDashboard";
+import Comment, { CommentData } from "~/components/editor/comment";
+import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 
 import DocumentRenderer, {
   OutputBlockType,
-} from "../../../components/editor/renderer/DocumentRenderer";
+} from "~/components/editor/renderer/DocumentRenderer";
 import { signIn, useSession } from "next-auth/react";
-import CommentList from "../../../components/editor/CommentList";
+import CommentList from "~/components/editor/CommentList";
 import { useMemo } from "react";
 
 // TODO: Add support for SSG
@@ -110,7 +108,7 @@ const Articles: NextPage = () => {
     <DashboardLayout>
       <Head>
         <title>
-          {(articleData.data?.title || "unnamed").toString()} - Pulth App
+          {(articleData.data?.title || "unnamed").toString() + " - Pulth App"}
         </title>
         <meta name="description" content={articleData.data?.description} />
         <meta name="author" content={articleData.data?.author?.name!} />

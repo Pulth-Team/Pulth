@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NextPage } from "next";
 import { ReactNode, useMemo } from "react";
-import { getASTfromHTML, PureNodeAST } from "../../../utils/editorHelpers";
+import { getASTfromHTML, PureNodeAST } from "~/utils/editorHelpers";
 
 type InlineRendererProps = {
   text: string;

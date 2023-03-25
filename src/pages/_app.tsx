@@ -1,15 +1,15 @@
 // src/pages/_app.tsx
-import type { AppRouter } from "../server/router";
+import type { AppRouter } from "~/server/router";
 import type { AppType } from "next/app";
 import type { Session } from "next-auth";
 
 import { withTRPC } from "@trpc/next";
 import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
-import "../styles/globals.css";
+import "~/styles/globals.css";
 import Script from "next/script";
 
-import { env } from "../env.mjs";
+import { env } from "~/env.mjs";
 import Head from "next/head";
 
 const MyApp: AppType<{ session: Session }> = ({

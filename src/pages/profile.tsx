@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../utils/trpc";
+import { trpc } from "~/utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,13 +9,13 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/gridDashboard";
-import MyArticleCard from "../components/editor/MyArticleCard";
-const Tour = dynamic(() => import("../components/Tour"), { ssr: false });
+import DashboardLayout from "~/components/layouts/gridDashboard";
+import MyArticleCard from "~/components/editor/MyArticleCard";
+const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import Loading from "../components/Loading";
+import Loading from "~/components/Loading";
 
 const Articles: NextPage = () => {
   const { data, status } = useSession({ required: true });

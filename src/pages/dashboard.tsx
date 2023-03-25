@@ -2,13 +2,13 @@ import type { NextPage } from "next";
 
 import Head from "next/head";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 
-const Tour = dynamic(() => import("../components/Tour"), { ssr: false });
+import dynamic from "next/dynamic";
+const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 import { useState } from "react";
 
 const Dashboard: NextPage = () => {

@@ -1,14 +1,14 @@
 import type { NextPage } from "next";
 import EditorJS from "@editorjs/editorjs";
 
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "~/utils/trpc";
 import Head from "next/head";
 
-import ArticleError from "../../../components/responses/ArticleError";
-import Loading from "../../../components/Loading";
-import EditorTopbar from "../../../components/editor/EditorTopbar";
+import ArticleError from "~/components/responses/ArticleError";
+import Loading from "~/components/Loading";
+import EditorTopbar from "~/components/editor/EditorTopbar";
 
-import DashboardLayout from "../../../components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 
 // load editor only on client side
 import { useSession } from "next-auth/react";
@@ -17,10 +17,10 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { Transition, Dialog } from "@headlessui/react";
-import TwitterIcon from "../../../components/icons/TwitterIcon";
-import FacebookIcon from "../../../components/icons/FacebookIcon";
+import TwitterIcon from "~/components/icons/TwitterIcon";
+import FacebookIcon from "~/components/icons/FacebookIcon";
 
-const Editor = dynamic(() => import("../../../components/editor/Editor"), {
+const Editor = dynamic(() => import("~/components/editor/Editor"), {
   ssr: false,
 });
 

@@ -3,20 +3,18 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 
-import { prisma } from "../server/db/client";
-
 import { useEffect, useReducer, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import DashboardLayout from "../components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 import Image from "next/image";
 
 import { Tab } from "@headlessui/react";
 import { Switch } from "@headlessui/react";
 import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
-import { trpc } from "../utils/trpc";
-import Loading from "../components/Loading";
+import { trpc } from "~/utils/trpc";
+import Loading from "~/components/Loading";
 
 const Settings: NextPage = () => {
   const router = useRouter();

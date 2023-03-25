@@ -1,4 +1,4 @@
-import Dashboard from "../components/layouts/gridDashboard";
+import Dashboard from "~/components/layouts/gridDashboard";
 
 const TestPage = () => {
   return (

@@ -1,16 +1,16 @@
 import type { NextPage } from "next";
-import DashboardLayout from "../../../components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 
 import Image from "next/image";
 
 import { useRouter } from "next/router";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "~/utils/trpc";
 import React from "react";
 
-import Loading from "../../../components/Loading";
-import ArticleCard from "../../../components/ArticleCard";
-import DragScrollContainer from "../../../components/DragScrollContainer";
-import Tour from "../../../components/Tour";
+import Loading from "~/components/Loading";
+import ArticleCard from "~/components/ArticleCard";
+import DragScrollContainer from "~/components/DragScrollContainer";
+import Tour from "~/components/Tour";
 
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 

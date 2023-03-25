@@ -7,8 +7,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { Menu } from "@headlessui/react";
-import { trpc } from "../../utils/trpc";
-import Loading from "../Loading";
+import { trpc } from "~/utils/trpc";
+import Loading from "~/components/Loading";
 
 const EditorTopbar: NextPage<{
   title: string;

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions as nextAuthOptions } from "./auth/[...nextauth]";
 
 import { S3 } from "aws-sdk";
-import { env } from "../../env.mjs";
+import { env } from "~/env.mjs";
 import formidable from "formidable";
 import fs from "fs";
 

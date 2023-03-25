@@ -6,9 +6,9 @@ import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 
-import DragScrollContainer from "../components/DragScrollContainer";
-import ArticleCard from "../components/ArticleCard";
-import DashboardLayout from "../components/layouts/gridDashboard";
+import DragScrollContainer from "~/components/DragScrollContainer";
+import ArticleCard from "~/components/ArticleCard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 import Tour from "../components/Tour";
 
 const Explore: NextPage = () => {

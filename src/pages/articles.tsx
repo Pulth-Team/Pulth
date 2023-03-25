@@ -1,16 +1,15 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "../components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts/gridDashboard";
 
 // load editor only on client side
 import dynamic from "next/dynamic";
-const Editor = dynamic(() => import("../components/editor/Editor"), {
+const Editor = dynamic(() => import("~/components/editor/Editor"), {
   ssr: false,
 });
 

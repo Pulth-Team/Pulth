@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
+import React, { useRef, useState, useCallback } from "react";
 
 function isHidden(el: HTMLElement) {
   var style = window.getComputedStyle(el);

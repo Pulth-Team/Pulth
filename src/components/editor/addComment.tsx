@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import Loading from "../Loading";
+import Loading from "~/components/Loading";
 
 interface AddCommentData {
   parent?: string;

@@ -1,7 +1,7 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { env } from "../../env.mjs";
+import { env } from "~/env.mjs";
 import algoliasearch from "algoliasearch";
 
 import slugify from "slugify";

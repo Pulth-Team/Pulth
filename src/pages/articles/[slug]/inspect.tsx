@@ -2,9 +2,9 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import DashboardLayout from "../../../components/layouts/gridDashboard";
-import Loading from "../../../components/Loading";
-import { trpc } from "../../../utils/trpc";
+import DashboardLayout from "~/components/layouts/gridDashboard";
+import Loading from "~/components/Loading";
+import { trpc } from "~/utils/trpc";
 
 import { Dialog, Tab, Transition } from "@headlessui/react";
 

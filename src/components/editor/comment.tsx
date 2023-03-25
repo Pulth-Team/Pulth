@@ -11,7 +11,7 @@ import { useState } from "react";
 
 import Image from "next/image";
 import CommentAdd, { AddCommentData } from "./addComment";
-import { trpc } from "../../utils/trpc";
+import { trpc } from "~/utils/trpc";
 
 interface CommentData {
   // id of the comment

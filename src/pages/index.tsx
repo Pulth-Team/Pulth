@@ -2,11 +2,10 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { trpc } from "../utils/trpc";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import FacebookIcon from "../components/icons/FacebookIcon";
-import TwitterIcon from "../components/icons/TwitterIcon";
+import FacebookIcon from "~/components/icons/FacebookIcon";
+import TwitterIcon from "~/components/icons/TwitterIcon";
 import { MapPinIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
 const Home: NextPage = () => {

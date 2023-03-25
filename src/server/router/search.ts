@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createRouter } from "./context";
 
 import algoliaSearch from "algoliasearch";
-import { env } from "../../env.mjs";
+import { env } from "~/env.mjs";
 
 export const searchRouter = createRouter().query("article", {
   input: z.object({

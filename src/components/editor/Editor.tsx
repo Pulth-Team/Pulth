@@ -4,7 +4,7 @@ import type { API } from "@editorjs/editorjs";
 import EditorJS from "@editorjs/editorjs";
 import { NextPage } from "next";
 import { useState, useEffect, useRef, useId } from "react";
-import { getBaseUrl } from "../../pages/_app";
+import { getBaseUrl } from "~/pages/_app";
 
 // todo add editorjs DataTypes
 const Editor: NextPage<{

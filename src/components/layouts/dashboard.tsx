@@ -8,9 +8,7 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 
-// import BatchRenderer from "../components/BatchRenderer";
-
-import CustomSearchBox from "../CustomSearchBox";
+import CustomSearchBox from "~/components/CustomSearchBox";
 
 import { useSession } from "next-auth/react";
 import React, { Fragment, useState } from "react";
@@ -37,7 +35,7 @@ import {
   Hits,
 } from "react-instantsearch-dom";
 
-import { env } from "../../env.mjs";
+import { env } from "~/env.mjs";
 
 const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   const { data } = useSession();
