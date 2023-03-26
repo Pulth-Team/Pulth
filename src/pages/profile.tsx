@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 import DashboardLayout from "~/components/layouts/gridDashboard";
@@ -18,27 +18,27 @@ import { Dialog } from "@headlessui/react";
 import Loading from "~/components/Loading";
 
 const Articles: NextPage = () => {
-  const { data, status } = useSession({ required: true });
-  const user = data?.user;
+  const { status } = useSession({ required: true });
 
   const [isOpen, setIsOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
 
-  const articleData = api.article.getByAuthor.useQuery({
-    userId: user?.id || "",
-  });
-
+  const articleData = api.article.getMyArticles.useQuery();
   const createMutation = api.article.create.useMutation();
 
   const onSubmitDialog = () => {
-    createMutation.mutate({
-      title: dialogTitle,
-      description: dialogDescription,
-    });
-
-    // refresh "My articles" data
-    articleData.refetch();
+    createMutation.mutate(
+      {
+        title: dialogTitle,
+        description: dialogDescription,
+      },
+      {
+        onSuccess: () => {
+          articleData.refetch();
+        },
+      }
+    );
 
     // reset dialog
     setDialogDescription("");
@@ -146,9 +146,13 @@ const Articles: NextPage = () => {
                       <button
                         className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
                         onClick={() => onSubmitDialog()}
-                        disabled={createQuery.isLoading}
+                        disabled={
+                          createMutation.isLoading ||
+                          dialogTitle.length < 12 ||
+                          dialogDescription.length < 24
+                        }
                       >
-                        {createQuery.isLoading ? (
+                        {createMutation.isLoading ? (
                           <Loading className="h-6 w-6 border-4" />
                         ) : (
                           ""
