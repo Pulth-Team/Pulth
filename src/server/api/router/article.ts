@@ -10,6 +10,7 @@ import {
 import { TRPCError } from "@trpc/server";
 
 export const articleRouter = createTRPCRouter({
+  // takes a slug and returns an article without isPublished value
   getBySlug: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const article = await ctx.prisma?.article.findUnique({
       where: {
@@ -101,6 +102,11 @@ export const articleRouter = createTRPCRouter({
       });
     }),
 
+  // takes a user id and returns a list of articles
+  // articles are sorted by createdAt
+  // articles are paginated
+  // articles are only returned if they are published
+  // articles has only title, description and slug
   getByAuthor: publicProcedure
     .input(
       z.object({
@@ -166,6 +172,8 @@ export const articleRouter = createTRPCRouter({
       return article;
     }),
 
+  // takes an article slug and returns the article
+  // the article is only returned if the user is the author
   inspect: protectedProcedure
     .input(
       z.object({
@@ -189,6 +197,38 @@ export const articleRouter = createTRPCRouter({
         });
 
       return article;
+    }),
+
+  // returns a list of articles of an currently logged in user
+  // articles are sorted by createdAt
+  // articles are paginated
+  getMyArticles: protectedProcedure
+    .input(
+      z
+        .object({
+          limit: z.number().optional().default(10),
+          skip: z.number().optional().default(0),
+        })
+        .optional()
+    )
+    .query(async ({ ctx }) => {
+      const articles = await ctx.prisma?.article.findMany({
+        where: {
+          authorId: ctx.session?.user.id,
+        },
+        select: {
+          title: true,
+          description: true,
+          slug: true,
+          isPublished: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return articles;
     }),
 
   publish: protectedProcedure
