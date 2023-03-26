@@ -22,12 +22,25 @@ import {
 } from "@heroicons/react/24/outline";
 
 const Inspect: NextPage = () => {
-  const { data, status } = useSession({ required: true });
+  const { status } = useSession({ required: true });
 
   const router = useRouter();
   const { slug } = router.query;
 
-  const articleData = api.article.inspect.useQuery({ slug: slug as string });
+  const articleData = api.article.inspect.useQuery(
+    {
+      slug: (slug as string) || "",
+    },
+    {
+      onSuccess: (data) => {
+        setTitleValue(data.title);
+        setDescValue(data.description);
+
+        setTitleResetButton(false);
+        setDescResetButton(false);
+      },
+    }
+  );
 
   const [titleValue, setTitleValue] = useState(articleData.data?.title);
   const [descValue, setDescValue] = useState(articleData.data?.description);
@@ -37,35 +50,29 @@ const Inspect: NextPage = () => {
   const [keywords, setKeywords] = useState([] as string[]);
   const [deleteTitleInput, setDeleteTitleInput] = useState("");
   const [inputError, setInputError] = useState(false);
+  const [keywordInput, setKeywordInput] = useState("");
+  const [keywordError, setKeywordError] = useState("");
 
   const deleteArticle = api.article.delete.useMutation();
   const publishArticleMutation = api.article.publish.useMutation();
+  const saveArticle = api.article.updateInfo.useMutation();
 
   const handleDeleteButton = () => {
     if (deleteTitleInput == articleData.data?.title) {
-      deleteArticle.mutate({ slug: slug as string });
+      deleteArticle.mutate(slug as string, {
+        onSuccess: (data) => {
+          console.warn(data);
+          router.push("/profile");
+        },
+      });
+
       setDeleteArticleModal(false);
-      router.push("/profile");
     } else {
       setInputError(true);
     }
   };
 
-  useEffect(() => {
-    setTitleValue(articleData.data?.title);
-    setDescValue(articleData.data?.description);
-  }, [
-    articleData.isFetched,
-    articleData.data?.title,
-    articleData.data?.description,
-  ]);
-
-  const saveArticle = api.article.updateInfo.useMutation();
-
   let body;
-
-  const [keywordInput, setKeywordInput] = useState("");
-  const [keywordError, setKeywordError] = useState("");
 
   let keywordList = (
     <div className="flex flex-wrap gap-4">
@@ -87,7 +94,7 @@ const Inspect: NextPage = () => {
         <input
           className="rounded-md border p-2"
           onChange={(e) => setKeywordInput(e.target.value)}
-          value={keywordInput}
+          value={keywordInput || ""}
         />
         <button
           className="rounded-md bg-indigo-500 p-1"
@@ -129,11 +136,25 @@ const Inspect: NextPage = () => {
       <button
         className="flex items-center gap-x-2 rounded-md bg-indigo-500 p-2 text-white"
         onClick={() => {
+          let mutationValues: {
+            title?: string;
+            description?: string;
+            slug: string;
+          } = {
+            slug: slug as string,
+          };
+
+          if (titleValue != articleData.data?.title) {
+            mutationValues["title"] = titleValue || "";
+          }
+
+          if (descValue != articleData.data?.description) {
+            mutationValues["description"] = descValue || "";
+          }
+
           saveArticle.mutate(
             {
-              slug: slug as string,
-              title: titleValue || "",
-              description: descValue || "",
+              ...mutationValues,
             },
             {
               onSuccess: (data) => {
@@ -203,7 +224,7 @@ const Inspect: NextPage = () => {
                         if (e.target.value === articleData.data?.title)
                           setTitleResetButton(false);
                       }}
-                      value={titleValue}
+                      value={titleValue || ""}
                     />
 
                     <button
@@ -229,7 +250,7 @@ const Inspect: NextPage = () => {
                             setDescResetButton(false);
                         }}
                         className="max-h-36 min-h-[96px] w-full rounded-md border-2 border-gray-300 px-2 py-1"
-                        value={descValue}
+                        value={descValue || ""}
                       />
                     </div>
 
@@ -250,11 +271,25 @@ const Inspect: NextPage = () => {
                     disabled={!descResetButton && !titleResetButton}
                     className="ml-auto flex gap-2 rounded-md bg-indigo-500 px-2 py-1 text-lg text-white transition-colors duration-200 disabled:border disabled:border-gray-700 disabled:bg-transparent disabled:text-gray-700"
                     onClick={async () => {
+                      let mutationValues: {
+                        title?: string;
+                        description?: string;
+                        slug: string;
+                      } = {
+                        slug: slug as string,
+                      };
+
+                      if (titleValue != articleData.data?.title) {
+                        mutationValues["title"] = titleValue || "";
+                      }
+
+                      if (descValue != articleData.data?.description) {
+                        mutationValues["description"] = descValue || "";
+                      }
+
                       saveArticle.mutate(
                         {
-                          slug: slug as string,
-                          title: titleValue || "",
-                          description: descValue || "",
+                          ...mutationValues,
                         },
                         {
                           onSuccess: (data) => {
@@ -297,7 +332,7 @@ const Inspect: NextPage = () => {
                 publishArticleMutation.mutate(
                   {
                     slug: slug as string,
-                    isPublishEvent: !articleData.data?.isPublished,
+                    setUnpublished: articleData.data?.isPublished,
                   },
                   {
                     onSuccess: (data) => {
