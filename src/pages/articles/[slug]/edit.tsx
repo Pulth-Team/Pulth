@@ -43,11 +43,11 @@ const Articles: NextPage = ({}) => {
     },
     {
       enabled: status === "authenticated",
-      //   refetchOnWindowFocus: false,
-      //   refetchOnMount: false,
-      //   refetchOnReconnect: false,
-      //   refetchInterval: false,
-      //   refetchIntervalInBackground: false,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
       onSuccess: (data) => {
         if (data) {
           setBodyData(data.bodyData);
