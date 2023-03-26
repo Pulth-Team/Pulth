@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { trpc } from "~/utils/trpc";
+import { api } from "~/utils/api";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -14,6 +14,7 @@ import DocumentRenderer, {
 import { signIn, useSession } from "next-auth/react";
 import CommentList from "~/components/editor/CommentList";
 import { useMemo } from "react";
+import CommentAlgo from "~/components/editor/CommentAlgo";
 
 // TODO: Add support for SSG
 // TODO: Add support for Loading State in CSR
@@ -23,13 +24,10 @@ const Articles: NextPage = () => {
   const { slug } = router.query;
 
   // query to get the article data
-  const articleData = trpc.useQuery([
-    "article.getArticleBySlug",
-    { slug: slug as string },
-  ]);
+  const articleData = api.article.getBySlug.useQuery(slug || "");
 
   // mutation to add a comment
-  const commentAddMutation = trpc.useMutation("comment.addComment");
+  const commentAddMutation = api.comment.create.useMutation();
 
   let blocks: OutputBlockType[] = [];
   if (articleData.data?.bodyData) {
@@ -80,7 +78,7 @@ const Articles: NextPage = () => {
             />
           ) : (
             <button
-              className="bg-gray-600 text-white flex items-center justify-center py-4 rounded-lg"
+              className="flex items-center justify-center rounded-lg bg-gray-600 py-4 text-white"
               onClick={() => signIn()}
             >
               Login to comment
@@ -88,8 +86,8 @@ const Articles: NextPage = () => {
           )}
 
           <hr className="my-2" />
-          <CommentList
-            comments={articleData.data?.Comments as CommentData[]}
+          {/* <CommentList
+            comments={articleData.data?.Comments as unknown as CommentData[]}
             currentArticleId={articleData.data?.id as string}
             currentUser={{
               id: userData?.user?.id as string,
@@ -99,7 +97,11 @@ const Articles: NextPage = () => {
             OnAnyEdit={() => {
               articleData.refetch();
             }}
-          />
+          /> */}
+
+          <CommentAlgo></CommentAlgo>
+
+          <pre>{JSON.stringify(articleData.data?.Comments, undefined, 2)}</pre>
         </div>
       </div>
     </>
@@ -117,8 +119,8 @@ const Articles: NextPage = () => {
         {/* Add keywords */}
       </Head>
       {/* read article container for our article renderer with media queries */}
-      <div className="p-4 container max-w-2xl mx-auto">
-        {articleData.data?.error ? <p>{articleData.data.error}</p> : body}
+      <div className="container mx-auto max-w-2xl p-4">
+        {body}
         {/* Add Comments, Tags, AuthorBox, Action Button */}
       </div>
     </DashboardLayout>

@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import EditorJS from "@editorjs/editorjs";
 
-import { trpc } from "~/utils/trpc";
+import { api } from "~/utils/api";
 import Head from "next/head";
 
 import ArticleError from "~/components/responses/ArticleError";
@@ -37,12 +37,10 @@ const Articles: NextPage = ({}) => {
   // const [editor, setEditor] = useState<EditorJS | null>(null);
   const editor = useRef<EditorJS | null>(null);
 
-  // const handleInit = useCallback((instance: EditorJS) => {
-  //   setEditor(instance);
-  // }, []);
-
-  const articleAuthorFetch = trpc.useQuery(
-    ["article.getArticleBySlugAuthor", { slug: slug as string }],
+  const articleAuthorFetch = api.article.inspect.useQuery(
+    {
+      slug: slug as string,
+    },
     {
       enabled: status === "authenticated",
       //   refetchOnWindowFocus: false,
@@ -58,15 +56,16 @@ const Articles: NextPage = ({}) => {
     }
   );
 
-  const publishArticleMutation = trpc.useMutation("article.publishArticle");
-  const deleteArticleMutation = trpc.useMutation("article.deleteArticleBySlug");
-  const updateArticleMutation = trpc.useMutation("article.updateArticleBody");
+  const publishArticleMutation = api.article.publish.useMutation();
+  const deleteArticleMutation = api.article.delete.useMutation();
+  const updateArticleMutation = api.article.updateBody.useMutation();
 
   const handleDeleteButton = () => {
     if (titleInput == articleAuthorFetch.data?.title) {
-      deleteArticleMutation.mutate({ slug: slug as string });
+      deleteArticleMutation.mutate(slug as string);
       setDeleteModal(false);
       router.push("/profile");
+      rp;
     } else {
       // TODO: add error message more than just an alert
 
@@ -187,7 +186,7 @@ const Articles: NextPage = ({}) => {
         <Dialog
           open={deleteModal}
           onClose={() => setDeleteModal(false)}
-          className="z-20 relative"
+          className="relative z-20"
           as="div"
         >
           <Transition.Child
@@ -202,7 +201,7 @@ const Articles: NextPage = ({}) => {
             <div className="fixed inset-0 bg-black bg-opacity-50"></div>
           </Transition.Child>
           <div className="fixed inset-0">
-            <div className="flex justify-center items-center h-full">
+            <div className="flex h-full items-center justify-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -212,7 +211,7 @@ const Articles: NextPage = ({}) => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Dialog.Panel className="bg-white rounded-md p-4 flex flex-col gap-y-4">
+                <Dialog.Panel className="flex flex-col gap-y-4 rounded-md bg-white p-4">
                   <Dialog.Title className="text-xl font-semibold">
                     Delete Article
                   </Dialog.Title>
@@ -220,17 +219,17 @@ const Articles: NextPage = ({}) => {
                     <label className="mb-2">
                       To delete your article write the name of you article below
                     </label>
-                    <label className="italic text-black/50 text-sm ">
+                    <label className="text-sm italic text-black/50 ">
                       {articleAuthorFetch.data?.title}
                     </label>
                     <input
                       placeholder="Article Name"
-                      className="p-2 rounded-lg border-2 focus:border-red-500 focus:ring-0 focus:outline-none"
+                      className="rounded-lg border-2 p-2 focus:border-red-500 focus:outline-none focus:ring-0"
                       onChange={(e) => setTitleInput(e.target.value.toString())}
                     ></input>
                   </div>
                   <button
-                    className="bg-red-500 rounded p-2 text-white w-1/3"
+                    className="w-1/3 rounded bg-red-500 p-2 text-white"
                     onClick={() => handleDeleteButton()}
                   >
                     Delete Article
@@ -245,7 +244,7 @@ const Articles: NextPage = ({}) => {
         <Dialog
           open={shareModal}
           onClose={() => setShareModal(false)}
-          className="z-20 relative"
+          className="relative z-20"
           as="div"
         >
           <Transition.Child
@@ -260,7 +259,7 @@ const Articles: NextPage = ({}) => {
             <div className="fixed inset-0 bg-black bg-opacity-50"></div>
           </Transition.Child>
           <div className="fixed inset-0">
-            <div className="flex justify-center items-center h-full">
+            <div className="flex h-full items-center justify-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -270,7 +269,7 @@ const Articles: NextPage = ({}) => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Dialog.Panel className="bg-white rounded-md p-4 flex flex-col gap-y-4">
+                <Dialog.Panel className="flex flex-col gap-y-4 rounded-md bg-white p-4">
                   <Dialog.Title className="text-xl font-semibold">
                     Share Article
                   </Dialog.Title>
@@ -278,15 +277,15 @@ const Articles: NextPage = ({}) => {
                   <div className="flex flex-col gap-y-2">
                     <p>Share this article via</p>
                     <div className="flex gap-x-4">
-                      <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-500 hover:bg-blue-500">
-                        <TwitterIcon className="stroke-none fill-blue-500 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-500 bg-transparent transition-colors duration-150 hover:bg-blue-500">
+                        <TwitterIcon className="mt-0.5 fill-blue-500 stroke-none transition-colors duration-150 group-hover:fill-white group-hover:stroke-none" />
                       </div>
-                      <div className="group cursor-pointer rounded-full h-12 w-12 bg-transparent border-2 transition-colors duration-150 flex justify-center items-center border-blue-900 hover:bg-blue-900">
-                        <FacebookIcon className="stroke-none fill-blue-900 group-hover:stroke-none group-hover:fill-white transition-colors duration-150 mt-0.5" />
+                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-900 bg-transparent transition-colors duration-150 hover:bg-blue-900">
+                        <FacebookIcon className="mt-0.5 fill-blue-900 stroke-none transition-colors duration-150 group-hover:fill-white group-hover:stroke-none" />
                       </div>
                     </div>
                     <p>You can use link</p>
-                    <div className="bg-black/10 p-2 rounded-md flex gap-x-3">
+                    <div className="flex gap-x-3 rounded-md bg-black/10 p-2">
                       <input
                         className="bg-transparent"
                         disabled
@@ -294,7 +293,7 @@ const Articles: NextPage = ({}) => {
                       />
                       <button
                         onClick={copyURL}
-                        className="bg-indigo-500 text-white py-1 px-2 rounded-md"
+                        className="rounded-md bg-indigo-500 py-1 px-2 text-white"
                       >
                         Copy Link
                       </button>

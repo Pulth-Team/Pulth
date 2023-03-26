@@ -7,7 +7,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { Menu } from "@headlessui/react";
-import { trpc } from "~/utils/trpc";
+import { trpc } from "~/utils/api";
 import Loading from "~/components/Loading";
 
 const EditorTopbar: NextPage<{
@@ -26,20 +26,20 @@ const EditorTopbar: NextPage<{
   publishLoading,
 }) => {
   return (
-    <div className="flex gap-x-2 px-4 bg-white z-10 shadow-md mb-4 py-2 items-center sticky top-0">
+    <div className="sticky top-0 z-10 mb-4 flex items-center gap-x-2 bg-white px-4 py-2 shadow-md">
       <h1 className="mr-auto">
         <span className="sr-only">Title of the article</span>
         {title}
       </h1>
       <button
-        className="rounded-md text-black/70 px-2 py-1 flex gap-2 items-center"
+        className="flex items-center gap-2 rounded-md px-2 py-1 text-black/70"
         onClick={() => onSave()}
       >
         {saveLoading && <Loading className="w-4 border-2" />}
         Save
       </button>
       <button
-        className="rounded-md font-medium p-2 px-4 bg-indigo-600 text-white flex gap-2 items-center"
+        className="flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white"
         onClick={() => onPublish()}
       >
         {publishLoading && <Loading className="w-4 border-2" />}
@@ -47,43 +47,43 @@ const EditorTopbar: NextPage<{
       </button>
       <Menu as="div" className="">
         <Menu.Button className="flex items-center">
-          <div className="rounded-md self-stretch">
-            <EllipsisVerticalIcon className="w-6 h-6" />
+          <div className="self-stretch rounded-md">
+            <EllipsisVerticalIcon className="h-6 w-6" />
           </div>
         </Menu.Button>
-        <Menu.Items className="absolute z-10 rounded translate-y-5 -translate-x-28 bg-white shadow-md py-2 flex flex-col items-start justify-start w-36">
+        <Menu.Items className="absolute z-10 flex w-36 translate-y-5 -translate-x-28 flex-col items-start justify-start rounded bg-white py-2 shadow-md">
           <Menu.Item
-            className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
+            className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
             onClick={() => onMenuClick("share")}
           >
-            <ShareIcon className="w-5 h-5" />
+            <ShareIcon className="h-5 w-5" />
             <p>Share</p>
           </Menu.Item>
           <Menu.Item
-            className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
+            className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
             onClick={() => onMenuClick("privacy")}
           >
-            <LockClosedIcon className="w-5 h-5" />
+            <LockClosedIcon className="h-5 w-5" />
             <p>Privacy</p>
           </Menu.Item>
           <Menu.Item
-            className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
+            className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
             onClick={() => onMenuClick("configure")}
           >
-            <PencilSquareIcon className="w-5 h-5" />
+            <PencilSquareIcon className="h-5 w-5" />
             <p>Configure</p>
           </Menu.Item>
           <hr className="" />
           <Menu.Item
-            className="p-2 hover:bg-gray-100 self-start w-full text-left flex gap-x-3 items-center"
+            className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
             onClick={() => onMenuClick("delete")}
             // onClick={() => deleteArticleFetch.refetch()}
           >
-            <TrashIcon className="w-5 h-5" />
+            <TrashIcon className="h-5 w-5" />
             <p>Delete</p>
           </Menu.Item>
         </Menu.Items>

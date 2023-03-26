@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { trpc } from "../utils/trpc";
+import { api } from "../utils/api";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -15,13 +15,10 @@ const Explore: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
 
-  const { data: articles } = trpc.useQuery([
-    "article.getLatestArticles",
-    {
-      limit: 10,
-      skip: 0,
-    },
-  ]);
+  const { data: articles } = api.article.getLatest.useQuery({
+    limit: 10,
+    skip: 0,
+  });
 
   return (
     <DashboardLayout>
@@ -35,12 +32,12 @@ const Explore: NextPage = () => {
       </Head>
       <div className="flex flex-col gap-y-4 px-0 md:px-5">
         <h1
-          className={`${user ?? "hidden"} text-4xl font-bold mb-4 md:px-0 px-5`}
+          className={`${user ?? "hidden"} mb-4 px-5 text-4xl font-bold md:px-0`}
         >
           Welcome back, <span className="text-indigo-700">{user?.name}</span>
         </h1>
         <div className="flex flex-col gap-y-5">
-          <p className="text-2xl font-semibold md:px-0 px-5">
+          <p className="px-5 text-2xl font-semibold md:px-0">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
           <DragScrollContainer>

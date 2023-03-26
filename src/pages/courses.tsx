@@ -6,8 +6,6 @@ import { useSession } from "next-auth/react";
 import DashboardLayout from "~/components/layouts/gridDashboard";
 
 const Courses: NextPage = () => {
-  // const batchFetch = trpc.useQuery(["article.batch-data"]);
-
   const { data } = useSession();
   const user = data?.user;
 
@@ -23,7 +21,7 @@ const Courses: NextPage = () => {
       </Head>
       <button
         type="button"
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        className="rounded bg-red-500 py-2 px-4 font-bold text-white hover:bg-red-700"
         onClick={() => {
           throw new Error("Not-Sentry Frontend Error");
         }}

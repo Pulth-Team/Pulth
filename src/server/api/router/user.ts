@@ -1,17 +1,19 @@
-import { createRouter } from "./context";
 import { z } from "zod";
 import { ObjectId } from "bson";
-import { TRPCAbortError } from "@trpc/client";
-import { TRPCError } from "@trpc/server";
 
-export const UserRouter = createRouter()
-  .query("getUserById", {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ input, ctx }) {
+import { TRPCError } from "@trpc/server";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+export const userRouter = createTRPCRouter({
+  getUserById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
       if (!ObjectId.isValid(input.id))
-        return new TRPCError({
+        throw new TRPCError({
           code: "BAD_REQUEST",
           message: "User id is not valid",
         });
@@ -46,18 +48,20 @@ export const UserRouter = createRouter()
         },
       });
       return user;
-    },
-  })
-  .mutation("updateUserById", {
-    input: z.object({
-      id: z.string(),
-      data: z.object({
-        name: z.string().optional(),
-        description: z.string().optional(),
-        image: z.string().optional(),
-      }),
     }),
-    async resolve({ input, ctx }) {
+
+  updateUserById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        data: z.object({
+          name: z.string().optional(),
+          description: z.string().optional(),
+          image: z.string().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       if (!ObjectId.isValid(input.id))
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -75,5 +79,5 @@ export const UserRouter = createRouter()
         },
       });
       return updatedUser;
-    },
-  });
+    }),
+});

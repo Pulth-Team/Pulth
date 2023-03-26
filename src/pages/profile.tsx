@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { trpc } from "~/utils/trpc";
+import { api } from "~/utils/api";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
@@ -25,18 +25,16 @@ const Articles: NextPage = () => {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
 
-  const articleData = trpc.useQuery([
-    "article.getUserArticleInfos",
-    { userId: user?.id },
-  ]);
+  const articleData = api.article.getByAuthor.useQuery({
+    userId: user?.id || "",
+  });
 
-  const createQuery = trpc.useMutation("article.createArticle");
+  const createMutation = api.article.create.useMutation();
 
   const onSubmitDialog = () => {
-    createQuery.mutate({
+    createMutation.mutate({
       title: dialogTitle,
       description: dialogDescription,
-      bodyData: [],
     });
 
     // refresh "My articles" data
@@ -59,14 +57,14 @@ const Articles: NextPage = () => {
       </Head>
       <div className="p-4">
         {status === "loading" ? (
-          <Loading className="w-12 h-12 border-2" />
+          <Loading className="h-12 w-12 border-2" />
         ) : (
           <>
             <h2>
               <span className="text-2xl font-bold">My Articles</span>
             </h2>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {articleData.data?.map((article) => (
                 <MyArticleCard
                   key={article.slug}
@@ -80,12 +78,12 @@ const Articles: NextPage = () => {
 
               {/* Add Project div */}
               <button
-                className="py-6 col-span-1 group bg-white border-dashed border-2 rounded-md hover:border-solid hover:border-indigo-500 flex flex-col justify-center items-center"
+                className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
                 onClick={() => setIsOpen(true)}
                 id="create-article-button"
               >
-                <PlusIcon className="w-6 h-6 group-hover:text-indigo-500"></PlusIcon>
-                <p className="group-hover:text-indigo-500 text-sm leading-6 font-medium">
+                <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
+                <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
                   Create New Article
                 </p>
               </button>
@@ -107,7 +105,7 @@ const Articles: NextPage = () => {
                   }}
                 />
                 <div className="fixed inset-0 flex items-center justify-center  ">
-                  <Dialog.Panel className="bg-white p-4 rounded-2xl lg:w-2/5 w-11/12">
+                  <Dialog.Panel className="w-11/12 rounded-2xl bg-white p-4 lg:w-2/5">
                     <Dialog.Title className="text-xl font-bold">
                       Create new article
                     </Dialog.Title>
@@ -120,7 +118,7 @@ const Articles: NextPage = () => {
                     <input
                       name="articleName"
                       type="text"
-                      className="w-full border border-gray-200 rounded-lg p-2 "
+                      className="w-full rounded-lg border border-gray-200 p-2 "
                       value={dialogTitle}
                       onChange={(e) => setDialogTitle(e.target.value)}
                     />
@@ -130,11 +128,11 @@ const Articles: NextPage = () => {
                     </label>
                     <textarea
                       name="articleDescription"
-                      className="w-full border border-gray-200 rounded-lg p-2"
+                      className="w-full rounded-lg border border-gray-200 p-2"
                       value={dialogDescription}
                       onChange={(e) => setDialogDescription(e.target.value)}
                     ></textarea>
-                    <div className="flex flex-row justify-between mt-4">
+                    <div className="mt-4 flex flex-row justify-between">
                       <button
                         className="mr-auto"
                         onClick={() => {
@@ -146,12 +144,12 @@ const Articles: NextPage = () => {
                         Cancel
                       </button>
                       <button
-                        className="flex flex-row gap-1 justify-center items-center p-2 bg-indigo-500 hover:bg-indigo-400 rounded-md text-white text-sm font-medium disabled:bg-indigo-300"
+                        className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
                         onClick={() => onSubmitDialog()}
                         disabled={createQuery.isLoading}
                       >
                         {createQuery.isLoading ? (
-                          <Loading className="w-6 h-6 border-4" />
+                          <Loading className="h-6 w-6 border-4" />
                         ) : (
                           ""
                         )}

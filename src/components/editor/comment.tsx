@@ -11,7 +11,7 @@ import { useState } from "react";
 
 import Image from "next/image";
 import CommentAdd, { AddCommentData } from "./addComment";
-import { trpc } from "~/utils/trpc";
+import { api } from "~/utils/api";
 
 interface CommentData {
   // id of the comment
@@ -70,19 +70,19 @@ const Comment = ({
   const [editValue, setEditValue] = useState("");
   const [showEdit, setShowEdit] = useState(false);
 
-  const commentAddMutation = trpc.useMutation("comment.addComment");
-  const commentUpdateMutation = trpc.useMutation("comment.updateComment");
-  const commentDeleteMutation = trpc.useMutation("comment.deleteComment");
+  const commentAddMutation = api.comment.create.useMutation();
+  const commentUpdateMutation = api.comment.update.useMutation();
+  const commentDeleteMutation = api.comment.delete.useMutation();
 
   return (
     <div>
       <div className="flex gap-2">
-        <div className="relative w-8 h-8 flex-shrink-0">
+        <div className="relative h-8 w-8 flex-shrink-0">
           <Image
             alt="avatar"
             layout="fill"
             src={comment.author.image || "/default_profile.jpg"}
-            className="w-8 h-8 rounded-full"
+            className="h-8 w-8 rounded-full"
           />
         </div>
         <div className={`${showEdit ? "w-full" : "mr-auto"} `}>
@@ -90,7 +90,7 @@ const Comment = ({
           {showEdit ? (
             <>
               <textarea
-                className="bg-[#fafafa] rounded-md outline-gray-300 w-full px-2 py-1 resize-none border-2 border-gray-200 overflow-y-hidden"
+                className="w-full resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] px-2 py-1 outline-gray-300"
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
               />
@@ -105,7 +105,7 @@ const Comment = ({
                     OnAnyEdit();
                     setShowEdit(!showEdit);
                   }}
-                  className="p-2 bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 rounded-md text-white flex gap-2 items-center disabled:bg-indigo-400"
+                  className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
                   disabled={editValue === "" || editValue === comment.content}
                 >
                   Save
@@ -115,7 +115,7 @@ const Comment = ({
                     setEditValue(comment.content);
                     setShowEdit(!showEdit);
                   }}
-                  className="p-2 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-md"
+                  className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
                 >
                   Cancel
                 </button>
@@ -133,14 +133,14 @@ const Comment = ({
                 setShowEdit(!showEdit);
               }}
             >
-              <PencilSquareIcon className="w-5 h-5" />
+              <PencilSquareIcon className="h-5 w-5" />
             </button>
             <button
               onClick={() => {
                 commentDeleteMutation.mutate({ id: comment.id });
               }}
             >
-              <TrashIcon className="w-5 h-5" />
+              <TrashIcon className="h-5 w-5" />
             </button>
           </>
         ) : (
@@ -150,12 +150,12 @@ const Comment = ({
                 if (commentDepth < 3) setShowReply(!showReply);
               }}
             >
-              <ArrowUturnLeftIcon className="w-5 h-5" />
+              <ArrowUturnLeftIcon className="h-5 w-5" />
             </button>
           )
         )}
       </div>
-      <div className="pl-10 mt-2 ">
+      <div className="mt-2 pl-10 ">
         {/* if showReply is true (if we clicked to reply button) show the comment add Comp. */}
         {showReply ? (
           <CommentAdd

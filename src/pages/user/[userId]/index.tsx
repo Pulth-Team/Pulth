@@ -4,7 +4,7 @@ import DashboardLayout from "~/components/layouts/gridDashboard";
 import Image from "next/image";
 
 import { useRouter } from "next/router";
-import { trpc } from "~/utils/trpc";
+import { api } from "~/utils/api";
 import React from "react";
 
 import Loading from "~/components/Loading";
@@ -18,15 +18,14 @@ const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
 
-  const { data: profileData, status } = trpc.useQuery([
-    "user.getUserById",
-    { id: userId?.toString() || "" },
-  ]);
+  const { data: profileData, status } = api.user.getUserById.useQuery({
+    id: userId?.toString() || "",
+  });
 
   if (status === "loading")
     return (
       <DashboardLayout>
-        <Loading className="border-2 w-16 h-16 m-16" />;
+        <Loading className="m-16 h-16 w-16 border-2" />;
       </DashboardLayout>
     );
   if (status === "error" || !profileData || profileData instanceof Error)
@@ -38,13 +37,13 @@ const ProfileIndex: NextPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col p-8 px-16 gap-y-8">
+      <div className="flex flex-col gap-y-8 p-8 px-16">
         <div className="flex justify-between">
           <div
-            className="flex items-center gap-x-5 bg-white p-3 rounded-lg"
+            className="flex items-center gap-x-5 rounded-lg bg-white p-3"
             id="info-box"
           >
-            <div className="h-36 w-36 relative">
+            <div className="relative h-36 w-36">
               <Image
                 src={profileData.image || "/default_profile.jpg"}
                 layout="fill"
@@ -57,7 +56,7 @@ const ProfileIndex: NextPage = () => {
               <p className="text-gray-600">{profileData.email}</p>
             </div>
           </div>
-          <div className="w-5/12 flex items-center gap-x-16 justify-end">
+          <div className="flex w-5/12 items-center justify-end gap-x-16">
             <div className="flex flex-col items-center">
               <p className="text-2xl font-semibold">1.56k</p>
               <p>followers</p>
@@ -67,7 +66,7 @@ const ProfileIndex: NextPage = () => {
               <p>follows</p>
             </div>
             <div>
-              <button className="flex text-white bg-black py-1.5 px-5 rounded-lg font-semibold gap-x-2 text-lg items-center">
+              <button className="flex items-center gap-x-2 rounded-lg bg-black py-1.5 px-5 text-lg font-semibold text-white">
                 <UserPlusIcon className="h-6 w-6 stroke-white" />
                 Follow
               </button>
@@ -78,8 +77,8 @@ const ProfileIndex: NextPage = () => {
           <h3 className="text-3xl font-bold">About Me</h3>
           <p className="text-lg text-black/80">{profileData.description}</p>
         </div>
-        <div className="flex flex-col bg-white p-3 rounded-lg" id="my-articles">
-          <h3 className="text-3xl font-bold mb-5">My Articles</h3>
+        <div className="flex flex-col rounded-lg bg-white p-3" id="my-articles">
+          <h3 className="mb-5 text-3xl font-bold">My Articles</h3>
           <DragScrollContainer>
             {profileData.Articles.map((article) => (
               <ArticleCard
