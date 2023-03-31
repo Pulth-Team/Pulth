@@ -24,7 +24,7 @@ const Articles: NextPage = () => {
   const { slug } = router.query;
 
   // query to get the article data
-  const articleData = api.article.getBySlug.useQuery(slug || "");
+  const articleData = api.article.getBySlug.useQuery((slug as string) || "");
 
   // mutation to add a comment
   const commentAddMutation = api.comment.create.useMutation();
@@ -36,11 +36,20 @@ const Articles: NextPage = () => {
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // todo open a modal  for the comment
-    commentAddMutation.mutate({
-      articleId: articleData.data?.id as string,
-      content: comment.content,
-      parentId: comment.parent,
-    });
+    commentAddMutation.mutate(
+      {
+        articleId: articleData.data?.id as string,
+        content: comment.content,
+        parentId: comment.parent,
+      },
+      {
+        onSuccess: () => {
+          // refetch the article data
+          // to get the updated comments
+          articleData.refetch();
+        },
+      }
+    );
   };
 
   let userImage = userData?.user?.image;
@@ -99,9 +108,15 @@ const Articles: NextPage = () => {
             }}
           /> */}
 
-          <CommentAlgo></CommentAlgo>
-
-          <pre>{JSON.stringify(articleData.data?.Comments, undefined, 2)}</pre>
+          <CommentAlgo
+            comments={articleData.data?.Comments || []}
+            user={{
+              name: userData?.user?.name as string,
+              image: userImage || "default_profile.jpg",
+            }}
+            articleId={articleData.data?.id as string}
+            revalidate={articleData.refetch}
+          />
         </div>
       </div>
     </>

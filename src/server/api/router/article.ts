@@ -34,14 +34,14 @@ export const articleRouter = createTRPCRouter({
         // we shouldnt but we are for now
         Comments: {
           select: {
-            // id: true,
-            // author: {
-            //   select: {
-            //     id: true,
-            //     name: true,
-            //     image: true,
-            //   },
-            // },
+            id: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
             content: true,
             parentIds: true,
           },
