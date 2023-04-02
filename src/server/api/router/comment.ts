@@ -79,16 +79,18 @@ export const commentRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       // Check if the comment exists
-      const commentData = await ctx.prisma?.comment.findUnique({
+      // which's author is the current user
+      const commentData = await ctx.prisma?.comment.findFirst({
         where: {
           id: input.id,
+          authorId: ctx.session?.user.id,
         },
       });
 
       // If the comment doesn't exist, return an error
       if (!commentData)
         throw new TRPCError({
-          message: "Comment not found",
+          message: "Comment not found, make sure you are the author",
           code: "NOT_FOUND",
         });
 
@@ -121,26 +123,30 @@ export const commentRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       // Check if the comment exists
-      const commentData = await ctx.prisma?.comment.findUnique({
+      // which's author is the current user
+      const commentData = await ctx.prisma?.comment.findFirst({
         where: {
           id: input.id,
+          authorId: ctx.session?.user.id,
         },
       });
 
       // If the comment doesn't exist, return an error
       if (!commentData)
         throw new TRPCError({
-          message: "Comment not found",
+          message: "Comment not found, make sure you are the author",
           code: "NOT_FOUND",
         });
 
       // Update the comment
+      // and set isEdited to true
       return await ctx.prisma?.comment.update({
         where: {
           id: input.id,
         },
         data: {
           content: input.content,
+          isEdited: true,
         },
       });
     }),

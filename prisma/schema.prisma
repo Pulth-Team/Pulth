@@ -99,10 +99,10 @@ model Article {
 
 // recursive comment Model
 model Comment {
-    id String @id @default(auto()) @map("_id") @db.ObjectId
-
-    authorId String @db.ObjectId
-    author   User   @relation("AuthorUser", fields: [authorId], references: [id], onDelete: Cascade)
+    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    authorId String  @db.ObjectId
+    author   User    @relation("AuthorUser", fields: [authorId], references: [id], onDelete: Cascade)
+    isEdited Boolean @default(false)
 
     articleId String  @db.ObjectId
     Article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
