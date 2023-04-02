@@ -12,7 +12,6 @@ import DocumentRenderer, {
   OutputBlockType,
 } from "~/components/editor/renderer/DocumentRenderer";
 import { signIn, useSession } from "next-auth/react";
-import CommentList from "~/components/editor/CommentList";
 import { useMemo } from "react";
 import CommentAlgo from "~/components/editor/CommentAlgo";
 
@@ -95,18 +94,6 @@ const Articles: NextPage = () => {
           )}
 
           <hr className="my-2" />
-          {/* <CommentList
-            comments={articleData.data?.Comments as unknown as CommentData[]}
-            currentArticleId={articleData.data?.id as string}
-            currentUser={{
-              id: userData?.user?.id as string,
-              name: userData?.user?.name as string,
-              image: userImage || "default_profile.jpg",
-            }}
-            OnAnyEdit={() => {
-              articleData.refetch();
-            }}
-          /> */}
 
           <CommentAlgo
             comments={articleData.data?.Comments || []}
