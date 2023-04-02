@@ -1,6 +1,10 @@
 import { NextPage } from "next";
 import Image from "next/image";
-import { ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUturnLeftIcon,
+  TrashIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 import { useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
@@ -9,6 +13,7 @@ import { signIn } from "next-auth/react";
 interface Comment {
   id: string;
   content: string;
+  isEdited: boolean;
   parentIds: string[];
   author: {
     id: string | null;
@@ -20,6 +25,7 @@ interface Comment {
 class CommentNode {
   id: string = "";
   content: string = "";
+  isEdited: boolean = false;
   parentIds: string[] = [];
   fullfilled: boolean = false;
   author: {
@@ -41,6 +47,7 @@ class CommentNode {
     node.parentIds = comment.parentIds;
     node.children = [];
     node.fullfilled = true;
+    node.isEdited = comment.isEdited;
     return node;
   }
 
@@ -182,8 +189,9 @@ const CommentAlgo: NextPage<{
             comment={comment}
             key={comment.id}
             user={user}
-            isAuthed={isAuthed}
             articleId={articleId}
+            isEdited={comment.isEdited}
+            isAuthed={isAuthed}
             revalidate={revalidate}
           />
         );
@@ -201,10 +209,15 @@ const Comment: NextPage<{
   };
   articleId: string;
   isAuthed: boolean;
+  isEdited: boolean;
   revalidate: () => void;
-}> = ({ comment, user, articleId, revalidate, isAuthed }) => {
+}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited }) => {
   const [reply, setReply] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(comment.content);
+
   const addCommentMutation = api.comment.create.useMutation();
+  const editCommentMutation = api.comment.update.useMutation();
   const deleteCommentMutation = api.comment.delete.useMutation();
 
   const amITheAuthor = comment.author.id === user.id;
@@ -219,17 +232,32 @@ const Comment: NextPage<{
             className="absolute rounded-full"
           ></Image>
         </div>
-        <div>
-          <p className="font-semibold leading-5">{comment.author.name}</p>
-          <p className="">{comment.content}</p>
+        <div className="flex-grow">
+          <p className="font-semibold leading-5">
+            {comment.author.name}{" "}
+            <span className="font-normal text-black/70">
+              {isEdited ? "edited" : ""}
+            </span>
+          </p>
+
+          {!isEditing && <p className="">{comment.content}</p>}
         </div>
         <ArrowUturnLeftIcon
-          className="ml-auto h-5 w-5 text-black/70 hover:text-black"
+          className="h-5 w-5 text-black/70 hover:text-black"
           onClick={() => {
             if (isAuthed) setReply(!reply);
             else signIn();
           }}
         />
+        {amITheAuthor && (
+          <PencilSquareIcon
+            className="h-5 w-5 text-black/70 hover:text-black"
+            onClick={() => {
+              setIsEditing(!isEditing);
+            }}
+          />
+        )}
+
         {amITheAuthor && (
           <TrashIcon
             className="h-5 w-5 text-black/70 hover:text-black"
@@ -246,6 +274,52 @@ const Comment: NextPage<{
           />
         )}
       </div>
+      {isEditing && (
+        <>
+          <div className="my-2 ml-10 flex">
+            <textarea
+              onChange={(e) => {
+                setEditValue(e.target.value);
+              }}
+              defaultValue={comment.content}
+              className="flex-grow resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] p-1 outline-gray-300"
+            ></textarea>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
+              onClick={() => {
+                editCommentMutation.mutate(
+                  {
+                    id: comment.id,
+                    content: editValue,
+                  },
+                  {
+                    onSuccess: () => {
+                      setIsEditing(false);
+                      comment.content = editValue;
+                      revalidate();
+                    },
+                  }
+                );
+              }}
+              disabled={editValue === comment.content}
+            >
+              Save
+            </button>
+            <button
+              className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
+              onClick={() => {
+                setIsEditing(false);
+                setEditValue(comment.content);
+              }}
+              disabled={editValue === comment.content}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
 
       <div className="flex flex-col gap-2 pl-10 pt-2">
         {reply && isAuthed && (
@@ -282,8 +356,9 @@ const Comment: NextPage<{
               comment={child}
               key={child.id}
               user={user}
-              isAuthed={isAuthed}
               articleId={articleId}
+              isEdited={child.isEdited}
+              isAuthed={isAuthed}
               revalidate={revalidate}
             />
           );
