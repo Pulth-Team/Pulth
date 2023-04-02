@@ -111,9 +111,11 @@ const Articles: NextPage = () => {
           <CommentAlgo
             comments={articleData.data?.Comments || []}
             user={{
+              id: userData?.user?.id as string,
               name: userData?.user?.name as string,
-              image: userImage || "default_profile.jpg",
+              image: userImage || "/default_profile.jpg",
             }}
+            isAuthed={status == "authenticated"}
             articleId={articleData.data?.id as string}
             revalidate={articleData.refetch}
           />

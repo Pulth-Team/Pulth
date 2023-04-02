@@ -4,6 +4,7 @@ import { ArrowUturnLeftIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
+import { signIn } from "next-auth/react";
 
 interface Comment {
   id: string;
@@ -163,12 +164,14 @@ const structureComments = (comments: Comment[]) => {
 const CommentAlgo: NextPage<{
   comments: Comment[];
   user: {
+    id: string;
     name: string;
     image: string;
   };
   articleId: string;
+  isAuthed: boolean;
   revalidate: () => void;
-}> = ({ comments, user, articleId, revalidate }) => {
+}> = ({ comments, user, articleId, revalidate, isAuthed }) => {
   const structuredComment = structureComments(comments);
 
   return (
@@ -179,6 +182,7 @@ const CommentAlgo: NextPage<{
             comment={comment}
             key={comment.id}
             user={user}
+            isAuthed={isAuthed}
             articleId={articleId}
             revalidate={revalidate}
           />
@@ -191,16 +195,19 @@ const CommentAlgo: NextPage<{
 const Comment: NextPage<{
   comment: CommentNode;
   user: {
+    id: string;
     name: string;
     image: string;
   };
   articleId: string;
+  isAuthed: boolean;
   revalidate: () => void;
-}> = ({ comment, user, articleId, revalidate }) => {
+}> = ({ comment, user, articleId, revalidate, isAuthed }) => {
   const [reply, setReply] = useState(false);
   const addCommentMutation = api.comment.create.useMutation();
   const deleteCommentMutation = api.comment.delete.useMutation();
 
+  const amITheAuthor = comment.author.id === user.id;
   return (
     <div className="">
       <div className="flex gap-2">
@@ -218,29 +225,34 @@ const Comment: NextPage<{
         </div>
         <ArrowUturnLeftIcon
           className="ml-auto h-5 w-5 text-black/70 hover:text-black"
-          onClick={() => setReply(!reply)}
-        />
-        <TrashIcon
-          className="h-5 w-5 text-black/70 hover:text-black"
           onClick={() => {
-            deleteCommentMutation.mutate(
-              { id: comment.id },
-              {
-                onSuccess: () => {
-                  revalidate();
-                },
-              }
-            );
+            if (isAuthed) setReply(!reply);
+            else signIn();
           }}
         />
+        {amITheAuthor && (
+          <TrashIcon
+            className="h-5 w-5 text-black/70 hover:text-black"
+            onClick={() => {
+              deleteCommentMutation.mutate(
+                { id: comment.id },
+                {
+                  onSuccess: () => {
+                    revalidate();
+                  },
+                }
+              );
+            }}
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-2 pl-10 pt-2">
-        {reply && (
+        {reply && isAuthed && (
           <CommentAdd
             user={{
               name: user.name as string,
-              image: user.image || "default_profile.jpg",
+              image: user.image || "/default_profile.jpg",
             }}
             OnComment={({ content }) => {
               addCommentMutation.mutate(
@@ -270,6 +282,7 @@ const Comment: NextPage<{
               comment={child}
               key={child.id}
               user={user}
+              isAuthed={isAuthed}
               articleId={articleId}
               revalidate={revalidate}
             />
