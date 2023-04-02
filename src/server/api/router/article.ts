@@ -42,6 +42,7 @@ export const articleRouter = createTRPCRouter({
                 image: true,
               },
             },
+            isEdited: true,
             content: true,
             parentIds: true,
           },
