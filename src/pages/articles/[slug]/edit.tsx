@@ -86,11 +86,21 @@ const Articles: NextPage = ({}) => {
   const OnSave = () => {
     editor.current?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
+      // for checking if the data has changed
       setBodyData(outputData.blocks);
-      updateArticleMutation.mutate({
-        slug: slug as string,
-        bodyData: outputData.blocks as any, // TODO: fix this type
-      });
+
+      updateArticleMutation.mutate(
+        {
+          slug: slug as string,
+          bodyData: outputData.blocks as any, // TODO: fix this type
+        },
+        {
+          onSuccess: () => {
+            // refetch the article data for updating the editor
+            articleAuthorFetch.refetch();
+          },
+        }
+      );
     });
     // editor?.save().then((outputData) => {
     //   console.log("Saved Article Data", outputData);
