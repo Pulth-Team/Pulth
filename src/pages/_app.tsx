@@ -31,7 +31,7 @@ const MyApp: AppType<{ session: Session }> = ({
     <div className="bg-white">
       <Head>
         {/* used for safari tab color */}
-        <meta name="theme-color" content="#ecd96f"></meta>
+        <meta name="theme-color" content="#1F2937"></meta>
       </Head>
       {showAnalytics ? (
         <>
