@@ -23,6 +23,9 @@ import {
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 
+// i guess i lost my sanity
+import Div100vh from "react-div-100vh";
+
 const GridDashboard: NextPage<{
   children: ReactNode;
   contentClassName?: string;
@@ -33,7 +36,7 @@ const GridDashboard: NextPage<{
 
   return (
     <>
-      <div className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
+      <Div100vh className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
         <aside className="row-start-3 flex flex-col bg-gray-800 md:row-span-2">
           <div className=" mb-6 hidden cursor-pointer flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
             <span className="text-xl font-bold text-indigo-500">PulthApp</span>
@@ -114,7 +117,7 @@ const GridDashboard: NextPage<{
         >
           {children}
         </main>
-      </div>
+      </Div100vh>
     </>
   );
 };
