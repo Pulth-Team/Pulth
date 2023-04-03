@@ -1,4 +1,3 @@
-import { EndEventFilterSensitiveLog } from "@aws-sdk/client-s3";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
