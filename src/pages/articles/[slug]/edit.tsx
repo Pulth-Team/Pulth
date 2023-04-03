@@ -37,24 +37,19 @@ const Articles: NextPage = ({}) => {
   // const [editor, setEditor] = useState<EditorJS | null>(null);
   const editor = useRef<EditorJS | null>(null);
 
-  const articleAuthorFetch = api.article.inspect.useQuery(
-    {
-      slug: slug as string,
+  const articleAuthorFetch = api.article.inspect.useQuery(slug as string, {
+    enabled: status === "authenticated",
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+    onSuccess: (data) => {
+      if (data) {
+        setBodyData(data.bodyData);
+      }
     },
-    {
-      enabled: status === "authenticated",
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchInterval: false,
-      refetchIntervalInBackground: false,
-      onSuccess: (data) => {
-        if (data) {
-          setBodyData(data.bodyData);
-        }
-      },
-    }
-  );
+  });
 
   const publishArticleMutation = api.article.publish.useMutation();
   const deleteArticleMutation = api.article.delete.useMutation();
@@ -65,7 +60,6 @@ const Articles: NextPage = ({}) => {
       deleteArticleMutation.mutate(slug as string);
       setDeleteModal(false);
       router.push("/profile");
-      rp;
     } else {
       // TODO: add error message more than just an alert
 

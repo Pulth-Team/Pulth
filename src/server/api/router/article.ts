@@ -176,16 +176,12 @@ export const articleRouter = createTRPCRouter({
   // takes an article slug and returns the article
   // the article is only returned if the user is the author
   inspect: protectedProcedure
-    .input(
-      z.object({
-        slug: z.string(),
-      })
-    )
+    .input(z.string())
     .query(async ({ input, ctx }) => {
       // find the article
       const article = await ctx.prisma?.article.findFirst({
         where: {
-          slug: input.slug,
+          slug: input,
           authorId: ctx.session?.user.id,
         },
       });
