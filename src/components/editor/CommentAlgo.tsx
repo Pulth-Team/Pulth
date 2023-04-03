@@ -242,37 +242,39 @@ const Comment: NextPage<{
 
           {!isEditing && <p className="">{comment.content}</p>}
         </div>
-        <ArrowUturnLeftIcon
-          className="h-5 w-5 text-black/70 hover:text-black"
-          onClick={() => {
-            if (isAuthed) setReply(!reply);
-            else signIn();
-          }}
-        />
-        {amITheAuthor && (
-          <PencilSquareIcon
+        <div className="flex flex-shrink-0 flex-row">
+          <ArrowUturnLeftIcon
             className="h-5 w-5 text-black/70 hover:text-black"
             onClick={() => {
-              setIsEditing(!isEditing);
+              if (isAuthed) setReply(!reply);
+              else signIn();
             }}
           />
-        )}
+          {amITheAuthor && (
+            <PencilSquareIcon
+              className="h-5 w-5 text-black/70 hover:text-black"
+              onClick={() => {
+                setIsEditing(!isEditing);
+              }}
+            />
+          )}
 
-        {amITheAuthor && (
-          <TrashIcon
-            className="h-5 w-5 text-black/70 hover:text-black"
-            onClick={() => {
-              deleteCommentMutation.mutate(
-                { id: comment.id },
-                {
-                  onSuccess: () => {
-                    revalidate();
-                  },
-                }
-              );
-            }}
-          />
-        )}
+          {amITheAuthor && (
+            <TrashIcon
+              className="h-5 w-5 text-black/70 hover:text-black"
+              onClick={() => {
+                deleteCommentMutation.mutate(
+                  { id: comment.id },
+                  {
+                    onSuccess: () => {
+                      revalidate();
+                    },
+                  }
+                );
+              }}
+            />
+          )}
+        </div>
       </div>
       {isEditing && (
         <>
