@@ -33,16 +33,16 @@ const GridDashboard: NextPage<{
 
   return (
     <>
-      <div className="grid grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop h-screen">
-        <aside className="bg-gray-800 md:row-span-2 row-start-3 flex flex-col">
-          <div className=" hidden md:flex flex-row items-center gap-2 p-4 rounded-md cursor-pointer bg-gray-800 text-gray-400 mb-6">
-            <span className="text-indigo-500 text-xl font-bold">PulthApp</span>
+      <div className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
+        <aside className="row-start-3 flex flex-col bg-gray-800 md:row-span-2">
+          <div className=" mb-6 hidden cursor-pointer flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
+            <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
-          <nav className="flex px-2 flex-row justify-evenly items-center h-full  md:flex-col md:justify-start md:items-start md:h-auto">
+          <nav className="flex h-full flex-row items-center justify-evenly px-2  md:h-auto md:flex-col md:items-start md:justify-start">
             {menuItems.map((item) => (
               <MenuItem
                 key={item.name}
-                icon={<item.icon className="w-6 h-6" />}
+                icon={<item.icon className="h-6 w-6" />}
                 text={item.name}
                 path={item.path}
                 id={item.id}
@@ -62,8 +62,8 @@ const GridDashboard: NextPage<{
           ) : (
             <div className="mt-auto hidden md:block">
               <Link href="/api/auth/signin">
-                <button className="p-2 bg-gray-700 flex rounded-md w-full ">
-                  <p className="text-gray-200 font-semibold w-full text-center h-12 flex justify-center items-center ">
+                <button className="flex w-full rounded-md bg-gray-700 p-2 ">
+                  <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200 ">
                     Login
                   </p>
                 </button>
@@ -71,15 +71,15 @@ const GridDashboard: NextPage<{
             </div>
           )}
         </aside>
-        <header className="bg-gray-800 md:row-span-1 h-14 row-start-1 flex items-center p-2 ">
-          <div className="text-indigo-500 text-xl font-bold px-2 self-stretch my-auto md:hidden">
-            <span className="text-indigo-500 text-xl font-bold">PulthApp</span>
+        <header className="row-start-1 flex h-14 items-center bg-gray-800 p-2 md:row-span-1 ">
+          <div className="my-auto self-stretch px-2 text-xl font-bold text-indigo-500 md:hidden">
+            <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {userStatus !== "authenticated" ? (
               <Link href="/api/auth/signin">
-                <button className="p-2 bg-gray-700 flex rounded-md m-2">
-                  <p className="text-gray-200 font-semibold text-center flex justify-center items-center ">
+                <button className="m-2 flex rounded-md bg-gray-700 p-2">
+                  <p className="flex items-center justify-center text-center font-semibold text-gray-200 ">
                     Login
                   </p>
                 </button>
@@ -88,7 +88,7 @@ const GridDashboard: NextPage<{
               ""
             )}
             <button
-              className={`flex flex-row items-center ml-auto text-white bg-gray-600 rounded-lg p-2 gap-2 hover:bg-gray-500 active:bg-gray-700 `}
+              className={`ml-auto flex flex-row items-center gap-2 rounded-lg bg-gray-600 p-2 text-white hover:bg-gray-500 active:bg-gray-700 `}
               id="search-button"
             >
               <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
@@ -108,7 +108,7 @@ const GridDashboard: NextPage<{
         </header>
         <main
           className={twMerge(
-            "col-span-1 overflow-auto bg-white min-h-full",
+            "col-span-1 min-h-full overflow-auto bg-white",
             contentClassName
           )}
         >
@@ -168,9 +168,9 @@ const MenuItem = ({
       <div
         id={id}
         className={twMerge(
-          "flex bg-transparent flex-col md:flex-row items-center md:self-stretch md:gap-2 p-2 rounded-md cursor-pointer",
+          "flex cursor-pointer flex-col items-center rounded-md bg-transparent p-2 md:flex-row md:gap-2 md:self-stretch",
           currentPath === path
-            ? "md:bg-gray-700 text-white"
+            ? "text-white md:bg-gray-700"
             : "bg-gray-800 text-gray-400",
           className
         )}
@@ -199,12 +199,12 @@ const AccountBox = ({
       className={twMerge(
         "flex",
         className,
-        "p-2 bg-gray-700 rounded-md mt-auto "
+        "mt-auto rounded-md bg-gray-700 p-2 "
       )}
       id="current-account-box"
     >
       <Menu>
-        <Menu.Button className="relative w-12 h-12 rounded-full overflow-hidden">
+        <Menu.Button className="relative h-12 w-12 overflow-hidden rounded-full">
           <Image
             src={image || "/default_profile.jpg"}
             layout="fill"
@@ -213,7 +213,7 @@ const AccountBox = ({
           />
         </Menu.Button>
         <Menu.Items
-          className={`absolute p-1 rounded-md bottom-0 -translate-y-20 bg-gray-700 `}
+          className={`absolute bottom-0 -translate-y-20 rounded-md bg-gray-700 p-1 `}
         >
           <Menu.Item>
             <div>
@@ -221,9 +221,9 @@ const AccountBox = ({
                 <a
                   className={`${
                     path === "/profile" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+                  } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
                 >
-                  <UserCircleIcon className="w-6 h-6" />
+                  <UserCircleIcon className="h-6 w-6" />
                   <p>Profile</p>
                 </a>
               </Link>
@@ -235,9 +235,9 @@ const AccountBox = ({
                 <a
                   className={`${
                     path === "/settings" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+                  } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
                 >
-                  <Cog8ToothIcon className="w-6 h-6" />
+                  <Cog8ToothIcon className="h-6 w-6" />
                   <p>Settings</p>
                 </a>
               </Link>
@@ -247,19 +247,19 @@ const AccountBox = ({
           <Menu.Item>
             <a
               onClick={() => signOut()}
-              className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+              className={` flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
             >
-              <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+              <ArrowLeftOnRectangleIcon className="h-6 w-6" />
               <p>Logout</p>
             </a>
           </Menu.Item>
         </Menu.Items>
       </Menu>
-      <div className="flex flex-col ml-2">
-        <p className="text-gray-200 font-semibold">{name}</p>
+      <div className="ml-2 flex flex-col">
+        <p className="font-semibold text-gray-200">{name}</p>
         <Link href={`/user/${id}`}>
           <button
-            className="text-gray-400 text-sm text-left hover:text-gray-100"
+            className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"
           >
             View Profile
@@ -272,34 +272,34 @@ const AccountBox = ({
 const MobilePhoto = ({ image }: { image: string }) => {
   return (
     <Menu as="div" className={`self-stretch md:hidden`}>
-      <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
+      <Menu.Button className={`relative h-10 w-10 focus:outline-none `}>
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
           layout="fill"
-          className="rounded-full aspect-square"
+          className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
-      <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
+      <Menu.Items className="absolute right-1 translate-y-3 rounded-md bg-gray-700 p-1 focus:outline-none active:outline-none">
         <Link href={"/profile"}>
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <UserCircleIcon className="h-5 w-5" />
-              <p className="max-h-fit h-fit">Profile</p>
+              <p className="h-fit max-h-fit">Profile</p>
             </div>
           </Menu.Item>
         </Link>
 
         <Link href="/settings">
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-              <p className="max-h-fit h-fit">Settings</p>
+              <p className="h-fit max-h-fit">Settings</p>
             </div>
           </Menu.Item>
         </Link>
         <Menu.Item>
-          <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+          <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
             <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
             <a className="max-h-min" onClick={() => signOut()}>
               Logout
