@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import EditorJS from "@editorjs/editorjs";
+import EditorJS, { API } from "@editorjs/editorjs";
 
 import { api } from "~/utils/api";
 import Head from "next/head";
@@ -133,6 +133,8 @@ const Articles: NextPage = ({}) => {
     await navigator.clipboard.writeText(shareURL);
   };
 
+  const onChange = useCallback((api: API) => {}, []);
+
   return (
     <DashboardLayout>
       <Head>
@@ -171,14 +173,14 @@ const Articles: NextPage = ({}) => {
               />
               <Editor
                 readonly={false}
-                data={{
+                data={JSON.stringify({
                   time: articleAuthorFetch.data.updatedAt,
                   blocks: articleAuthorFetch.data.bodyData,
                   version: articleAuthorFetch.data.editorVersion,
-                }}
+                })}
                 editorRef={editor}
                 // OnInit={handleInit}
-                OnChange={(api) => {}}
+                OnChange={onChange}
               />
             </div>
           ) : (

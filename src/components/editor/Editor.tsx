@@ -1,4 +1,4 @@
-import type { MutableRefObject } from "react";
+import { MutableRefObject, memo, useLayoutEffect } from "react";
 import type { API } from "@editorjs/editorjs";
 
 import EditorJS from "@editorjs/editorjs";
@@ -14,18 +14,25 @@ const Editor: NextPage<{
 
   editorRef: MutableRefObject<EditorJS | null>;
   OnInit?: () => void;
+
   OnChange?: (editorAPI: API) => void;
-}> = ({ className, data, readonly, OnInit, editorRef, OnChange }) => {
+}> = memo(function EditorComp({
+  className,
+  data,
+  readonly,
+  OnInit,
+  editorRef,
+  OnChange,
+}) {
   const id = useId();
 
-  // const InternalEditorRef = useRef<EditorJS | null>(null);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editorRef.current) {
+      console.log("editorRef.current Init", editorRef.current);
       editorRef.current = new EditorJS({
         holder: id,
         autofocus: true,
-        data: Object.assign({}, data),
+        data: JSON.parse(data),
         readOnly: readonly,
         tools: editorTools,
         onReady: OnInit ?? (() => {}),
@@ -41,26 +48,16 @@ const Editor: NextPage<{
         editorRef.current = null;
       }
     };
+  }, [readonly, OnInit, id, editorRef, OnChange, data]);
 
-    //    if (!InternalEditorRef.current) {
-    //   InternalEditorRef.current = new EditorJS({
-    //     holder: id,
-    //     autofocus: false,
-    //     data: Object.assign({}, data),
-    //     readOnly: readonly,
-    //     tools: editorTools,
-    //     onReady: () => {
-    //       console.log("ready");
-    //     },
+  //data, readonly, OnInit, id, editorRef, OnChange
+  //data causes to reinit the editor
+  //it happens because of the referantial equality of the data object
 
-    //     onChange: OnChange ?? (() => {}),
-    //   });
-    //   editorRef.current = InternalEditorRef.current;
-    //   if (OnInit) OnInit(InternalEditorRef.current);
-    // } else {
-    //   // console.log("editorRef.current", InternalEditorRef.current);
-    // }
-  }, [data, readonly, OnInit, id, editorRef, OnChange]);
+  //the solution is give the data with a referantial equality
+  //so we can use the useEffect hook to update the data
+  // example prop will look like this
+  // data={JSON.stringify(data)}
 
   return (
     <div className="flex justify-center">
@@ -70,7 +67,7 @@ const Editor: NextPage<{
       ></div>
     </div>
   );
-};
+});
 
 export default Editor;
 
