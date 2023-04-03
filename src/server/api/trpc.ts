@@ -19,6 +19,7 @@ import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import algolia from "algoliasearch";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -35,9 +36,16 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
+  // create an algolia client
+  const algoliaClient = algolia(
+    env.ALGOLIA_APP_ID,
+    env.ALGOLIA_API_KEY
+  ).initIndex(env.ALGOLIA_INDEX_NAME);
+
   return {
     session: opts.session,
     prisma,
+    algolia: algoliaClient,
   };
 };
 
@@ -68,6 +76,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { env } from "~/env.mjs";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

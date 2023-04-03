@@ -147,6 +147,7 @@ const Articles: NextPage = ({}) => {
               <EditorTopbar
                 title={articleAuthorFetch.data.title}
                 onSave={OnSave}
+                isPublished={articleAuthorFetch.data.isPublished}
                 onPublish={async () => {
                   const currentData = await editor.current?.save();
 
@@ -163,7 +164,17 @@ const Articles: NextPage = ({}) => {
                     // and the data will be updated regardless of the publish status
                     articleAuthorFetch.refetch();
                   }
-                  publishArticleMutation.mutate({ slug: slug as string });
+                  publishArticleMutation.mutate(
+                    {
+                      slug: slug as string,
+                      setUnpublished: articleAuthorFetch.data.isPublished,
+                    },
+                    {
+                      onSuccess: () => {
+                        articleAuthorFetch.refetch();
+                      },
+                    }
+                  );
                 }}
                 onMenuClick={(type) => {
                   OnMenuClick(type);

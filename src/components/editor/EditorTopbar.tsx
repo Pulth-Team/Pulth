@@ -15,6 +15,7 @@ const EditorTopbar: NextPage<{
   onPublish: () => void;
   onMenuClick: (type: "delete" | "privacy" | "share" | "configure") => void;
   saveLoading: boolean;
+  isPublished: boolean;
   publishLoading: boolean;
 }> = ({
   title,
@@ -22,6 +23,7 @@ const EditorTopbar: NextPage<{
   onPublish,
   onMenuClick,
   saveLoading,
+  isPublished,
   publishLoading,
 }) => {
   return (
@@ -35,14 +37,14 @@ const EditorTopbar: NextPage<{
         onClick={() => onSave()}
       >
         {saveLoading && <Loading className="w-4 border-2" />}
-        Save
+        {isPublished ? "Update" : "Save"}
       </button>
       <button
         className="flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white"
         onClick={() => onPublish()}
       >
         {publishLoading && <Loading className="w-4 border-2" />}
-        Publish
+        {isPublished ? "Unpublish" : "Publish"}
       </button>
       <Menu as="div" className="">
         <Menu.Button className="flex items-center">

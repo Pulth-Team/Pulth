@@ -8,6 +8,7 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { env } from "~/env.mjs";
 
 export const articleRouter = createTRPCRouter({
   // takes a slug and returns an article without isPublished value
@@ -170,6 +171,9 @@ export const articleRouter = createTRPCRouter({
         },
       });
 
+      // we dont add it to the algolia index here
+      // we will add it to the algolia index when the article is published
+
       return article;
     }),
 
@@ -232,7 +236,7 @@ export const articleRouter = createTRPCRouter({
     .input(
       z.object({
         slug: z.string(),
-        setUnpublished: z.boolean().optional(),
+        setUnpublished: z.boolean(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -281,6 +285,32 @@ export const articleRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
           message: "Something went wrong",
         });
+
+      // if the article is published, add it to the algolia index
+      if (!input.setUnpublished) {
+        await ctx.algolia.partialUpdateObject(
+          {
+            objectID: updatedArticle.id,
+            slug: updatedArticle.slug,
+            title: updatedArticle.title,
+            description: updatedArticle.description,
+
+            author: {
+              id: ctx.session?.user.id,
+              name: ctx.session?.user.name,
+              image: ctx.session?.user.image,
+            },
+            publishedAt: updatedArticle.createdAt.getTime(),
+            updatedAt: updatedArticle.updatedAt.getTime(),
+          },
+          {
+            createIfNotExists: true,
+          }
+        );
+      } else {
+        // if the article is unpublished, remove it from the algolia index
+        await ctx.algolia.deleteObject(updatedArticle.id);
+      }
 
       return updatedArticle;
     }),
@@ -386,7 +416,7 @@ export const articleRouter = createTRPCRouter({
           });
 
         // update the slug
-        newSlug = slugify(input.title, { lower: true });
+        newSlug = slugified(input.title);
       }
 
       // update the article

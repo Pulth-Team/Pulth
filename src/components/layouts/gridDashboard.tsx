@@ -1,13 +1,21 @@
 import type { NextPage } from "next";
-import type { ReactNode } from "react";
+import { Fragment, ReactNode, useState } from "react";
 
 import { twMerge } from "tailwind-merge";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Menu } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
+
+import algoliasearch from "algoliasearch/lite";
+import {
+  InstantSearch,
+  RefinementList,
+  Hits,
+  connectSearchBox,
+} from "react-instantsearch-dom";
 
 import {
   HomeIcon,
@@ -20,11 +28,13 @@ import {
   UserCircleIcon,
   MagnifyingGlassIcon,
   ChevronRightIcon,
-  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+
+import { env } from "~/env.mjs";
 
 // i guess i lost my sanity
 import Div100vh from "react-div-100vh";
+import SearchModal from "../SearchModal";
 
 const GridDashboard: NextPage<{
   children: ReactNode;
@@ -33,6 +43,8 @@ const GridDashboard: NextPage<{
   const { data: userData, status: userStatus } = useSession();
   const router = useRouter();
   const currentPath = router.pathname;
+
+  const [searchModal, setSearchModal] = useState(false);
 
   return (
     <>
@@ -93,6 +105,9 @@ const GridDashboard: NextPage<{
             <button
               className={`ml-auto flex flex-row items-center gap-2 rounded-lg bg-gray-600 p-2 text-white hover:bg-gray-500 active:bg-gray-700 `}
               id="search-button"
+              onClick={() => {
+                setSearchModal(true);
+              }}
             >
               <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
               <p className="sr-only">Search</p>
@@ -117,6 +132,8 @@ const GridDashboard: NextPage<{
         >
           {children}
         </main>
+
+        <SearchModal isOpen={searchModal} setOpen={setSearchModal} />
       </Div100vh>
     </>
   );
