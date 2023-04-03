@@ -86,6 +86,10 @@ const Articles: NextPage = ({}) => {
   const OnSave = () => {
     editor.current?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
+      updateArticleMutation.mutate({
+        slug: slug as string,
+        bodyData: outputData.blocks as any, // TODO: fix this type
+      });
     });
     // editor?.save().then((outputData) => {
     //   console.log("Saved Article Data", outputData);
