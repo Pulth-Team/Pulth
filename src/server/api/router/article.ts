@@ -8,7 +8,7 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { env } from "~/env.mjs";
+import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 
 export const articleRouter = createTRPCRouter({
   // takes a slug and returns an article without isPublished value
@@ -65,8 +65,11 @@ export const articleRouter = createTRPCRouter({
         message: "Article with given slug not found",
       });
 
-    const { isPublished, ...rest } = article;
-    return rest;
+    const { isPublished, bodyData, ...rest } = article;
+    return {
+      ...rest,
+      bodyData: bodyData as unknown as OutputBlockType[],
+    };
   }),
 
   // this will be replaced with a recommended articles query

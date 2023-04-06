@@ -3,17 +3,17 @@ import type { NextPage } from "next";
 import { api } from "~/utils/api";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 import DashboardLayout from "~/components/layouts/gridDashboard";
 import Comment, { CommentData } from "~/components/editor/comment";
 import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 
-import DocumentRenderer, {
-  OutputBlockType,
-} from "~/components/editor/renderer/DocumentRenderer";
+import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
 import { signIn, useSession } from "next-auth/react";
 import { useMemo } from "react";
 import CommentAlgo from "~/components/editor/CommentAlgo";
+import Link from "next/link";
 
 // TODO: Add support for SSG
 // TODO: Add support for Loading State in CSR
@@ -28,10 +28,9 @@ const Articles: NextPage = () => {
   // mutation to add a comment
   const commentAddMutation = api.comment.create.useMutation();
 
-  let blocks: OutputBlockType[] = [];
-  if (articleData.data?.bodyData) {
-    blocks = articleData.data.bodyData as unknown as OutputBlockType[];
-  }
+  // let blocks: OutputBlockType[] = articleData.isLoading
+  //   ? []
+  //   : articleData.data?.bodyData;
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // todo open a modal  for the comment
@@ -59,13 +58,34 @@ const Articles: NextPage = () => {
   // so that it doesn't re-render on every re-render
   // this is a performance optimization technique called memoization or memoization caching
   const RenderedDocument = useMemo(
-    () => <DocumentRenderer blocks={blocks} />,
-    [blocks]
+    () => <DocumentRenderer blocks={articleData.data?.bodyData || []} />,
+    [articleData.data?.bodyData]
   );
 
   let body = (
     <>
       {RenderedDocument}
+      {/* About the author */}
+      <div className="mt-4 flex items-center justify-between px-4">
+        <div className="flex items-center gap-x-3">
+          <div className="relative h-12 w-12 ">
+            <Image
+              layout="fill"
+              src={articleData.data?.author.image || "/default_profile.jpg"}
+              alt={articleData.data?.author.name || "unknown"}
+              className=" rounded-full"
+            />
+          </div>
+          <p className="text-lg font-semibold">
+            {articleData.data?.author.name || "unknown"}
+          </p>
+        </div>
+
+        {/* TODO ADD subs icon (prime like) */}
+        <Link href={`/user/${articleData.data?.author.id}`}>
+          <a className="rounded-lg bg-indigo-500 px-4 py-2 text-white">Visit</a>
+        </Link>
+      </div>
       <div className="py-4 ">
         <p className="text-lg font-semibold">
           <span className="font-medium">
