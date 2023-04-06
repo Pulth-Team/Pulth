@@ -196,7 +196,7 @@ const MenuItem = ({
         )}
       >
         {icon}
-        <p className="text-sm ">{text}</p>
+        <p className="text-sm md:text-base">{text}</p>
       </div>
     </Link>
   );
