@@ -64,6 +64,11 @@ const Articles: NextPage = () => {
 
   let body = (
     <>
+      {/* this might be a bad idea but lets keep that here for now */}
+      <h1 className="m-0 mb-2 p-0 text-3xl font-bold">
+        {articleData.data?.title || "unnamed"}
+      </h1>
+
       {RenderedDocument}
       {/* About the author */}
       <div className="mt-4 flex items-center justify-between px-4">
