@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 import Loading from "~/components/Loading";
 import Dashboard from "~/components/layouts/gridDashboard";
 import { api } from "~/utils/api";
-import { Tab } from "@headlessui/react";
+import { Tab, Dialog } from "@headlessui/react";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -21,12 +21,16 @@ const Inspect: NextPage = () => {
   const infoIsLoading = articleInfo.isLoading;
 
   const articleUpdateInfoMutation = api.article.updateInfo.useMutation();
-  const updateInfoIsLoading = articleUpdateInfoMutation.isLoading;
   const articlePublishMutation = api.article.publish.useMutation();
+  const articleDeleteMutation = api.article.delete.useMutation();
+
+  const updateInfoIsLoading = articleUpdateInfoMutation.isLoading;
   const publishMutationIsLoading = articlePublishMutation.isLoading;
 
   const [title, setTitle] = useState(articleInfo.data?.title);
   const [description, setDescription] = useState(articleInfo.data?.description);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteModalInput, setDeleteModalInput] = useState("");
 
   useEffect(() => {
     setTitle(articleInfo.data?.title);
@@ -55,13 +59,15 @@ const Inspect: NextPage = () => {
             </Link>
 
             {/* This Should open a model for confirmation */}
-            <button className="mt-4 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white">
+            <button
+              className="mt-4 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
               Delete
             </button>
           </div>
         </div>
         <hr className="mt-1 border-black" />
-
         <div className="flex flex-col gap-x-2 md:flex-row">
           <div className="flex-grow">
             <div className="mt-4">
@@ -262,7 +268,10 @@ const Inspect: NextPage = () => {
             )}
 
             <Link href={"/articles/" + slug}>
-              <button className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:mb-0 ">
+              <button
+                className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                disabled={!articleInfo.data?.isPublished}
+              >
                 View
               </button>
             </Link>
@@ -297,11 +306,83 @@ const Inspect: NextPage = () => {
             </button>
 
             {/* This Should open a model for confirmation */}
-            <button className="flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:hidden">
+            <button
+              className="flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:hidden"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
               Delete
             </button>
           </div>
         </div>
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => {
+            setDeleteDialogOpen(false);
+
+            setDeleteModalInput("");
+          }}
+          className={
+            "fixed inset-0 z-10 flex items-center justify-center overflow-y-auto"
+          }
+        >
+          <Dialog.Overlay
+            className={"fixed inset-0  bg-black/50 backdrop-blur-md"}
+          />
+          <Dialog.Panel className={"z-10 max-w-xl rounded-xl bg-white p-2"}>
+            <Dialog.Title className={"mb-2 text-xl font-semibold"}>
+              Deactivate account
+            </Dialog.Title>
+            <Dialog.Description className={"texl-lg"}>
+              All of the comments and data associated with this article will be
+              permanently deleted. This action cannot be undone.
+              <br />
+              <br />
+              Are you sure you want to delete
+              <span className="font-bold">
+                &quot;{articleInfo.data?.title}&quot;
+              </span>
+              ?
+            </Dialog.Description>
+
+            <input
+              className="my-2 w-full p-2"
+              onChange={(e) => {
+                setDeleteModalInput(e.target.value);
+              }}
+            />
+            {deleteModalInput !== articleInfo.data?.title && (
+              <p className="mb-2 text-xs text-red-500">
+                Please type the title of the article to confirm
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                disabled={deleteModalInput !== articleInfo.data?.title}
+                onClick={() => {
+                  articleDeleteMutation.mutate(slug as string, {
+                    onSuccess: (data) => {
+                      router.push("/articles");
+                      setDeleteDialogOpen(false);
+                    },
+                  });
+                }}
+                className="mt-4 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white disabled:bg-red-400"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  setDeleteDialogOpen(false);
+
+                  setDeleteModalInput("");
+                }}
+                className=" mt-4 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white"
+              >
+                Cancel
+              </button>
+            </div>
+          </Dialog.Panel>
+        </Dialog>
       </div>
     </Dashboard>
   );
