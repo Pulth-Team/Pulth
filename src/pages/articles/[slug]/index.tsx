@@ -1,19 +1,26 @@
 import type { NextPage } from "next";
 
-import { api } from "~/utils/api";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import Link from "next/link";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
-import Comment, { CommentData } from "~/components/editor/comment";
-import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
-
-import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
 import { signIn, useSession } from "next-auth/react";
 import { useMemo } from "react";
+import {
+  SparklesIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  BookmarkIcon,
+  ArrowUpTrayIcon,
+} from "@heroicons/react/24/outline";
+
+import { api } from "~/utils/api";
+
+import DashboardLayout from "~/components/layouts/gridDashboard";
+import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
+import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
-import Link from "next/link";
 
 // TODO: Add support for SSG
 // TODO: Add support for Loading State in CSR
@@ -70,6 +77,28 @@ const Articles: NextPage = () => {
       </h1>
 
       {RenderedDocument}
+
+      {/* Rank and action buttons */}
+      <div className="mb-6 mt-8 flex flex-row justify-between">
+        <div className="flex gap-4">
+          <div className="flex gap-2">
+            <SparklesIcon className="h-6 w-6 text-black" />
+            {articleData.data?.voteRank || 0}
+          </div>
+
+          {/* TODO: Add Vote functionality */}
+          <button>
+            <ChevronUpIcon className="h-6 w-6 text-black" />
+          </button>
+          <button>
+            <ChevronDownIcon className="h-6 w-6 text-black" />
+          </button>
+        </div>
+        <div className="flex gap-4">
+          <ArrowUpTrayIcon className="h-6 w-6 text-black" />
+          <BookmarkIcon className="h-6 w-6 text-black" />
+        </div>
+      </div>
       {/* About the author */}
       <div className="mt-4 flex items-center justify-between px-4">
         <div className="flex items-center gap-x-3">
@@ -98,6 +127,7 @@ const Articles: NextPage = () => {
           Visit
         </Link>
       </div>
+
       <div className="py-4 ">
         <p className="text-lg font-semibold">
           <span className="font-medium">

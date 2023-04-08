@@ -31,6 +31,8 @@ export const articleRouter = createTRPCRouter({
           },
         },
         isPublished: true,
+        voteRank: true,
+
         // should we include the comments here?
         // we shouldnt but we are for now
         Comments: {
