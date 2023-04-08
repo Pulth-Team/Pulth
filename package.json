@@ -27,7 +27,7 @@
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
     "@types/formidable": "^2.0.5",
-    "algoliasearch": "^4.14.3",
+    "algoliasearch": "^4.17.0",
     "aws-sdk": "^2.1353.0",
     "bson": "^5.0.1",
     "dayjs": "^1.11.7",
