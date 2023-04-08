@@ -311,7 +311,10 @@ const AccountBox = ({
       </Menu>
       <div className="ml-2 flex flex-col">
         <p className="font-semibold text-gray-200">{name}</p>
-        <Link href={`/user/${id}`}>
+        <Link
+          //href={`/user/${id}`}
+          href={{ pathname: `/user/[userId]`, query: { userId: id } }}
+        >
           <button
             className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"

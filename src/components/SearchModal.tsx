@@ -85,7 +85,13 @@ interface HitProps {
 
 function Hit({ hit }: HitProps) {
   return (
-    <Link href={`/articles/${hit.slug}`}>
+    <Link
+      // href={`/articles/${hit.slug}`}
+      href={{
+        pathname: "/articles/[slug]",
+        query: { slug: hit.slug },
+      }}
+    >
       <div
         className="mb-2 flex cursor-pointer flex-row items-center justify-between rounded-md bg-slate-700/30 p-1.5 hover:bg-indigo-900/70"
         // onClick={() => setSearchModal(false)}
@@ -108,7 +114,13 @@ function Hit({ hit }: HitProps) {
                 className="mr-2 rounded-full"
               />
             </div>
-            <Link href={"/user/" + hit.author.id}>
+            <Link
+              // href={"/user/" + hit.author.id}
+              href={{
+                pathname: "/user/[userId]",
+                query: { userId: hit.author.id },
+              }}
+            >
               <p className="font-semibold text-gray-400 hover:underline">
                 {hit.author.name}
               </p>

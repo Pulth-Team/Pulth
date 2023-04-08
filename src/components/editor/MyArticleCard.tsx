@@ -14,13 +14,19 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
   isPublished,
 }) => {
   return (
-    <Link href={`/articles/${slug}/inspect`}>
+    <Link
+      // href={`/articles/${slug}/inspect`}
+      href={{
+        pathname: `/articles/${slug}/inspect`,
+        query: { slug: slug },
+      }}
+    >
       <div
-        className={`bg-gray-100 col-span-1 group flex flex-col items-start justify-start
-                       p-4 rounded-md shadow-sm hover:shadow-md min-h-[128px]
+        className={`group col-span-1 flex min-h-[128px] flex-col items-start justify-start
+                       rounded-md bg-gray-100 p-4 shadow-sm hover:shadow-md
                        ${
                          !isPublished
-                           ? "border-2 border-dashed bg-white border-gray-300 hover:bg-gray-100 hover:border-indigo-500"
+                           ? "border-2 border-dashed border-gray-300 bg-white hover:border-indigo-500 hover:bg-gray-100"
                            : "hover:bg-indigo-500"
                        }`}
       >

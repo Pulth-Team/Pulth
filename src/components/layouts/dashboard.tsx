@@ -79,7 +79,13 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   ];
   function Hit({ hit }: { hit: any }) {
     return (
-      <Link href={`/articles/${hit.slug}`}>
+      <Link
+        // href={`/articles/${hit.slug}`}
+        href={{
+          pathname: `/articles/${hit.slug}`,
+          query: { slug: hit.slug },
+        }}
+      >
         <div
           className="mb-2 flex cursor-pointer flex-row items-center justify-between rounded-md bg-slate-700/30 p-1.5 hover:bg-indigo-900/70"
           onClick={() => setSearchModal(false)}
@@ -304,7 +310,13 @@ const AccountBox = ({
       </Menu>
       <div className="ml-2 flex flex-col">
         <p className="font-semibold text-gray-200">{name}</p>
-        <Link href={`/user/${id}`}>
+        <Link
+          //href={`/user/${id}`}
+          href={{
+            pathname: `/user/[id]`,
+            query: { id },
+          }}
+        >
           <button
             className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"

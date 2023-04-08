@@ -88,7 +88,11 @@ const Articles: NextPage = () => {
 
         {/* TODO ADD subs icon (prime like) */}
         <Link
-          href={`/user/${articleData.data?.author.id}`}
+          // href={`/user/${articleData.data?.author.id}`}
+          href={{
+            pathname: `/user/[userId]`,
+            query: { userId: articleData.data?.author.id },
+          }}
           className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
         >
           Visit

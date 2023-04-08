@@ -59,7 +59,11 @@ const ArticleCard: NextPage<
       </div>
       <div className="flex items-baseline justify-between">
         <Link
-          href={`/articles/${slug}`}
+          // href={`/articles/${slug}`}
+          href={{
+            pathname: `/articles/[slug]`,
+            query: { slug: slug },
+          }}
           className="mb-1 cursor-pointer text-xl font-semibold line-clamp-1 "
         >
           {Title}
@@ -71,7 +75,13 @@ const ArticleCard: NextPage<
       <p className=" mb-4 line-clamp-4">{children}</p>
 
       <div className="mt-auto flex gap-2">
-        <Link href={`/user/${Author?.UserId}`}>
+        <Link
+          // href={`/user/${Author?.UserId}`}
+          href={{
+            pathname: `/user/[userId]`,
+            query: { userId: Author?.UserId },
+          }}
+        >
           <div className="relative h-9 w-9 cursor-pointer">
             <Image
               src={Author?.Image || "/default-profile.png"}
@@ -83,7 +93,13 @@ const ArticleCard: NextPage<
           </div>
         </Link>
         <div>
-          <Link href={`/user/${Author?.UserId}`}>
+          <Link
+            // href={`/user/${Author?.UserId}`}
+            href={{
+              pathname: `/user/[userId]`,
+              query: { userId: Author?.UserId },
+            }}
+          >
             <p className="cursor-pointer text-sm">{Author?.Name}</p>
           </Link>
           <p className="text-xs text-black/70">
@@ -93,7 +109,14 @@ const ArticleCard: NextPage<
         </div>
 
         {/* TODO Add more actions menu including "Dont Recommend me", "I Loved This","Cancel" */}
-        <Link href={`/articles/${slug}`} className="cursor-pointer">
+        <Link
+          // href={`/articles/${slug}`}
+          href={{
+            pathname: `/articles/[slug]`,
+            query: { slug: slug },
+          }}
+          className="cursor-pointer"
+        >
           <button className="ml-auto flex items-stretch gap-x-2 rounded-md bg-indigo-500 p-1">
             <p className="text-white">Go to Article</p>
             <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />

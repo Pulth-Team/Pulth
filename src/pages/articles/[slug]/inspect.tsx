@@ -39,7 +39,7 @@ const Inspect: NextPage = () => {
 
   return (
     <Dashboard>
-      <div className="py-8 px-4 ">
+      <div className="px-4 py-8 ">
         <div className="flex flex-row">
           <div className="flex-grow">
             <p className="text-xs text-black/70">Inspect Article</p>
@@ -52,7 +52,13 @@ const Inspect: NextPage = () => {
             </h1>
           </div>
           <div className="hidden gap-4 md:flex ">
-            <Link href={"/articles/" + slug + "/edit"}>
+            <Link
+              //href={"/articles/" + slug + "/edit"}
+              href={{
+                pathname: `/articles/[slug]/edit`,
+                query: { slug: slug },
+              }}
+            >
               <button className=" mt-4  flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white">
                 Edit
               </button>
@@ -97,7 +103,7 @@ const Inspect: NextPage = () => {
                           ? "border-b-4 border-b-indigo-500 text-white"
                           : " text-white/70"
                       }
-                          relative flex w-full items-center justify-center py-2 px-4 focus:outline-none`
+                          relative flex w-full items-center justify-center px-4 py-2 focus:outline-none`
                     }
                   >
                     <span>General</span>
@@ -109,7 +115,7 @@ const Inspect: NextPage = () => {
                           ? "border-b-4 border-b-indigo-500 text-white"
                           : " text-white/70"
                       }
-                          relative flex w-full items-center justify-center py-2 px-4 focus:outline-none`
+                          relative flex w-full items-center justify-center px-4 py-2 focus:outline-none`
                     }
                   >
                     <span>SEO</span>
@@ -121,7 +127,7 @@ const Inspect: NextPage = () => {
                           ? "border-b-4 border-b-indigo-500 text-white"
                           : " text-white/70"
                       }
-                          relative flex w-full items-center justify-center py-2 px-4 focus:outline-none`
+                          relative flex w-full items-center justify-center px-4 py-2 focus:outline-none`
                     }
                   >
                     <span>Stats</span>
@@ -162,7 +168,7 @@ const Inspect: NextPage = () => {
 
                     <div className="flex justify-end gap-2">
                       <button
-                        className="mt-6 mb-2 flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white disabled:bg-indigo-400"
+                        className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white disabled:bg-indigo-400"
                         disabled={
                           title === "" ||
                           description === "" ||
@@ -217,7 +223,7 @@ const Inspect: NextPage = () => {
                         )}
                       </button>
                       <button
-                        className="mt-6 mb-2 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400"
+                        className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400"
                         disabled={
                           title === articleInfo.data?.title &&
                           description === articleInfo.data?.description
@@ -267,7 +273,13 @@ const Inspect: NextPage = () => {
               <p>{dayjs(articleInfo.data?.createdAt).fromNow()}</p>
             )}
 
-            <Link href={"/articles/" + slug}>
+            <Link
+              //href={"/articles/" + slug}
+              href={{
+                pathname: "/articles/[slug]",
+                query: { slug: slug },
+              }}
+            >
               <button
                 className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                 disabled={!articleInfo.data?.isPublished}
@@ -275,8 +287,13 @@ const Inspect: NextPage = () => {
                 View
               </button>
             </Link>
-            <Link href={"/articles/" + slug + "/edit"}>
-              <button className=" mt-6 mb-2 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden">
+            <Link
+              href={{
+                pathname: "/articles/[slug]/edit",
+                query: { slug: slug },
+              }}
+            >
+              <button className=" mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden">
                 Edit
               </button>
             </Link>

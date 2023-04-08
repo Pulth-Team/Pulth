@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-// creates a NextFunctionComponent
+// Its not used anywhere
 const NotAuthenticated: NextPage = () => {
   const currentPath = useRouter().pathname;
 
