@@ -87,8 +87,11 @@ const Articles: NextPage = () => {
         </div>
 
         {/* TODO ADD subs icon (prime like) */}
-        <Link href={`/user/${articleData.data?.author.id}`}>
-          <a className="rounded-lg bg-indigo-500 px-4 py-2 text-white">Visit</a>
+        <Link
+          href={`/user/${articleData.data?.author.id}`}
+          className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
+        >
+          Visit
         </Link>
       </div>
       <div className="py-4 ">

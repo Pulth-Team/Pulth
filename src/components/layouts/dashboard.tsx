@@ -81,26 +81,26 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
     return (
       <Link href={`/articles/${hit.slug}`}>
         <div
-          className="bg-slate-700/30 hover:bg-indigo-900/70 p-1.5 rounded-md mb-2 cursor-pointer flex flex-row justify-between items-center"
+          className="mb-2 flex cursor-pointer flex-row items-center justify-between rounded-md bg-slate-700/30 p-1.5 hover:bg-indigo-900/70"
           onClick={() => setSearchModal(false)}
         >
           <div className="flex flex-col gap-y-2">
-            <p className="text-lg md:text-xl line-clamp-1 text-white font-bold">
+            <p className="text-lg font-bold text-white line-clamp-1 md:text-xl">
               {hit.title}
             </p>
-            <p className="text-gray-400 italic text-sm line-clamp-2 md:line-clamp-1 font-semibold">
+            <p className="text-sm font-semibold italic text-gray-400 line-clamp-2 md:line-clamp-1">
               {hit.description}
             </p>
             <Link href="/profile">
-              <div className="flex gap-x-1 items-center">
-                <UserCircleIcon className="stroke-white h-5 w-5" />
-                <p className="text-gray-400 font-semibold hover:underline">
+              <div className="flex items-center gap-x-1">
+                <UserCircleIcon className="h-5 w-5 stroke-white" />
+                <p className="font-semibold text-gray-400 hover:underline">
                   {hit.author}
                 </p>
               </div>
             </Link>
           </div>
-          <ChevronRightIcon className="stroke-white h-4 w-4 flex-shrink-0" />
+          <ChevronRightIcon className="h-4 w-4 flex-shrink-0 stroke-white" />
         </div>
       </Link>
     );
@@ -108,8 +108,8 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed flex w-screen bg-gray-800 p-2  gap-2  z-20">
-        <span className="text-indigo-500 text-xl font-bold mr-auto self-stretch my-auto">
+      <div className="fixed z-20 flex w-screen gap-2 bg-gray-800  p-2  md:hidden">
+        <span className="my-auto mr-auto self-stretch text-xl font-bold text-indigo-500">
           PulthApp
         </span>
 
@@ -121,7 +121,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
         )}
       </div>
       {/* Mobile Content */}
-      <div className="pt-14 pb-20 md:hidden overflow-y-hidden">{children}</div>
+      <div className="overflow-y-hidden pb-20 pt-14 md:hidden">{children}</div>
 
       {/* Mobile Bottom Bar */}
       <MobileBottombar path={router.pathname} />
@@ -129,17 +129,17 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
       {/* Laptop Sidebar */}
       <div className="hidden md:flex ">
         <div
-          className="flex flex-col flex-shrink-0 p-2 bg-gray-800 w-72 max-h-[stretch] top-0 bottom-0"
+          className="bottom-0 top-0 flex max-h-[stretch] w-72 flex-shrink-0 flex-col bg-gray-800 p-2"
           id="dashboard-sidebar"
         >
-          <div className="flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer bg-gray-800 text-gray-400 mb-8">
-            <span className="text-indigo-500 text-xl font-bold">PulthApp</span>
+          <div className="mb-8 flex cursor-pointer flex-row items-center gap-2 rounded-md bg-gray-800 p-2 text-gray-400">
+            <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
 
           {menuItems.map((item) => (
             <MenuItem
               key={item.name}
-              icon={<item.icon className="w-6 h-6" />}
+              icon={<item.icon className="h-6 w-6" />}
               text={item.name}
               path={item.path}
               id={item.id}
@@ -166,8 +166,8 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           ) : (
             <div className="mt-auto">
               <Link href="/api/auth/signin">
-                <button className="p-2 bg-gray-700 flex rounded-md w-full ">
-                  <p className="text-gray-200 font-semibold w-full text-center h-12 flex justify-center items-center ">
+                <button className="flex w-full rounded-md bg-gray-700 p-2 ">
+                  <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200 ">
                     Login
                   </p>
                 </button>
@@ -178,12 +178,12 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
         {/* Laptop Top Bar */}
         {/* the horizontal overflow solution  */}
         {/* https://stackoverflow.com/questions/36230944/prevent-flex-items-from-overflowing-a-container */}
-        <div className="flex flex-col  flex-grow max-h-[stretch] h-screen min-w-0 ">
-          <div className="flex  bg-gray-800 p-2  gap-2 flex-shrink-0 top-0 text-white  ">
+        <div className="flex h-screen  max-h-[stretch] min-w-0 flex-grow flex-col ">
+          <div className="top-0  flex flex-shrink-0  gap-2 bg-gray-800 p-2 text-white  ">
             <SearchButton onClick={onSearchClick} className="ml-auto" />
           </div>
           {/* Laptop Content */}
-          <div className="overflow-scroll h-full  ">{children}</div>
+          <div className="h-full overflow-scroll  ">{children}</div>
         </div>
       </div>
 
@@ -191,7 +191,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
         <Dialog
           open={searchModal}
           onClose={() => setSearchModal(false)}
-          className="z-20 relative"
+          className="relative z-20"
           as="div"
         >
           <Transition.Child
@@ -206,7 +206,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
             <div className="fixed inset-0 bg-black bg-opacity-70"></div>
           </Transition.Child>
           <div className="fixed inset-0">
-            <div className="flex justify-center items-center h-full">
+            <div className="flex h-full items-center justify-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -216,7 +216,7 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Dialog.Panel className="bg-gray-800 rounded-md p-4 flex flex-col gap-y-4 md:w-1/2 w-11/12">
+                <Dialog.Panel className="flex w-11/12 flex-col gap-y-4 rounded-md bg-gray-800 p-4 md:w-1/2">
                   <InstantSearch
                     searchClient={searchClient}
                     indexName={env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME}
@@ -249,11 +249,11 @@ const AccountBox = ({
 }) => {
   return (
     <div
-      className="p-2 bg-gray-700 flex rounded-md mt-auto"
+      className="mt-auto flex rounded-md bg-gray-700 p-2"
       id="current-account-box"
     >
       <Menu>
-        <Menu.Button className="relative w-12 h-12 rounded-full overflow-hidden">
+        <Menu.Button className="relative h-12 w-12 overflow-hidden rounded-full">
           <Image
             src={image || "/default_profile.jpg"}
             layout="fill"
@@ -262,33 +262,31 @@ const AccountBox = ({
           />
         </Menu.Button>
         <Menu.Items
-          className={`absolute p-1 rounded-md bottom-0 -translate-y-20 bg-gray-700 `}
+          className={`absolute bottom-0 -translate-y-20 rounded-md bg-gray-700 p-1 `}
         >
           <Menu.Item>
             <div>
-              <Link href="/profile">
-                <a
-                  className={`${
-                    path === "/profile" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
-                >
-                  <UserCircleIcon className="w-6 h-6" />
-                  <p>Profile</p>
-                </a>
+              <Link
+                href="/profile"
+                className={`${
+                  path === "/profile" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <UserCircleIcon className="h-6 w-6" />
+                <p>Profile</p>
               </Link>
             </div>
           </Menu.Item>
           <Menu.Item>
             <div>
-              <Link href="/settings">
-                <a
-                  className={`${
-                    path === "/settings" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
-                >
-                  <Cog8ToothIcon className="w-6 h-6" />
-                  <p>Settings</p>
-                </a>
+              <Link
+                href="/settings"
+                className={`${
+                  path === "/settings" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <Cog8ToothIcon className="h-6 w-6" />
+                <p>Settings</p>
               </Link>
             </div>
           </Menu.Item>
@@ -296,19 +294,19 @@ const AccountBox = ({
           <Menu.Item>
             <a
               onClick={() => signOut()}
-              className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+              className={` flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
             >
-              <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+              <ArrowLeftOnRectangleIcon className="h-6 w-6" />
               <p>Logout</p>
             </a>
           </Menu.Item>
         </Menu.Items>
       </Menu>
-      <div className="flex flex-col ml-2">
-        <p className="text-gray-200 font-semibold">{name}</p>
+      <div className="ml-2 flex flex-col">
+        <p className="font-semibold text-gray-200">{name}</p>
         <Link href={`/user/${id}`}>
           <button
-            className="text-gray-400 text-sm text-left hover:text-gray-100"
+            className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"
           >
             View Profile
@@ -336,7 +334,7 @@ const MenuItem = ({
     <Link href={path}>
       <div
         id={id}
-        className={`flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer ${
+        className={`flex cursor-pointer flex-row items-center gap-2 rounded-md p-2 ${
           currentPath === path
             ? "bg-gray-700 text-white"
             : "bg-gray-800 text-gray-400"
@@ -353,7 +351,7 @@ const MobileLogin = ({ className }: { className?: string }) => {
   return (
     <Link href="/api/auth/signin" className={className ?? ""}>
       <div
-        className={` flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2`}
+        className={` flex flex-row items-center rounded-lg bg-gray-600 p-1 px-2 text-white`}
       >
         <ArrowLeftOnRectangleIcon
           className={`h-6 w-6 rotate-180`}
@@ -367,34 +365,34 @@ const MobileLogin = ({ className }: { className?: string }) => {
 const MobilePhoto = ({ image }: { image: string }) => {
   return (
     <Menu as="div" className={` self-stretch`}>
-      <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
+      <Menu.Button className={`relative h-10 w-10 focus:outline-none `}>
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
           layout="fill"
-          className="rounded-full aspect-square"
+          className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
-      <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
+      <Menu.Items className="absolute right-1 translate-y-3 rounded-md bg-gray-700 p-1 focus:outline-none active:outline-none">
         <Link href={"/profile"}>
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <UserCircleIcon className="h-5 w-5" />
-              <p className="max-h-fit h-fit">Profile</p>
+              <p className="h-fit max-h-fit">Profile</p>
             </div>
           </Menu.Item>
         </Link>
 
         <Link href="/settings">
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-              <p className="max-h-fit h-fit">Settings</p>
+              <p className="h-fit max-h-fit">Settings</p>
             </div>
           </Menu.Item>
         </Link>
         <Menu.Item>
-          <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+          <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
             <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
             <a className="max-h-min" onClick={() => signOut()}>
               Logout
@@ -416,7 +414,7 @@ const SearchButton = ({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2 gap-2 hover:bg-gray-500 active:bg-gray-700  ${
+      className={`flex flex-row items-center gap-2 rounded-lg bg-gray-600 p-1 px-2 text-white hover:bg-gray-500 active:bg-gray-700  ${
         className || ""
       } `}
       id="search-button"
@@ -430,7 +428,7 @@ const SearchButton = ({
 
 const MobileBottombar = ({ path }: { path: string }) => {
   return (
-    <div className="md:hidden fixed z-10 flex bottom-0 w-screen bg-gray-800 justify-evenly py-3 text-white/60">
+    <div className="fixed bottom-0 z-10 flex w-screen justify-evenly bg-gray-800 py-3 text-white/60 md:hidden">
       <Link href={`/dashboard`}>
         <button
           className={`flex flex-col items-center ${

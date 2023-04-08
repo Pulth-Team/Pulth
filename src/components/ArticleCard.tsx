@@ -44,12 +44,12 @@ const ArticleCard: NextPage<
     <div
       className={`${
         className || ""
-      } flex flex-col bg-gray-100 gap-y-1 rounded-xl p-4 min-w-[256px] max-w-xs flex-shrink-0`}
+      } flex min-w-[256px] max-w-xs flex-shrink-0 flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
     >
       <div className="flex justify-between whitespace-nowrap  ">
         <div className="flex gap-1">
           {isRecommended && (
-            <div className="capitalize font-light text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#7b4397] to-[#dc2430]">
+            <div className="bg-gradient-to-r from-[#7b4397] to-[#dc2430] bg-clip-text text-sm font-light capitalize text-transparent">
               #recommended
             </div>
           )}
@@ -57,31 +57,34 @@ const ArticleCard: NextPage<
           {/* <div className="capitalize  font-light text-sm">#Javascript</div> */}
         </div>
       </div>
-      <div className="flex justify-between items-baseline">
-        <Link href={`/articles/${slug}`} className="cursor-pointer">
-          <a className="text-xl font-semibold mb-1 line-clamp-1 ">{Title}</a>
+      <div className="flex items-baseline justify-between">
+        <Link
+          href={`/articles/${slug}`}
+          className="mb-1 cursor-pointer text-xl font-semibold line-clamp-1 "
+        >
+          {Title}
         </Link>
         {/* <div className="whitespace-nowrap font-light text-sm flex-shrink-0">
           {dayjs(createdAt).fromNow()}
         </div> */}
       </div>
-      <p className=" line-clamp-4 mb-4">{children}</p>
+      <p className=" mb-4 line-clamp-4">{children}</p>
 
       <div className="mt-auto flex gap-2">
         <Link href={`/user/${Author?.UserId}`}>
-          <div className="w-9 h-9 relative cursor-pointer">
+          <div className="relative h-9 w-9 cursor-pointer">
             <Image
               src={Author?.Image || "/default-profile.png"}
               alt="profile"
               height={64}
               width={64}
-              className="rounded-full aspect-square"
+              className="aspect-square rounded-full"
             ></Image>
           </div>
         </Link>
         <div>
           <Link href={`/user/${Author?.UserId}`}>
-            <p className="text-sm cursor-pointer">{Author?.Name}</p>
+            <p className="cursor-pointer text-sm">{Author?.Name}</p>
           </Link>
           <p className="text-xs text-black/70">
             {/* {Author?.Title} */}
@@ -91,9 +94,9 @@ const ArticleCard: NextPage<
 
         {/* TODO Add more actions menu including "Dont Recommend me", "I Loved This","Cancel" */}
         <Link href={`/articles/${slug}`} className="cursor-pointer">
-          <button className="ml-auto bg-indigo-500 p-1 flex gap-x-2 items-stretch rounded-md">
+          <button className="ml-auto flex items-stretch gap-x-2 rounded-md bg-indigo-500 p-1">
             <p className="text-white">Go to Article</p>
-            <ArrowRightCircleIcon className="self-stretch w-6 stroke-white" />
+            <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
           </button>
         </Link>
       </div>

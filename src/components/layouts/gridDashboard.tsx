@@ -9,14 +9,6 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 
-import algoliasearch from "algoliasearch/lite";
-import {
-  InstantSearch,
-  RefinementList,
-  Hits,
-  connectSearchBox,
-} from "react-instantsearch-dom";
-
 import {
   HomeIcon,
   MapIcon,
@@ -42,7 +34,6 @@ const GridDashboard: NextPage<{
 }> = ({ children, contentClassName }) => {
   const { data: userData, status: userStatus } = useSession();
   const router = useRouter();
-  const currentPath = router.pathname;
 
   const [searchModal, setSearchModal] = useState(false);
 
@@ -237,29 +228,27 @@ const AccountBox = ({
         >
           <Menu.Item>
             <div>
-              <Link href="/profile">
-                <a
-                  className={`${
-                    path === "/profile" ? "bg-gray-600" : "bg-gray-700"
-                  } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
-                >
-                  <UserCircleIcon className="h-6 w-6" />
-                  <p>Profile</p>
-                </a>
+              <Link
+                href="/profile"
+                className={`${
+                  path === "/profile" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <UserCircleIcon className="h-6 w-6" />
+                <p>Profile</p>
               </Link>
             </div>
           </Menu.Item>
           <Menu.Item>
             <div>
-              <Link href="/settings">
-                <a
-                  className={`${
-                    path === "/settings" ? "bg-gray-600" : "bg-gray-700"
-                  } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
-                >
-                  <Cog8ToothIcon className="h-6 w-6" />
-                  <p>Settings</p>
-                </a>
+              <Link
+                href="/settings"
+                className={`${
+                  path === "/settings" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <Cog8ToothIcon className="h-6 w-6" />
+                <p>Settings</p>
               </Link>
             </div>
           </Menu.Item>
@@ -296,7 +285,7 @@ const MobilePhoto = ({ image }: { image: string }) => {
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
-          layout="fill"
+          fill
           className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>

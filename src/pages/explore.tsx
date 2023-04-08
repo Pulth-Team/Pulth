@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 
 import { api } from "../utils/api";
 import Head from "next/head";
-import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 

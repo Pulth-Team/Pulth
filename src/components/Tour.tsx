@@ -247,7 +247,7 @@ const Tour: NextPage<{
     <>
       <div
         className={twMerge(
-          "bg-white rounded shadow-md z-50 p-2",
+          "z-50 rounded bg-white p-2 shadow-md",
           className,
           tours[tourIndex]?.className,
           !isRunning && "hidden",
@@ -258,7 +258,7 @@ const Tour: NextPage<{
         {tours[tourIndex]?.message}
 
         <hr className="mb-1 mt-2" />
-        <div className="flex justify-between my-1 mx-4">
+        <div className="mx-4 my-1 flex justify-between">
           <button
             onClick={() => {
               clearTour("skipped");
@@ -277,6 +277,8 @@ const Tour: NextPage<{
               }}
               shallow={true}
               passHref
+              // HACK: this should be fixed
+              legacyBehavior
             >
               <a
                 className={
@@ -302,7 +304,7 @@ const Tour: NextPage<{
       </div>
       <div
         id="backdrop-shadow"
-        className={`w-screen h-screen backdrop-blur-sm backdrop-brightness-50 absolute top-0 left-0 z-40 ${
+        className={`absolute left-0 top-0 z-40 h-screen w-screen backdrop-blur-sm backdrop-brightness-50 ${
           isRunning || "hidden"
         }`}
         onClick={() => clearTour("backdrop")}

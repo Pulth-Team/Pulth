@@ -35,8 +35,8 @@ const NewDashboard: NextPage<{ children: ReactNode }> = ({ children }) => {
   return (
     <div className="">
       {/* Navbar */}
-      <div className="p-2 h-14 z-20 bg-gray-800 flex fixed w-full">
-        <div className="text-indigo-500 text-xl font-bold mr-auto self-stretch my-auto">
+      <div className="fixed z-20 flex h-14 w-full bg-gray-800 p-2">
+        <div className="my-auto mr-auto self-stretch text-xl font-bold text-indigo-500">
           PulthApp
         </div>
         {/* search button will be here */}
@@ -44,7 +44,7 @@ const NewDashboard: NextPage<{ children: ReactNode }> = ({ children }) => {
         {!user ? (
           <Link href="/api/auth/signin" className={""}>
             <div
-              className={` flex flex-row items-center text-white bg-gray-600 rounded-lg p-1 px-2`}
+              className={` flex flex-row items-center rounded-lg bg-gray-600 p-1 px-2 text-white`}
             >
               <ArrowLeftOnRectangleIcon
                 className={`h-6 w-6 rotate-180`}
@@ -57,11 +57,11 @@ const NewDashboard: NextPage<{ children: ReactNode }> = ({ children }) => {
         )}
       </div>
 
-      <div className="hidden md:flex flex-col p-2 bg-gray-800 w-72 max-h-[stretch] top-0 bottom-0 fixed pt-14">
+      <div className="fixed bottom-0 top-0 hidden max-h-[stretch] w-72 flex-col bg-gray-800 p-2 pt-14 md:flex">
         {menuItems.map((item) => (
           <MenuItem
             key={item.name}
-            icon={<item.icon className="w-6 h-6" />}
+            icon={<item.icon className="h-6 w-6" />}
             text={item.name}
             path={item.path}
             id={item.id}
@@ -79,8 +79,8 @@ const NewDashboard: NextPage<{ children: ReactNode }> = ({ children }) => {
         ) : (
           <div className="mt-auto">
             <Link href="/api/auth/signin">
-              <button className="p-2 bg-gray-700 flex rounded-md w-full ">
-                <p className="text-gray-200 font-semibold w-full text-center h-12 flex justify-center items-center ">
+              <button className="flex w-full rounded-md bg-gray-700 p-2 ">
+                <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200 ">
                   Login
                 </p>
               </button>
@@ -88,7 +88,7 @@ const NewDashboard: NextPage<{ children: ReactNode }> = ({ children }) => {
           </div>
         )}
       </div>
-      <div className="pt-14 pb-20 overflow-y-hidden md:pl-72">{children}</div>
+      <div className="overflow-y-hidden pb-20 pt-14 md:pl-72">{children}</div>
 
       {/* mobile bottom bar (?)*/}
       <MobileBottombar path={router.pathname} />
@@ -129,34 +129,34 @@ const menuItems = [
 const MobilePhoto = ({ image }: { image: string }) => {
   return (
     <Menu as="div" className={`self-stretch md:hidden`}>
-      <Menu.Button className={`relative focus:outline-none w-10 h-10 `}>
+      <Menu.Button className={`relative h-10 w-10 focus:outline-none `}>
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
           layout="fill"
-          className="rounded-full aspect-square"
+          className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
-      <Menu.Items className="absolute p-1 rounded-md translate-y-3 right-1 bg-gray-700 focus:outline-none active:outline-none">
+      <Menu.Items className="absolute right-1 translate-y-3 rounded-md bg-gray-700 p-1 focus:outline-none active:outline-none">
         <Link href={"/profile"}>
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <UserCircleIcon className="h-5 w-5" />
-              <p className="max-h-fit h-fit">Profile</p>
+              <p className="h-fit max-h-fit">Profile</p>
             </div>
           </Menu.Item>
         </Link>
 
         <Link href="/settings">
           <Menu.Item>
-            <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+            <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
               <Cog8ToothIcon className="h-5 w-5"></Cog8ToothIcon>
-              <p className="max-h-fit h-fit">Settings</p>
+              <p className="h-fit max-h-fit">Settings</p>
             </div>
           </Menu.Item>
         </Link>
         <Menu.Item>
-          <div className="p-1 text-white hover:bg-gray-800 active:bg-gray-800 cursor-pointer rounded flex items-center align-middle gap-x-1">
+          <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
             <ArrowRightOnRectangleIcon className="h-5 w-5"></ArrowRightOnRectangleIcon>
             <a className="max-h-min" onClick={() => signOut()}>
               Logout
@@ -169,7 +169,7 @@ const MobilePhoto = ({ image }: { image: string }) => {
 };
 const MobileBottombar = ({ path }: { path: string }) => {
   return (
-    <div className="md:hidden fixed z-10 flex bottom-0 w-screen bg-gray-800 justify-evenly py-3 text-white/60">
+    <div className="fixed bottom-0 z-10 flex w-screen justify-evenly bg-gray-800 py-3 text-white/60 md:hidden">
       <Link href={`/dashboard`}>
         <button
           className={`flex flex-col items-center ${
@@ -231,7 +231,7 @@ const MenuItem = ({
     <Link href={path}>
       <div
         id={id}
-        className={`flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer ${
+        className={`flex cursor-pointer flex-row items-center gap-2 rounded-md p-2 ${
           currentPath === path
             ? "bg-gray-700 text-white"
             : "bg-gray-800 text-gray-400"
@@ -256,11 +256,11 @@ const AccountBox = ({
 }) => {
   return (
     <div
-      className="p-2 bg-gray-700 flex rounded-md mt-auto"
+      className="mt-auto flex rounded-md bg-gray-700 p-2"
       id="current-account-box"
     >
       <Menu>
-        <Menu.Button className="relative w-12 h-12 rounded-full overflow-hidden">
+        <Menu.Button className="relative h-12 w-12 overflow-hidden rounded-full">
           <Image
             src={image || "/default_profile.jpg"}
             layout="fill"
@@ -269,33 +269,31 @@ const AccountBox = ({
           />
         </Menu.Button>
         <Menu.Items
-          className={`absolute p-1 rounded-md bottom-0 -translate-y-20 bg-gray-700 `}
+          className={`absolute bottom-0 -translate-y-20 rounded-md bg-gray-700 p-1 `}
         >
           <Menu.Item>
             <div>
-              <Link href="/profile">
-                <a
-                  className={`${
-                    path === "/profile" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
-                >
-                  <UserCircleIcon className="w-6 h-6" />
-                  <p>Profile</p>
-                </a>
+              <Link
+                href="/profile"
+                className={`${
+                  path === "/profile" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <UserCircleIcon className="h-6 w-6" />
+                <p>Profile</p>
               </Link>
             </div>
           </Menu.Item>
           <Menu.Item>
             <div>
-              <Link href="/settings">
-                <a
-                  className={`${
-                    path === "/settings" ? "bg-gray-600" : "bg-gray-700"
-                  } flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
-                >
-                  <Cog8ToothIcon className="w-6 h-6" />
-                  <p>Settings</p>
-                </a>
+              <Link
+                href="/settings"
+                className={`${
+                  path === "/settings" ? "bg-gray-600" : "bg-gray-700"
+                } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
+              >
+                <Cog8ToothIcon className="h-6 w-6" />
+                <p>Settings</p>
               </Link>
             </div>
           </Menu.Item>
@@ -303,19 +301,19 @@ const AccountBox = ({
           <Menu.Item>
             <a
               onClick={() => signOut()}
-              className={` flex flex-row items-center gap-2 p-2 rounded-md cursor-pointer  text-gray-100`}
+              className={` flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
             >
-              <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+              <ArrowLeftOnRectangleIcon className="h-6 w-6" />
               <p>Logout</p>
             </a>
           </Menu.Item>
         </Menu.Items>
       </Menu>
-      <div className="flex flex-col ml-2">
-        <p className="text-gray-200 font-semibold">{name}</p>
+      <div className="ml-2 flex flex-col">
+        <p className="font-semibold text-gray-200">{name}</p>
         <Link href={`/user/${id}`}>
           <button
-            className="text-gray-400 text-sm text-left hover:text-gray-100"
+            className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"
           >
             View Profile
