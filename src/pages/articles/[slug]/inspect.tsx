@@ -273,29 +273,34 @@ const Inspect: NextPage = () => {
               <p>{dayjs(articleInfo.data?.createdAt).fromNow()}</p>
             )}
 
-            <Link
-              //href={"/articles/" + slug}
-              href={{
-                pathname: "/articles/[slug]",
-                query: { slug: slug },
-              }}
-            >
+            {articleInfo.data?.isPublished ? (
+              <Link
+                //href={"/articles/" + slug}
+                href={{
+                  pathname: "/articles/[slug]",
+                  query: { slug: slug },
+                }}
+                className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+              >
+                View
+              </Link>
+            ) : (
               <button
                 className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                 disabled={!articleInfo.data?.isPublished}
               >
                 View
               </button>
-            </Link>
+            )}
+
             <Link
               href={{
                 pathname: "/articles/[slug]/edit",
                 query: { slug: slug },
               }}
+              className=" mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden"
             >
-              <button className=" mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden">
-                Edit
-              </button>
+              Edit
             </Link>
             <button
               onClick={() => {
