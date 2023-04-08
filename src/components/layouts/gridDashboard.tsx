@@ -44,7 +44,7 @@ const GridDashboard: NextPage<{
           <div className=" mb-6 hidden cursor-pointer flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
             <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
-          <nav className="flex h-full flex-row items-center justify-evenly px-2  md:h-auto md:flex-col md:items-start md:justify-start">
+          <nav className="flex h-full flex-row items-center justify-evenly px-2 md:h-auto  md:flex-col md:items-stretch md:justify-start">
             {menuItems.map((item) => (
               <MenuItem
                 key={item.name}
@@ -53,7 +53,7 @@ const GridDashboard: NextPage<{
                 path={item.path}
                 id={item.id}
                 currentPath={router.pathname}
-                className=""
+                className="flex-grow"
               />
             ))}
           </nav>
@@ -179,7 +179,7 @@ const MenuItem = ({
       <div
         id={id}
         className={twMerge(
-          "flex cursor-pointer flex-col items-center rounded-md bg-transparent p-2 md:flex-row md:gap-2 md:self-stretch",
+          "flex cursor-pointer flex-col  items-center rounded-md bg-transparent p-2 md:flex-row md:gap-2 md:self-stretch",
           currentPath === path
             ? "text-white md:bg-gray-700"
             : "bg-gray-800 text-gray-400",
