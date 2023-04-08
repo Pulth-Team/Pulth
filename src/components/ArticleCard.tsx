@@ -116,7 +116,6 @@ const ArticleCard: NextPage<
             query: { slug: slug },
           }}
           className="ml-auto flex cursor-pointer items-center gap-x-2 rounded-md bg-indigo-500 p-1"
-          as="button"
         >
           <p className="text-white">Go to Article</p>
           <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
