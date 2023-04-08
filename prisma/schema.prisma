@@ -49,13 +49,16 @@ model User {
 
     metaData MetaData?
 
-    Articles Article[]
+    Articles Article[] @relation("ArticleAuthor")
+    // votedArticles Article[] @relation("ArticleVoters", fields: [voterIds], references: [id])
     Comments Comment[] @relation("AuthorUser")
 
     ratedCommentsId String[]  @db.ObjectId
     // im not hundred percent sure this is the right way to do this
     ratedComments   Comment[] @relation("RatedUser", fields: [ratedCommentsId], references: [id])
     images          Image[]
+    articleId       String?   @db.ObjectId
+    votedTo         VotedBy[] @relation("ArticleVotes")
 }
 
 model MetaData {
@@ -80,7 +83,7 @@ model VerificationToken {
 model Article {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    author   User   @relation(fields: [authorId], references: [id])
+    author   User   @relation("ArticleAuthor", fields: [authorId], references: [id])
     authorId String @db.ObjectId
 
     title       String
@@ -93,6 +96,9 @@ model Article {
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
     editorVersion String?
+
+    voteRank Int       @default(0)
+    votes    VotedBy[] @relation("ArticleVotes")
 
     Comments Comment[]
 }
@@ -133,4 +139,16 @@ model Image {
 
     url String
     alt String
+}
+
+model VotedBy {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    userId String @db.ObjectId
+    user   User   @relation("ArticleVotes", fields: [userId], references: [id], onDelete: Cascade)
+
+    articleId String  @db.ObjectId
+    article   Article @relation("ArticleVotes", fields: [articleId], references: [id], onDelete: Cascade)
+
+    upVote Boolean
 }
