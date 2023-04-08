@@ -242,7 +242,7 @@ const Inspect: NextPage = () => {
             </div>
           </div>
 
-          <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 self-start px-2 py-4 md:order-last md:w-auto md:flex-shrink md:flex-grow-0">
+          <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 self-start p-2 shadow-md md:order-last md:w-auto md:flex-shrink md:flex-grow-0">
             <span className="text-black/70">status:</span>
             {infoIsLoading ? (
               <Loading className="h-7 w-7 border-2" />
