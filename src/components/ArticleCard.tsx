@@ -115,12 +115,11 @@ const ArticleCard: NextPage<
             pathname: `/articles/[slug]`,
             query: { slug: slug },
           }}
-          className="cursor-pointer"
+          className="ml-auto flex cursor-pointer items-center gap-x-2 rounded-md bg-indigo-500 p-1"
+          as="button"
         >
-          <button className="ml-auto flex items-stretch gap-x-2 rounded-md bg-indigo-500 p-1">
-            <p className="text-white">Go to Article</p>
-            <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
-          </button>
+          <p className="text-white">Go to Article</p>
+          <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
         </Link>
       </div>
     </div>
