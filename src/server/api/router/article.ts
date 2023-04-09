@@ -151,6 +151,38 @@ export const articleRouter = createTRPCRouter({
       return userArticles;
     }),
 
+  // returns a list of articles of an currently logged in user
+  // articles are sorted by createdAt
+  // articles are paginated
+  getMyArticles: protectedProcedure
+    .input(
+      z
+        .object({
+          limit: z.number().optional().default(10),
+          skip: z.number().optional().default(0),
+        })
+        .optional()
+    )
+    .query(async ({ ctx }) => {
+      const articles = await ctx.prisma?.article.findMany({
+        where: {
+          authorId: ctx.session?.user.id,
+        },
+        select: {
+          title: true,
+          description: true,
+          slug: true,
+          isPublished: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return articles;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -203,38 +235,6 @@ export const articleRouter = createTRPCRouter({
         });
 
       return article;
-    }),
-
-  // returns a list of articles of an currently logged in user
-  // articles are sorted by createdAt
-  // articles are paginated
-  getMyArticles: protectedProcedure
-    .input(
-      z
-        .object({
-          limit: z.number().optional().default(10),
-          skip: z.number().optional().default(0),
-        })
-        .optional()
-    )
-    .query(async ({ ctx }) => {
-      const articles = await ctx.prisma?.article.findMany({
-        where: {
-          authorId: ctx.session?.user.id,
-        },
-        select: {
-          title: true,
-          description: true,
-          slug: true,
-          isPublished: true,
-          createdAt: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-
-      return articles;
     }),
 
   publish: protectedProcedure
@@ -435,6 +435,18 @@ export const articleRouter = createTRPCRouter({
           slug: newSlug,
         },
       });
+      // update the algolia index
+      await ctx.algolia.partialUpdateObject(
+        {
+          objectID: updatedArticle.id,
+          slug: updatedArticle.slug,
+          title: updatedArticle.title,
+          description: updatedArticle.description,
+        },
+        {
+          createIfNotExists: true,
+        }
+      );
 
       //check if the article was updated
       if (!updatedArticle)
@@ -477,6 +489,9 @@ export const articleRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
           message: "Something went wrong",
         });
+
+      // delete the article from the algolia index
+      await ctx.algolia.deleteObject(article.id);
 
       return deletedArticle;
     }),
