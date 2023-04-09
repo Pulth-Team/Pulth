@@ -17,7 +17,7 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
     <Link
       // href={`/articles/${slug}/inspect`}
       href={{
-        pathname: `/articles/${slug}/inspect`,
+        pathname: `/articles/[slug]/inspect`,
         query: { slug: slug },
       }}
     >
