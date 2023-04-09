@@ -116,8 +116,6 @@ const Articles: NextPage = () => {
               voteRank
             )}
           </div>
-
-          {/* TODO: Add Vote functionality */}
           <button
             onClick={() => {
               if (authStatus !== "authenticated") {
@@ -177,11 +175,15 @@ const Articles: NextPage = () => {
             />
           </button>
         </div>
-        <div className="flex gap-4">
+        <div></div>
+        {/* TODO: Add share and bookmark functionality */}
+        {/* Will be added later */}
+        {/* <div className="flex gap-4">
           <ArrowUpTrayIcon className="h-6 w-6 text-black" />
           <BookmarkIcon className="h-6 w-6 text-black" />
-        </div>
+        </div> */}
       </div>
+
       {/* About the author */}
       <div className="mt-4 flex items-center justify-between px-4">
         <div className="flex items-center gap-x-3">
@@ -198,17 +200,31 @@ const Articles: NextPage = () => {
           </p>
         </div>
 
-        {/* TODO ADD subs icon (prime like) */}
-        <Link
-          // href={`/user/${articleData.data?.author.id}`}
-          href={{
-            pathname: `/user/[userId]`,
-            query: { userId: articleData.data?.author.id },
-          }}
-          className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
-        >
-          Visit
-        </Link>
+        <div className="flex gap-2">
+          {/* TODO ADD subs icon (prime like) */}
+          {articleData.data?.author.id === userData?.user.id && (
+            <Link
+              // href={`/user/${articleData.data?.author.id}`}
+              href={{
+                pathname: `/articles/[slug]/inspect`,
+                query: { slug: slug },
+              }}
+              className="rounded-lg bg-gray-500 px-4 py-2 text-white"
+            >
+              Inspect
+            </Link>
+          )}
+          <Link
+            // href={`/user/${articleData.data?.author.id}`}
+            href={{
+              pathname: `/user/[userId]`,
+              query: { userId: articleData.data?.author.id },
+            }}
+            className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
+          >
+            Visit
+          </Link>
+        </div>
       </div>
 
       <div className="py-4 ">
