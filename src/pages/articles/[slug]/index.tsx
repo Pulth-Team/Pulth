@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { signIn, useSession } from "next-auth/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   SparklesIcon,
   ChevronUpIcon,
@@ -21,23 +21,47 @@ import DashboardLayout from "~/components/layouts/gridDashboard";
 import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
 import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
+import Loading from "~/components/Loading";
 
 // TODO: Add support for SSG
 // TODO: Add support for Loading State in CSR
 const Articles: NextPage = () => {
   const router = useRouter();
-  const { data: userData, status } = useSession();
+  const { data: userData, status: authStatus } = useSession();
   const { slug } = router.query;
+  const [voteRank, setVoteRank] = useState(0);
+  const [myVote, setMyVote] = useState<"up" | "down" | "none">("none");
 
   // query to get the article data
-  const articleData = api.article.getBySlug.useQuery((slug as string) || "");
-
+  const articleData = api.article.getBySlug.useQuery((slug as string) || "", {
+    onSuccess: (data) => {
+      setVoteRank(data.voteRank);
+    },
+  });
   // mutation to add a comment
   const commentAddMutation = api.comment.create.useMutation();
-
-  // let blocks: OutputBlockType[] = articleData.isLoading
-  //   ? []
-  //   : articleData.data?.bodyData;
+  // mutation to add a vote
+  const voteAddMutation = api.vote.voteByArticleId.useMutation({
+    onSuccess: (data) => {
+      setVoteRank(data.newRank);
+    },
+  });
+  // query to get my vote
+  const myVoteData = api.vote.checkMyVoteByArticleId.useQuery(
+    articleData.data?.id as string,
+    {
+      enabled: authStatus === "authenticated" && articleData.data?.id !== null,
+      onSuccess: (data) => {
+        // check if there is a msg prop
+        if ("msg" in data) {
+          setMyVote("none");
+        } else {
+          // otherwise set the vote to the data vote
+          setMyVote(data.upVote ? "up" : "down");
+        }
+      },
+    }
+  );
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // todo open a modal  for the comment
@@ -83,15 +107,74 @@ const Articles: NextPage = () => {
         <div className="flex gap-4">
           <div className="flex gap-2">
             <SparklesIcon className="h-6 w-6 text-black" />
-            {articleData.data?.voteRank || 0}
+            {/* {voteAddMutation.data
+              ? voteAddMutation.data.newRank
+              : articleData.data?.voteRank || 0} */}
+            {voteAddMutation.isLoading ? (
+              <Loading className="h-6 w-6 border-2" />
+            ) : (
+              voteRank
+            )}
           </div>
 
           {/* TODO: Add Vote functionality */}
-          <button>
-            <ChevronUpIcon className="h-6 w-6 text-black" />
+          <button
+            onClick={() => {
+              if (authStatus !== "authenticated") {
+                signIn();
+                return;
+              } else {
+                voteAddMutation.mutate(
+                  {
+                    articleId: articleData.data?.id as string,
+                    vote: "up",
+                  },
+                  {
+                    onSuccess: (data) => {
+                      if (data.voteDirection == "deleted") setMyVote("none");
+                      else setMyVote("up");
+                    },
+                  }
+                );
+              }
+            }}
+          >
+            <ChevronUpIcon
+              className={`h-6 w-6 ${
+                myVote !== "none" && myVote === "up"
+                  ? "text-indigo-500"
+                  : " text-black"
+              }`}
+            />
           </button>
-          <button>
-            <ChevronDownIcon className="h-6 w-6 text-black" />
+          <button
+            onClick={() => {
+              if (authStatus !== "authenticated") {
+                signIn();
+                return;
+              } else {
+                voteAddMutation.mutate(
+                  {
+                    articleId: articleData.data?.id as string,
+                    vote: "down",
+                  },
+                  {
+                    onSuccess: (data) => {
+                      if (data.voteDirection == "deleted") setMyVote("none");
+                      else setMyVote("down");
+                    },
+                  }
+                );
+              }
+            }}
+          >
+            <ChevronDownIcon
+              className={`h-6 w-6 ${
+                myVote !== "none" && myVote === "down"
+                  ? "text-indigo-500"
+                  : " text-black"
+              }`}
+            />
           </button>
         </div>
         <div className="flex gap-4">
@@ -137,7 +220,7 @@ const Articles: NextPage = () => {
         </p>
         <hr className="mb-2" />
         <div className="flex flex-col ">
-          {status == "authenticated" ? (
+          {authStatus == "authenticated" ? (
             <CommentAdd
               user={{
                 name: userData?.user?.name as string,
@@ -164,7 +247,7 @@ const Articles: NextPage = () => {
               name: userData?.user?.name as string,
               image: userImage || "/default_profile.jpg",
             }}
-            isAuthed={status == "authenticated"}
+            isAuthed={authStatus == "authenticated"}
             articleId={articleData.data?.id as string}
             revalidate={articleData.refetch}
           />

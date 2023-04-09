@@ -5,6 +5,7 @@ import { userRouter } from "./router/user";
 import { commentRouter } from "./router/comment";
 import { articleRouter } from "./router/article";
 import { authRouter } from "./router/auth";
+import { voteRouter } from "./router/vote";
 
 /**
  * This is the primary router for your server.
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   comment: commentRouter,
   article: articleRouter,
   auth: authRouter,
+  vote: voteRouter,
 });
 
 // export type definition of API
