@@ -72,17 +72,6 @@ const Articles: NextPage = ({}) => {
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
 
-  // // TODO: find a better way to update the body data (without using useEffect)
-  // // FIXME: is this really working? (it seems to be working) (not sure)
-  // useEffect(() => {
-  //   if (bodyData) {
-  //     updateArticleMutation.mutate({
-  //       slug: slug as string,
-  //       bodyData,
-  //     });
-  //   }
-  // }, [bodyData]);
-
   const OnSave = () => {
     editor.current?.save().then((outputData) => {
       console.log("Saved Article Data", outputData);
