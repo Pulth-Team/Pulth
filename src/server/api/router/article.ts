@@ -9,6 +9,7 @@ import {
 } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
+import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
 
 export const articleRouter = createTRPCRouter({
   // takes a slug and returns an article without isPublished value
@@ -234,7 +235,15 @@ export const articleRouter = createTRPCRouter({
           message: "Article not found in your account",
         });
 
-      return article;
+      const { bodyData, ...rest } = article;
+
+      return {
+        ...rest,
+        bodyData: JSON.parse(bodyData?.toString() || "[]") as OutputBlockData<
+          string,
+          any
+        >[],
+      };
     }),
 
   publish: protectedProcedure
@@ -317,7 +326,15 @@ export const articleRouter = createTRPCRouter({
         await ctx.algolia.deleteObject(updatedArticle.id);
       }
 
-      return updatedArticle;
+      const { bodyData, ...rest } = updatedArticle;
+
+      return {
+        ...rest,
+        bodyData: JSON.parse(bodyData?.toString() || "[]") as OutputBlockData<
+          string,
+          any
+        >[],
+      };
     }),
 
   updateBody: protectedProcedure
@@ -326,9 +343,9 @@ export const articleRouter = createTRPCRouter({
         slug: z.string(),
         bodyData: z.array(
           z.object({
-            id: z.string(),
+            id: z.string().optional(),
             type: z.string(),
-            data: z.any(),
+            data: z.any().optional(),
           })
         ),
       })

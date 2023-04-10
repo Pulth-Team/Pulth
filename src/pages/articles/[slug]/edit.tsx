@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import EditorJS, { API } from "@editorjs/editorjs";
+import EditorJS, { API, OutputBlockData } from "@editorjs/editorjs";
 
 import { api } from "~/utils/api";
 import Head from "next/head";
@@ -27,7 +27,9 @@ const Editor = dynamic(() => import("~/components/editor/Editor"), {
 const Articles: NextPage = ({}) => {
   const { status } = useSession({ required: true });
   const [isFetching, setIsFetching] = useState(true);
-  const [bodyData, setBodyData] = useState<any>(null);
+  const [bodyData, setBodyData] = useState<
+    OutputBlockData<string, any>[] | null
+  >(null);
   const [titleInput, setTitleInput] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
   const [shareModal, setShareModal] = useState(false);
@@ -81,7 +83,7 @@ const Articles: NextPage = ({}) => {
       updateArticleMutation.mutate(
         {
           slug: slug as string,
-          bodyData: outputData.blocks as any, // TODO: fix this type
+          bodyData: outputData.blocks,
         },
         {
           onSuccess: () => {
