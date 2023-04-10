@@ -102,15 +102,6 @@ const Articles: NextPage = ({}) => {
         }
       );
     });
-    // editor?.save().then((outputData) => {
-    //   console.log("Saved Article Data", outputData);
-    //   setBodyData(outputData.blocks);
-    //   // articleUpdateBodyFetch.refetch();
-    //   updateArticleMutation.mutate({
-    //     slug: slug as string,
-    //     bodyData: outputData.blocks as any, // TODO: fix this type
-    //   });
-    // });
   };
 
   const OnMenuClick = (menuType: string) => {
@@ -315,7 +306,7 @@ const Articles: NextPage = ({}) => {
                       />
                       <button
                         onClick={copyURL}
-                        className="rounded-md bg-indigo-500 py-1 px-2 text-white"
+                        className="rounded-md bg-indigo-500 px-2 py-1 text-white"
                       >
                         Copy Link
                       </button>
