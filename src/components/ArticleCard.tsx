@@ -6,11 +6,7 @@ import React from "react";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { create } from "domain";
-import {
-  ArrowRightCircleIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 
 interface ArticleCardProps {
   Title: string;

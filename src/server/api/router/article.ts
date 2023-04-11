@@ -242,9 +242,8 @@ export const articleRouter = createTRPCRouter({
         // bodyData: JSON.parse(
         //   { bodyData: bodyData?.toString() || "[]" }.toString()
         // ).bodyData as OutputBlockData<string, any>[],
-        bodyData: JSON.parse(
-          `{"bodyData":"${bodyData?.toString() || "undefined"}"}`
-        ) as OutputBlockData<string, any>[],
+        // bodyData: JSON.parse(bodyData?.toString()).bodyData,
+        bodyData: bodyData as unknown as OutputBlockData<string, any>[],
       };
     }),
 
