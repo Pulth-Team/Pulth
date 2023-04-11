@@ -291,7 +291,7 @@ const MobilePhoto = ({ image }: { image: string }) => {
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
-          fill
+          layout="fill"
           className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
