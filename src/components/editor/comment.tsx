@@ -164,12 +164,26 @@ const Comment = ({
             user={{ name: currentUser.name, image: currentUser.image }}
             isLoading={false}
             OnComment={(e: AddCommentData) => {
-              commentAddMutation.mutate({
-                content: e.content,
-                parentId: e.parent,
-                articleId: currentArticleId,
-              });
-              setShowReply(false);
+              commentAddMutation.mutate(
+                {
+                  content: e.content,
+                  parentId: e.parent,
+                  articleId: currentArticleId,
+                },
+                {
+                  onSuccess: () => {
+                    setShowReply(false);
+                  },
+                  onError(error, variables, context) {
+                    // TODO: check isSuccess and show error if not
+                    console.log("Error while adding a new comment: ", {
+                      error,
+                      variables,
+                      context,
+                    });
+                  },
+                }
+              );
             }}
             OnCancel={() => {
               setShowReply(false);

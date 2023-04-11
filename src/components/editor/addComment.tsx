@@ -57,9 +57,9 @@ const CommentAdd = ({
   };
 
   return (
-    <div className={`flex align-top gap-3 ${className}`}>
+    <div className={`flex gap-3 align-top ${className}`}>
       {/* next-image with fill and square layout */}
-      <div className="w-8 h-8 relative flex-shrink-0">
+      <div className="relative h-8 w-8 flex-shrink-0">
         <Image
           src={user.image || "/default_profile.jpg"}
           alt="Current User's photo"
@@ -67,10 +67,10 @@ const CommentAdd = ({
           className="absolute rounded-full"
         />
       </div>
-      <div className="flex flex-col gap-1 flex-grow">
-        <div className="leading-5 font-semibold">{user.name}</div>
+      <div className="flex flex-grow flex-col gap-1">
+        <div className="font-semibold leading-5">{user.name}</div>
         <textarea
-          className="bg-[#fafafa] rounded-md outline-gray-300 w-full px-2 py-1 resize-none border-2 border-gray-200 overflow-y-hidden"
+          className="w-full resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] px-2 py-1 outline-gray-300"
           ref={textAreaRef}
           onChange={onChange}
           value={val}
@@ -78,10 +78,8 @@ const CommentAdd = ({
         ></textarea>
         <div className="flex justify-end gap-2">
           <button
-            className="p-2 bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 rounded-md text-white flex gap-2 items-center disabled:bg-indigo-400"
+            className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
             onClick={() => {
-              // TODO: check isSuccess and show error if not
-              // if isSuccess is true, clear the textarea
               OnComment({
                 parent: parentId === null ? undefined : parentId,
                 content: val,
@@ -90,11 +88,11 @@ const CommentAdd = ({
             }}
             disabled={val.length == 0 || isLoading}
           >
-            {isLoading ? <Loading className="w-6 h-6 border-2" /> : ""}
+            {isLoading ? <Loading className="h-6 w-6 border-2" /> : ""}
             Send
           </button>
           <button
-            className="p-2 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 rounded-md"
+            className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
             onClick={() => {
               if (OnCancel) OnCancel();
               setVal("");
