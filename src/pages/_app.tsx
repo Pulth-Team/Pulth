@@ -19,18 +19,19 @@ const MyApp: AppType<{ session: Session }> = ({
   const isProduction = process.env.NODE_ENV === "production";
   const isServer = typeof window === "undefined";
 
-  let GOOGLE_ANALYTICS_ID;
+  let GOOGLE_ANALYTICS_ID = "aaa";
 
-  if (isServer) GOOGLE_ANALYTICS_ID = env.GOOGLE_ANALYTICS_ID;
-  else GOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
+  if (isServer) GOOGLE_ANALYTICS_ID = env.GOOGLE_ANALYTICS_ID ?? "error_server";
+  else
+    GOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? "error_client";
 
   // show analytics only in production and development (not in preview mode)
   const showAnalytics = (isProduction || isDevelopment) && GOOGLE_ANALYTICS_ID;
-  console.log("showAnalytics", showAnalytics, {
-    isProduction,
-    isDevelopment,
-    GOOGLE_ANALYTICS_ID,
-  });
+  // console.log("showAnalytics", showAnalytics, {
+  //   isProduction,
+  //   isDevelopment,
+  //   GOOGLE_ANALYTICS_ID,
+  // });
 
   return (
     <div className="bg-white">
