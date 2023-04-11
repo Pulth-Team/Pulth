@@ -9,7 +9,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import Image from "next/image";
+import Image from "next/legacy/image";
 import CommentAdd, { AddCommentData } from "./addComment";
 import { api } from "~/utils/api";
 

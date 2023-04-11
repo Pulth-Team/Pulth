@@ -8,7 +8,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
 import DashboardLayout from "~/components/layouts/gridDashboard";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 import { Tab } from "@headlessui/react";
 import { Switch } from "@headlessui/react";

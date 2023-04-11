@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 // mobile Photo
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Menu } from "@headlessui/react";
 import { signOut } from "next-auth/react";
 

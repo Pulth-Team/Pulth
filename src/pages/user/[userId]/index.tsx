@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import DashboardLayout from "~/components/layouts/gridDashboard";
 
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";

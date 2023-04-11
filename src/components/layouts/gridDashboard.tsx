@@ -6,7 +6,7 @@ import { twMerge } from "tailwind-merge";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { signOut, useSession } from "next-auth/react";
 
 import {

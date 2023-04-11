@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 import { Dialog, Menu, Transition } from "@headlessui/react";
 

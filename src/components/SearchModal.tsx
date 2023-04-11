@@ -1,6 +1,6 @@
 import { Dispatch, Fragment, SetStateAction } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
