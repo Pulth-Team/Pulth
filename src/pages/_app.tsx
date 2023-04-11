@@ -41,7 +41,7 @@ const MyApp: AppType<{ session: Session }> = ({
       {showAnalytics ? (
         <>
           <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOGLE_ANALYTICS_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
             strategy="afterInteractive"
           />
           <Script id="google-analytics" strategy="afterInteractive">
@@ -50,7 +50,7 @@ const MyApp: AppType<{ session: Session }> = ({
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', '${env.GOOGLE_ANALYTICS_ID}');
+          gtag('config', '${GOOGLE_ANALYTICS_ID}');
         `}
           </Script>
         </>
