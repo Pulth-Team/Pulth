@@ -17,7 +17,7 @@ const server = z.object({
 
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  GOOOGLE_ANALYTICS_ID: z.string().optional(),
+  GOOGLE_ANALYTICS_ID: z.string().optional(),
 
   ALGOLIA_APP_ID: z.string(),
   ALGOLIA_API_KEY: z.string(),
@@ -41,7 +41,7 @@ const client = z.object({
   NEXT_PUBLIC_ALGOLIA_APP_ID: z.string(),
   NEXT_PUBLIC_ALGOLIA_API_KEY: z.string(),
   NEXT_PUBLIC_ALGOLIA_INDEX_NAME: z.string(),
-  NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID: z.string().optional(),
+  NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: z.string().optional(),
 });
 
 /**
@@ -58,7 +58,7 @@ const processEnv = {
   GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  GOOOGLE_ANALYTICS_ID: process.env.GOOOGLE_ANALYTICS_ID,
+  GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID,
   ALGOLIA_APP_ID: process.env.ALGOLIA_APP_ID,
   ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
   ALGOLIA_INDEX_NAME: process.env.ALGOLIA_INDEX_NAME,
@@ -69,8 +69,7 @@ const processEnv = {
   NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
   NEXT_PUBLIC_ALGOLIA_API_KEY: process.env.NEXT_PUBLIC_ALGOLIA_API_KEY,
   NEXT_PUBLIC_ALGOLIA_INDEX_NAME: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME,
-  NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID:
-    process.env.NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID,
+  NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID,
 };
 
 // Don't touch the part below
