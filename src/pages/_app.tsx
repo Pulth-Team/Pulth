@@ -19,17 +19,17 @@ const MyApp: AppType<{ session: Session }> = ({
   const isProduction = process.env.NODE_ENV === "production";
   const isServer = typeof window === "undefined";
 
-  let GOOOGLE_ANALYTICS_ID;
+  let GOOGLE_ANALYTICS_ID;
 
-  if (isServer) GOOOGLE_ANALYTICS_ID = env.GOOOGLE_ANALYTICS_ID;
-  else GOOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID;
+  if (isServer) GOOGLE_ANALYTICS_ID = env.GOOGLE_ANALYTICS_ID;
+  else GOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
   // show analytics only in production and development (not in preview mode)
-  const showAnalytics = (isProduction || isDevelopment) && GOOOGLE_ANALYTICS_ID;
+  const showAnalytics = (isProduction || isDevelopment) && GOOGLE_ANALYTICS_ID;
   console.log("showAnalytics", showAnalytics, {
     isProduction,
     isDevelopment,
-    GOOOGLE_ANALYTICS_ID,
+    GOOGLE_ANALYTICS_ID,
   });
 
   return (
@@ -41,7 +41,7 @@ const MyApp: AppType<{ session: Session }> = ({
       {showAnalytics ? (
         <>
           <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOOGLE_ANALYTICS_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOGLE_ANALYTICS_ID}`}
             strategy="afterInteractive"
           />
           <Script id="google-analytics" strategy="afterInteractive">
@@ -50,7 +50,7 @@ const MyApp: AppType<{ session: Session }> = ({
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', '${env.GOOOGLE_ANALYTICS_ID}');
+          gtag('config', '${env.GOOGLE_ANALYTICS_ID}');
         `}
           </Script>
         </>
