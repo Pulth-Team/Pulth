@@ -1,50 +1,62 @@
-// src/pages/_app.tsx
-import { withTRPC } from "@trpc/next";
-import type { AppRouter } from "../server/router";
-import type { AppType } from "next/dist/shared/lib/utils";
-import superjson from "superjson";
+import { type AppType } from "next/app";
+import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import "../styles/globals.css";
 
-const MyApp: AppType = ({
+import { api } from "~/utils/api";
+
+import "~/styles/globals.css";
+
+import Script from "next/script";
+import { env } from "~/env.mjs";
+import Head from "next/head";
+
+const MyApp: AppType<{ session: Session }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const isLocal = typeof process.env.VERCEL_ENV === "undefined";
+  const isDevelopment = process.env.NODE_ENV === "development" && !isLocal;
+  const isProduction = process.env.NODE_ENV === "production";
+  const isServer = typeof window === "undefined";
+
+  let GOOOGLE_ANALYTICS_ID;
+
+  if (isServer) GOOOGLE_ANALYTICS_ID = env.GOOOGLE_ANALYTICS_ID;
+  else GOOOGLE_ANALYTICS_ID = env.NEXT_PUBLIC_GOOOGLE_ANALYTICS_ID;
+
+  // show analytics only in production and development (not in preview mode)
+  const showAnalytics = (isProduction || isDevelopment) && GOOOGLE_ANALYTICS_ID;
+
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <div className="bg-white">
+      <Head>
+        {/* used for safari tab color */}
+        <meta name="theme-color" content="#1F2937"></meta>
+      </Head>
+      {showAnalytics ? (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOOGLE_ANALYTICS_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '${env.GOOOGLE_ANALYTICS_ID}');
+        `}
+          </Script>
+        </>
+      ) : (
+        <></>
+      )}
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </div>
   );
 };
 
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    return "";
-  }
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
-};
-
-export default withTRPC<AppRouter>({
-  config({ ctx }) {
-    /**
-     * If you want to use SSR, you need to use the server's full URL
-     * @link https://trpc.io/docs/ssr
-     */
-    const url = `${getBaseUrl()}/api/trpc`;
-
-    return {
-      url,
-      transformer: superjson,
-      /**
-       * @link https://react-query.tanstack.com/reference/QueryClient
-       */
-      // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
-    };
-  },
-  /**
-   * @link https://trpc.io/docs/ssr
-   */
-  ssr: false,
-})(MyApp);
+export default api.withTRPC(MyApp);
