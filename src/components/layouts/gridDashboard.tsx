@@ -66,7 +66,7 @@ const GridDashboard: NextPage<{
               id={userData?.user?.id!}
             />
           ) : (
-            <div className="mt-auto hidden md:block">
+            <div className="m-2 mt-auto hidden md:block ">
               <Link href="/api/auth/signin">
                 <button className="flex w-full rounded-md bg-gray-700 p-2 ">
                   <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200 ">
