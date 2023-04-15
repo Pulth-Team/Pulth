@@ -114,29 +114,77 @@ const Articles: NextPage = () => {
                       <Dialog.Description className={"text-sm font-light"}>
                         Enter a name and a description for your new article.
                       </Dialog.Description>
-                      <label htmlFor="articleName" className="mt-4 block">
-                        Title
-                      </label>
-                      <input
-                        name="articleName"
-                        type="text"
-                        className="w-full rounded-lg border border-gray-200 p-2 "
-                        value={dialogTitle}
-                        onChange={(e) => setDialogTitle(e.target.value)}
-                      />
+                      <div>
+                        <label
+                          htmlFor="articleName"
+                          className="mt-4 block"
+                          title="Title is required"
+                        >
+                          Title{" "}
+                          <span className="italic text-red-500 underline">
+                            *
+                          </span>
+                        </label>
+                        <input
+                          name="articleName"
+                          type="text"
+                          className="peer w-full rounded-lg border border-gray-200 p-2"
+                          value={dialogTitle}
+                          onChange={(e) => setDialogTitle(e.target.value)}
+                          minLength={8}
+                          maxLength={100}
+                          required
+                          //
+                          aria-invalid={
+                            dialogTitle.length < 8 || dialogTitle.length > 100
+                          }
+                          aria-describedby="articleNameError"
+                          aria-errormessage="Article's name must be between 8 and 100 characters long."
+                        />
+                        <p
+                          id="articleNameError"
+                          className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-focus-visible:hidden "
+                        >
+                          Article's name must be between 8 and 100 characters
+                          long.
+                        </p>
+                      </div>
 
-                      <label
-                        htmlFor="articleDescription"
-                        className="mt-4 block"
-                      >
-                        Description
-                      </label>
-                      <textarea
-                        name="articleDescription"
-                        className="w-full rounded-lg border border-gray-200 p-2"
-                        value={dialogDescription}
-                        onChange={(e) => setDialogDescription(e.target.value)}
-                      ></textarea>
+                      <div>
+                        <label
+                          htmlFor="articleDescription"
+                          className="mt-4 block"
+                          title="Description is required"
+                        >
+                          Description{" "}
+                          <span className="italic text-red-500 underline">
+                            *
+                          </span>
+                        </label>
+                        <textarea
+                          name="articleDescription"
+                          className="peer w-full rounded-lg border border-gray-200 p-2 "
+                          value={dialogDescription}
+                          onChange={(e) => setDialogDescription(e.target.value)}
+                          minLength={8}
+                          maxLength={128}
+                          required
+                          //
+                          aria-invalid={
+                            dialogTitle.length < 8 || dialogTitle.length > 128
+                          }
+                          aria-describedby="articleDescriptionError"
+                          aria-errormessage="Article's description must be between 8 and 128 characters long."
+                        ></textarea>
+                        <p
+                          id="articleDescriptionError"
+                          className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-empty:hidden peer-focus:hidden"
+                        >
+                          Article's description must be between 8 and 128
+                          characters long.
+                        </p>
+                      </div>
+
                       <div className="mt-4 flex flex-row justify-between">
                         <button
                           className="mr-auto"
