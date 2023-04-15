@@ -19,15 +19,6 @@ const Courses: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <button
-        type="button"
-        className="rounded bg-red-500 py-2 px-4 font-bold text-white hover:bg-red-700"
-        onClick={() => {
-          throw new Error("Not-Sentry Frontend Error");
-        }}
-      >
-        Throw error to nothing there is no sentry
-      </button>
     </DashboardLayout>
   );
 };
