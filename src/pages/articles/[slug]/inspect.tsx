@@ -339,9 +339,10 @@ const Inspect: NextPage = () => {
         <Dialog
           open={deleteDialogOpen}
           onClose={() => {
-            setDeleteDialogOpen(false);
-
-            setDeleteModalInput("");
+            if (!articleDeleteMutation.isLoading) {
+              setDeleteDialogOpen(false);
+              setDeleteModalInput("");
+            }
           }}
           className={
             "fixed inset-0 z-10 flex items-center justify-center overflow-y-auto"
@@ -382,7 +383,7 @@ const Inspect: NextPage = () => {
                 disabled={deleteModalInput !== articleInfo.data?.title}
                 onClick={() => {
                   articleDeleteMutation.mutate(slug as string, {
-                    onSuccess: (data) => {
+                    onSuccess: () => {
                       router.push("/articles");
                       setDeleteDialogOpen(false);
                     },
@@ -390,6 +391,9 @@ const Inspect: NextPage = () => {
                 }}
                 className="mt-4 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white disabled:bg-red-400"
               >
+                {articleDeleteMutation.isLoading && (
+                  <Loading className="mr-2 h-6 w-6 border-2" />
+                )}
                 Delete
               </button>
               <button

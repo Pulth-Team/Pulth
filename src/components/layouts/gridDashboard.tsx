@@ -41,7 +41,7 @@ const GridDashboard: NextPage<{
     <>
       <Div100vh className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
         <aside className="row-start-3 flex flex-col bg-gray-800 md:row-span-2">
-          <div className=" mb-6 hidden cursor-pointer flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
+          <div className=" mb-6 hidden flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
             <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
           <nav className="flex h-full flex-row items-center justify-evenly px-2 md:h-auto  md:flex-col md:items-stretch md:justify-start">

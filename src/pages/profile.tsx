@@ -36,16 +36,12 @@ const Articles: NextPage = () => {
       {
         onSuccess: () => {
           articleData.refetch();
+          setDialogDescription("");
+          setDialogTitle("");
+          setIsOpen(false);
         },
       }
     );
-
-    // reset dialog
-    setDialogDescription("");
-    setDialogTitle("");
-
-    // close dialog
-    setIsOpen(false);
   };
 
   return (
@@ -64,106 +60,116 @@ const Articles: NextPage = () => {
               <span className="text-2xl font-bold">My Articles</span>
             </h2>
 
-            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {articleData.data?.map((article) => (
-                <MyArticleCard
-                  key={article.slug}
-                  title={article.title}
-                  description={article.description}
-                  slug={article.slug}
-                  isPublished={article.isPublished}
-                  // image={article.image}
-                />
-              ))}
+            {articleData.isLoading ? (
+              <Loading className="h-12 w-12 border-4" />
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {articleData.data?.map((article) => (
+                  <MyArticleCard
+                    key={article.slug}
+                    title={article.title}
+                    description={article.description}
+                    slug={article.slug}
+                    isPublished={article.isPublished}
+                    // TODO: Maybe add an image
+                    // image={article.image}
+                  />
+                ))}
 
-              {/* Add Project div */}
-              <button
-                className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
-                onClick={() => setIsOpen(true)}
-                id="create-article-button"
-              >
-                <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
-                <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
-                  Create New Article
-                </p>
-              </button>
+                {/* Add Project div */}
+                <button
+                  className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
+                  onClick={() => setIsOpen(true)}
+                  id="create-article-button"
+                >
+                  <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
+                  <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
+                    Create New Article
+                  </p>
+                </button>
 
-              {/* Add Stepper dialog for Tag and topic selection */}
-              <Dialog
-                open={isOpen}
-                onClose={() => {
-                  setDialogDescription("");
-                  setDialogTitle("");
-                  setIsOpen(false);
-                }}
-              >
-                <div
-                  className="fixed inset-0 bg-black/30  backdrop-blur-md"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
+                {/* Add Stepper dialog for Tag and topic selection */}
+                <Dialog
+                  open={isOpen}
+                  onClose={() => {
+                    if (!createMutation.isLoading) {
+                      setIsOpen(false);
+                      setDialogDescription("");
+                      setDialogTitle("");
+                    }
                   }}
-                />
-                <div className="fixed inset-0 flex items-center justify-center  ">
-                  <Dialog.Panel className="w-11/12 rounded-2xl bg-white p-4 lg:w-2/5">
-                    <Dialog.Title className="text-xl font-bold">
-                      Create new article
-                    </Dialog.Title>
-                    <Dialog.Description className={"text-sm font-light"}>
-                      Enter a name and a description for your new article.
-                    </Dialog.Description>
-                    <label htmlFor="articleName" className="mt-4 block">
-                      Title
-                    </label>
-                    <input
-                      name="articleName"
-                      type="text"
-                      className="w-full rounded-lg border border-gray-200 p-2 "
-                      value={dialogTitle}
-                      onChange={(e) => setDialogTitle(e.target.value)}
-                    />
+                >
+                  <div
+                    className="fixed inset-0 bg-black/30  backdrop-blur-md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                  />
+                  <div className="fixed inset-0 flex items-center justify-center  ">
+                    <Dialog.Panel className="w-11/12 rounded-2xl bg-white p-4 lg:w-2/5">
+                      <Dialog.Title className="text-xl font-bold">
+                        Create new article
+                      </Dialog.Title>
+                      <Dialog.Description className={"text-sm font-light"}>
+                        Enter a name and a description for your new article.
+                      </Dialog.Description>
+                      <label htmlFor="articleName" className="mt-4 block">
+                        Title
+                      </label>
+                      <input
+                        name="articleName"
+                        type="text"
+                        className="w-full rounded-lg border border-gray-200 p-2 "
+                        value={dialogTitle}
+                        onChange={(e) => setDialogTitle(e.target.value)}
+                      />
 
-                    <label htmlFor="articleDescription" className="mt-4 block">
-                      Description
-                    </label>
-                    <textarea
-                      name="articleDescription"
-                      className="w-full rounded-lg border border-gray-200 p-2"
-                      value={dialogDescription}
-                      onChange={(e) => setDialogDescription(e.target.value)}
-                    ></textarea>
-                    <div className="mt-4 flex flex-row justify-between">
-                      <button
-                        className="mr-auto"
-                        onClick={() => {
-                          setDialogDescription("");
-                          setDialogTitle("");
-                          setIsOpen(false);
-                        }}
+                      <label
+                        htmlFor="articleDescription"
+                        className="mt-4 block"
                       >
-                        Cancel
-                      </button>
-                      <button
-                        className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
-                        onClick={() => onSubmitDialog()}
-                        disabled={
-                          createMutation.isLoading ||
-                          dialogTitle.length < 12 ||
-                          dialogDescription.length < 24
-                        }
-                      >
-                        {createMutation.isLoading ? (
-                          <Loading className="h-6 w-6 border-4" />
-                        ) : (
-                          ""
-                        )}
-                        Continue
-                      </button>
-                    </div>
-                  </Dialog.Panel>
-                </div>
-              </Dialog>
-            </div>
+                        Description
+                      </label>
+                      <textarea
+                        name="articleDescription"
+                        className="w-full rounded-lg border border-gray-200 p-2"
+                        value={dialogDescription}
+                        onChange={(e) => setDialogDescription(e.target.value)}
+                      ></textarea>
+                      <div className="mt-4 flex flex-row justify-between">
+                        <button
+                          className="mr-auto"
+                          onClick={() => {
+                            setDialogDescription("");
+                            setDialogTitle("");
+                            setIsOpen(false);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
+                          onClick={() => onSubmitDialog()}
+                          disabled={
+                            createMutation.isLoading ||
+                            dialogTitle.length < 12 ||
+                            dialogDescription.length < 24
+                          }
+                        >
+                          {createMutation.isLoading ? (
+                            <Loading className="h-6 w-6 border-4" />
+                          ) : (
+                            ""
+                          )}
+                          Continue
+                        </button>
+                      </div>
+                    </Dialog.Panel>
+                  </div>
+                </Dialog>
+              </div>
+            )}
           </>
         )}
       </div>
