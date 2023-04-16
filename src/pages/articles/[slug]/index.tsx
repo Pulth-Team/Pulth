@@ -103,7 +103,7 @@ const Articles: NextPage = () => {
       {!articleData.data?.id && (
         <div>
           <p className="mb-4">
-            Article not found. Maybe it's been deleted by the author.
+            Article not found. Maybe it&apos;s been deleted by the author.
             <br /> Or just never existed. Who knows? 🤷‍♂️ <br />
           </p>
           <Link
