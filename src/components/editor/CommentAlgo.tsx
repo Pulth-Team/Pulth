@@ -139,15 +139,15 @@ class CommentTree {
         );
 
         if (pathExists instanceof CommentNode) {
-          console.log(
-            "path exists",
-            { content: pathExists.content, id: pathExists.id },
-            {
-              content: comment.content,
-              id: comment.id,
-              given: comment.parentIds.slice(1),
-            }
-          );
+          // console.log(
+          //   "path exists",
+          //   { content: pathExists.content, id: pathExists.id },
+          //   {
+          //     content: comment.content,
+          //     id: comment.id,
+          //     given: comment.parentIds.slice(1),
+          //   }
+          // );
 
           pathExists.addChild(CommentNode.fromComment(comment));
         } else {
@@ -193,6 +193,7 @@ const CommentAlgo: NextPage<{
             isEdited={comment.isEdited}
             isAuthed={isAuthed}
             revalidate={revalidate}
+            depth={0}
           />
         );
       })}
@@ -210,8 +211,9 @@ const Comment: NextPage<{
   articleId: string;
   isAuthed: boolean;
   isEdited: boolean;
+  depth: number;
   revalidate: () => void;
-}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited }) => {
+}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited, depth }) => {
   const [reply, setReply] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
@@ -243,13 +245,16 @@ const Comment: NextPage<{
           {!isEditing && <p className="">{comment.content}</p>}
         </div>
         <div className="flex flex-shrink-0 flex-row">
-          <ArrowUturnLeftIcon
-            className="h-5 w-5 text-black/70 hover:text-black"
-            onClick={() => {
-              if (isAuthed) setReply(!reply);
-              else signIn();
-            }}
-          />
+          {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
+          {depth < 3 && (
+            <ArrowUturnLeftIcon
+              className="h-5 w-5 text-black/70 hover:text-black"
+              onClick={() => {
+                if (isAuthed) setReply(!reply);
+                else signIn();
+              }}
+            />
+          )}
           {amITheAuthor && (
             <PencilSquareIcon
               className="h-5 w-5 text-black/70 hover:text-black"
@@ -362,6 +367,7 @@ const Comment: NextPage<{
               isEdited={child.isEdited}
               isAuthed={isAuthed}
               revalidate={revalidate}
+              depth={depth + 1}
             />
           );
         })}
