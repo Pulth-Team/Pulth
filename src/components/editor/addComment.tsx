@@ -15,6 +15,7 @@ const CommentAdd = ({
   isLoading,
   parentId = null,
   className,
+  maxLength = 255,
 }: {
   // user: the current use who writes this comment
   user: {
@@ -35,6 +36,7 @@ const CommentAdd = ({
 
   // className: the class name of the root div
   className?: string;
+  maxLength?: number;
 }) => {
   // val: the value of the textarea
   const [val, setVal] = useState("");
@@ -75,8 +77,13 @@ const CommentAdd = ({
           onChange={onChange}
           value={val}
           placeholder="Write a comment..."
+          maxLength={maxLength}
+          minLength={1}
         ></textarea>
         <div className="flex justify-end gap-2">
+          <span className="text-sm text-gray-500">
+            {val.length}/{maxLength}
+          </span>
           <button
             className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
             onClick={() => {

@@ -21,8 +21,5 @@ module.exports = {
       slab: ["Roboto Slab", "sans-serif"],
     },
   },
-  plugins: [
-    require("@tailwindcss/line-clamp"),
-    require("@headlessui/tailwindcss")({ prefix: "ui" }),
-  ],
+  plugins: [require("@headlessui/tailwindcss")({ prefix: "ui" })],
 };

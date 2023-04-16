@@ -64,7 +64,6 @@ const Articles: NextPage = ({}) => {
       router.push("/profile");
     } else {
       // TODO: add error message more than just an alert
-
       alert("Wrong Title Name");
     }
   };
@@ -73,27 +72,6 @@ const Articles: NextPage = ({}) => {
     if (articleAuthorFetch.isSuccess && status === "authenticated")
       setIsFetching(false);
   }, [status, articleAuthorFetch.isSuccess]);
-
-  const OnSave = () => {
-    editor.current?.save().then((outputData) => {
-      console.log("Saved Article Data", outputData);
-      // for checking if the data has changed
-      setBodyData(outputData.blocks);
-
-      updateArticleMutation.mutate(
-        {
-          slug: slug as string,
-          bodyData: outputData.blocks,
-        },
-        {
-          onSuccess: () => {
-            // refetch the article data for updating the editor
-            articleAuthorFetch.refetch();
-          },
-        }
-      );
-    });
-  };
 
   const OnMenuClick = (menuType: string) => {
     switch (menuType) {
@@ -128,24 +106,38 @@ const Articles: NextPage = ({}) => {
             <div>
               <EditorTopbar
                 title={articleAuthorFetch.data.title}
-                onSave={OnSave}
+                onSave={() => {
+                  editor.current?.save().then((outputData) => {
+                    console.log("Saved Article Data", outputData);
+                    // for checking if the data has changed
+                    setBodyData(outputData.blocks);
+
+                    updateArticleMutation.mutate(
+                      {
+                        slug: slug as string,
+                        bodyData: outputData.blocks,
+                      },
+                      {
+                        onSuccess: () => {
+                          // refetch the article data for updating the editor
+                          articleAuthorFetch.refetch();
+                        },
+                      }
+                    );
+                  });
+                }}
                 isPublished={articleAuthorFetch.data.isPublished}
                 onPublish={async () => {
+                  // TODO: needs a rework for update Article cycle
                   const currentData = await editor.current?.save();
 
-                  // TODO: add a better way to check if the data has changed
-                  // check if the data has changed
-                  // if changed save the data
-                  if (
-                    JSON.stringify(currentData?.blocks) !==
-                    JSON.stringify(bodyData)
-                  ) {
-                    // we can update the body data and the publish the article
-                    // the order of the mutation is not important
-                    // because the article will be published regardless of the data
-                    // and the data will be updated regardless of the publish status
-                    articleAuthorFetch.refetch();
-                  }
+                  // TODO: Add ui feedback to user
+                  // if the data is null then return
+                  if (!currentData) return;
+                  // if the data is empty then return
+                  if (currentData.blocks.length == 0) return;
+
+                  // if there is a data then toggle article publish state
                   publishArticleMutation.mutate(
                     {
                       slug: slug as string,
@@ -153,6 +145,7 @@ const Articles: NextPage = ({}) => {
                     },
                     {
                       onSuccess: () => {
+                        // refetch the article data for updating the editor
                         articleAuthorFetch.refetch();
                       },
                     }
