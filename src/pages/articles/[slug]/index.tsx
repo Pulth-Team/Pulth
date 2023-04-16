@@ -97,7 +97,7 @@ const Articles: NextPage = () => {
     <>
       {/* this might be a bad idea but lets keep that here for now */}
       <h1 className="m-0 mb-2 p-0 text-3xl font-bold">
-        {articleData.data?.title || "Article Not Found"}
+        {!articleData.data?.title && "Article Not Found"}
       </h1>
 
       {!articleData.data?.id && (
