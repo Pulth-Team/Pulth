@@ -242,7 +242,7 @@ const Comment: NextPage<{
             </span>
           </p>
 
-          {!isEditing && <p className="">{comment.content}</p>}
+          {!isEditing && <p className="break-all">{comment.content}</p>}
         </div>
         <div className="flex flex-shrink-0 flex-row">
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
@@ -289,6 +289,8 @@ const Comment: NextPage<{
                 setEditValue(e.target.value);
               }}
               defaultValue={comment.content}
+              maxLength={255}
+              minLength={1}
               className="flex-grow resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] p-1 outline-gray-300"
             ></textarea>
           </div>
@@ -310,7 +312,7 @@ const Comment: NextPage<{
                   }
                 );
               }}
-              disabled={editValue === comment.content}
+              disabled={editValue === comment.content || editValue === ""}
             >
               Save
             </button>
@@ -320,7 +322,6 @@ const Comment: NextPage<{
                 setIsEditing(false);
                 setEditValue(comment.content);
               }}
-              disabled={editValue === comment.content}
             >
               Cancel
             </button>
