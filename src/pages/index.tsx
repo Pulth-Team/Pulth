@@ -110,6 +110,7 @@ const Home: NextPage = () => {
               height={800}
               width={800}
               alt="learning"
+              priority
             />
           </motion.div>
           <motion.div
