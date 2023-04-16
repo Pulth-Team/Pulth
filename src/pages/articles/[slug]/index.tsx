@@ -97,178 +97,199 @@ const Articles: NextPage = () => {
     <>
       {/* this might be a bad idea but lets keep that here for now */}
       <h1 className="m-0 mb-2 p-0 text-3xl font-bold">
-        {articleData.data?.title || "unnamed"}
+        {!articleData.data?.title && "Article Not Found"}
       </h1>
+
+      {!articleData.data?.id && (
+        <div>
+          <p className="mb-4">
+            Article not found. Maybe it&apos;s been deleted by the author.
+            <br /> Or just never existed. Who knows? 🤷‍♂️ <br />
+          </p>
+          <Link
+            href="/dashboard"
+            className="my-2 rounded-md bg-indigo-500 p-2 text-white"
+          >
+            Go back to home
+          </Link>
+        </div>
+      )}
 
       {RenderedDocument}
 
       {/* Rank and action buttons */}
-      <div className="mb-6 mt-8 flex flex-row justify-between">
-        <div className="flex gap-4">
-          <div className="flex gap-2">
-            <SparklesIcon className="h-6 w-6 text-black" />
-            {/* {voteAddMutation.data
+      {articleData.data?.id && (
+        <div className="mb-6 mt-8 flex flex-row justify-between">
+          <div className="flex gap-4">
+            <div className="flex gap-2">
+              <SparklesIcon className="h-6 w-6 text-black" />
+              {/* {voteAddMutation.data
               ? voteAddMutation.data.newRank
               : articleData.data?.voteRank || 0} */}
-            {voteAddMutation.isLoading ? (
-              <Loading className="h-6 w-6 border-2" />
-            ) : (
-              voteRank
-            )}
+              {voteAddMutation.isLoading ? (
+                <Loading className="h-6 w-6 border-2" />
+              ) : (
+                voteRank
+              )}
+            </div>
+            <button
+              onClick={() => {
+                if (authStatus !== "authenticated") {
+                  signIn();
+                  return;
+                } else {
+                  voteAddMutation.mutate(
+                    {
+                      articleId: articleData.data?.id as string,
+                      vote: "up",
+                    },
+                    {
+                      onSuccess: (data) => {
+                        if (data.voteDirection == "deleted") setMyVote("none");
+                        else setMyVote("up");
+                      },
+                    }
+                  );
+                }
+              }}
+            >
+              <ChevronUpIcon
+                className={`h-6 w-6 ${
+                  myVote !== "none" && myVote === "up"
+                    ? "text-indigo-500"
+                    : " text-black"
+                }`}
+              />
+            </button>
+            <button
+              onClick={() => {
+                if (authStatus !== "authenticated") {
+                  signIn();
+                  return;
+                } else {
+                  voteAddMutation.mutate(
+                    {
+                      articleId: articleData.data?.id as string,
+                      vote: "down",
+                    },
+                    {
+                      onSuccess: (data) => {
+                        if (data.voteDirection == "deleted") setMyVote("none");
+                        else setMyVote("down");
+                      },
+                    }
+                  );
+                }
+              }}
+            >
+              <ChevronDownIcon
+                className={`h-6 w-6 ${
+                  myVote !== "none" && myVote === "down"
+                    ? "text-indigo-500"
+                    : " text-black"
+                }`}
+              />
+            </button>
           </div>
-          <button
-            onClick={() => {
-              if (authStatus !== "authenticated") {
-                signIn();
-                return;
-              } else {
-                voteAddMutation.mutate(
-                  {
-                    articleId: articleData.data?.id as string,
-                    vote: "up",
-                  },
-                  {
-                    onSuccess: (data) => {
-                      if (data.voteDirection == "deleted") setMyVote("none");
-                      else setMyVote("up");
-                    },
-                  }
-                );
-              }
-            }}
-          >
-            <ChevronUpIcon
-              className={`h-6 w-6 ${
-                myVote !== "none" && myVote === "up"
-                  ? "text-indigo-500"
-                  : " text-black"
-              }`}
-            />
-          </button>
-          <button
-            onClick={() => {
-              if (authStatus !== "authenticated") {
-                signIn();
-                return;
-              } else {
-                voteAddMutation.mutate(
-                  {
-                    articleId: articleData.data?.id as string,
-                    vote: "down",
-                  },
-                  {
-                    onSuccess: (data) => {
-                      if (data.voteDirection == "deleted") setMyVote("none");
-                      else setMyVote("down");
-                    },
-                  }
-                );
-              }
-            }}
-          >
-            <ChevronDownIcon
-              className={`h-6 w-6 ${
-                myVote !== "none" && myVote === "down"
-                  ? "text-indigo-500"
-                  : " text-black"
-              }`}
-            />
-          </button>
-        </div>
-        <div></div>
-        {/* TODO: Add share and bookmark functionality */}
-        {/* Will be added later */}
-        {/* <div className="flex gap-4">
+          <div></div>
+          {/* TODO: Add share and bookmark functionality */}
+          {/* Will be added later */}
+          {/* <div className="flex gap-4">
           <ArrowUpTrayIcon className="h-6 w-6 text-black" />
           <BookmarkIcon className="h-6 w-6 text-black" />
         </div> */}
-      </div>
+        </div>
+      )}
 
       {/* About the author */}
-      <div className="mt-4 flex items-center justify-between px-4">
-        <div className="flex items-center gap-x-3">
-          <div className="relative h-12 w-12 ">
-            <Image
-              layout="fill"
-              src={articleData.data?.author.image || "/default_profile.jpg"}
-              alt={articleData.data?.author.name || "unknown"}
-              className=" rounded-full"
-            />
+      {articleData.data?.author && (
+        <div className="mt-4 flex items-center justify-between px-4">
+          <div className="flex items-center gap-x-3">
+            <div className="relative h-12 w-12 ">
+              <Image
+                layout="fill"
+                src={articleData.data?.author.image || "/default_profile.jpg"}
+                alt={articleData.data?.author.name || "unknown"}
+                className=" rounded-full"
+              />
+            </div>
+            <p className="text-lg font-semibold">
+              {articleData.data?.author.name || "unknown"}
+            </p>
           </div>
-          <p className="text-lg font-semibold">
-            {articleData.data?.author.name || "unknown"}
-          </p>
-        </div>
 
-        <div className="flex gap-2">
-          {/* TODO ADD subs icon (prime like) */}
-          {articleData.data?.author.id === userData?.user.id && (
+          <div className="flex gap-2">
+            {/* TODO ADD subs icon (prime like) */}
+            {articleData.data?.author.id === userData?.user.id && (
+              <Link
+                // href={`/user/${articleData.data?.author.id}`}
+                href={{
+                  pathname: `/articles/[slug]/inspect`,
+                  query: { slug: slug },
+                }}
+                className="rounded-lg bg-gray-500 px-4 py-2 text-white"
+              >
+                Inspect
+              </Link>
+            )}
             <Link
               // href={`/user/${articleData.data?.author.id}`}
               href={{
-                pathname: `/articles/[slug]/inspect`,
-                query: { slug: slug },
+                pathname: `/user/[userId]`,
+                query: { userId: articleData.data?.author.id },
               }}
-              className="rounded-lg bg-gray-500 px-4 py-2 text-white"
+              className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
             >
-              Inspect
+              Visit
             </Link>
-          )}
-          <Link
-            // href={`/user/${articleData.data?.author.id}`}
-            href={{
-              pathname: `/user/[userId]`,
-              query: { userId: articleData.data?.author.id },
-            }}
-            className="rounded-lg bg-indigo-500 px-4 py-2 text-white"
-          >
-            Visit
-          </Link>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="py-4 ">
-        <p className="text-lg font-semibold">
-          <span className="font-medium">
-            {articleData.data?.Comments?.length + " "}
-          </span>
-          Comments
-        </p>
-        <hr className="mb-2" />
-        <div className="flex flex-col ">
-          {authStatus == "authenticated" ? (
-            <CommentAdd
+      {articleData.data?.Comments && (
+        <div className="py-4">
+          <p className="text-lg font-semibold">
+            <span className="font-medium">
+              {articleData.data?.Comments?.length + " "}
+            </span>
+            Comments
+          </p>
+          <hr className="mb-2" />
+          <div className="flex flex-col ">
+            {authStatus == "authenticated" ? (
+              <CommentAdd
+                user={{
+                  name: userData?.user?.name as string,
+                  image: userImage || "default_profile.jpg",
+                }}
+                OnComment={OnCommentAdd}
+                isLoading={commentAddMutation.isLoading}
+              />
+            ) : (
+              <button
+                className="flex items-center justify-center rounded-lg bg-gray-600 py-4 text-white"
+                onClick={() => signIn()}
+              >
+                Login to comment
+              </button>
+            )}
+
+            <hr className="my-2" />
+
+            <CommentAlgo
+              comments={articleData.data?.Comments || []}
               user={{
+                id: userData?.user?.id as string,
                 name: userData?.user?.name as string,
-                image: userImage || "default_profile.jpg",
+                image: userImage || "/default_profile.jpg",
               }}
-              OnComment={OnCommentAdd}
-              isLoading={commentAddMutation.isLoading}
+              isAuthed={authStatus == "authenticated"}
+              articleId={articleData.data?.id as string}
+              revalidate={articleData.refetch}
             />
-          ) : (
-            <button
-              className="flex items-center justify-center rounded-lg bg-gray-600 py-4 text-white"
-              onClick={() => signIn()}
-            >
-              Login to comment
-            </button>
-          )}
-
-          <hr className="my-2" />
-
-          <CommentAlgo
-            comments={articleData.data?.Comments || []}
-            user={{
-              id: userData?.user?.id as string,
-              name: userData?.user?.name as string,
-              image: userImage || "/default_profile.jpg",
-            }}
-            isAuthed={authStatus == "authenticated"}
-            articleId={articleData.data?.id as string}
-            revalidate={articleData.refetch}
-          />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
   return (

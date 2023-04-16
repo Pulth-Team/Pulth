@@ -139,15 +139,15 @@ class CommentTree {
         );
 
         if (pathExists instanceof CommentNode) {
-          console.log(
-            "path exists",
-            { content: pathExists.content, id: pathExists.id },
-            {
-              content: comment.content,
-              id: comment.id,
-              given: comment.parentIds.slice(1),
-            }
-          );
+          // console.log(
+          //   "path exists",
+          //   { content: pathExists.content, id: pathExists.id },
+          //   {
+          //     content: comment.content,
+          //     id: comment.id,
+          //     given: comment.parentIds.slice(1),
+          //   }
+          // );
 
           pathExists.addChild(CommentNode.fromComment(comment));
         } else {
@@ -193,6 +193,7 @@ const CommentAlgo: NextPage<{
             isEdited={comment.isEdited}
             isAuthed={isAuthed}
             revalidate={revalidate}
+            depth={0}
           />
         );
       })}
@@ -210,8 +211,9 @@ const Comment: NextPage<{
   articleId: string;
   isAuthed: boolean;
   isEdited: boolean;
+  depth: number;
   revalidate: () => void;
-}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited }) => {
+}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited, depth }) => {
   const [reply, setReply] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
@@ -240,16 +242,19 @@ const Comment: NextPage<{
             </span>
           </p>
 
-          {!isEditing && <p className="">{comment.content}</p>}
+          {!isEditing && <p className="break-all">{comment.content}</p>}
         </div>
         <div className="flex flex-shrink-0 flex-row">
-          <ArrowUturnLeftIcon
-            className="h-5 w-5 text-black/70 hover:text-black"
-            onClick={() => {
-              if (isAuthed) setReply(!reply);
-              else signIn();
-            }}
-          />
+          {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
+          {depth < 3 && (
+            <ArrowUturnLeftIcon
+              className="h-5 w-5 text-black/70 hover:text-black"
+              onClick={() => {
+                if (isAuthed) setReply(!reply);
+                else signIn();
+              }}
+            />
+          )}
           {amITheAuthor && (
             <PencilSquareIcon
               className="h-5 w-5 text-black/70 hover:text-black"
@@ -279,15 +284,38 @@ const Comment: NextPage<{
       {isEditing && (
         <>
           <div className="my-2 ml-10 flex">
+            {/* will height change when present */}
             <textarea
               onChange={(e) => {
                 setEditValue(e.target.value);
+                // will grow and shrink with the content with minimum high of 2 lines
+                let maxValue = 56;
+                let currentHeight = e.target.scrollHeight;
+
+                // assign currentHeight to maxValue if its bigger
+                if (currentHeight > maxValue) maxValue = currentHeight;
+
+                e.target.style.height = maxValue + "px";
               }}
-              defaultValue={comment.content}
+              onFocus={(e) => {
+                // will grow and shrink with the content
+                let maxValue = 56;
+                let currentHeight = e.target.scrollHeight;
+
+                console.log({ currentHeight, maxValue });
+                // assign currentHeight to maxValue if its bigger
+                if (currentHeight > maxValue) maxValue = currentHeight;
+
+                e.target.style.height = maxValue + "px";
+              }}
+              defaultValue={isEditing ? comment.content : ""}
+              maxLength={255}
+              minLength={1}
               className="flex-grow resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] p-1 outline-gray-300"
             ></textarea>
           </div>
           <div className="flex justify-end gap-2">
+            <p className="text-sm text-gray-500">{editValue.length}/255</p>
             <button
               className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
               onClick={() => {
@@ -305,7 +333,7 @@ const Comment: NextPage<{
                   }
                 );
               }}
-              disabled={editValue === comment.content}
+              disabled={editValue === comment.content || editValue === ""}
             >
               Save
             </button>
@@ -315,7 +343,6 @@ const Comment: NextPage<{
                 setIsEditing(false);
                 setEditValue(comment.content);
               }}
-              disabled={editValue === comment.content}
             >
               Cancel
             </button>
@@ -362,6 +389,7 @@ const Comment: NextPage<{
               isEdited={child.isEdited}
               isAuthed={isAuthed}
               revalidate={revalidate}
+              depth={depth + 1}
             />
           );
         })}

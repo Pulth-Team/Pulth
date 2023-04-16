@@ -145,8 +145,8 @@ const Articles: NextPage = () => {
                           id="articleNameError"
                           className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-focus-visible:hidden "
                         >
-                          Article's name must be between 8 and 100 characters
-                          long.
+                          Article&apos;s name must be between 8 and 100
+                          characters long.
                         </p>
                       </div>
 
@@ -180,7 +180,7 @@ const Articles: NextPage = () => {
                           id="articleDescriptionError"
                           className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-empty:hidden peer-focus:hidden"
                         >
-                          Article's description must be between 8 and 128
+                          Article&apos;s description must be between 8 and 128
                           characters long.
                         </p>
                       </div>
