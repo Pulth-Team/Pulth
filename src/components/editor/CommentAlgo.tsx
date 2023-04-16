@@ -284,17 +284,38 @@ const Comment: NextPage<{
       {isEditing && (
         <>
           <div className="my-2 ml-10 flex">
+            {/* will height change when present */}
             <textarea
               onChange={(e) => {
                 setEditValue(e.target.value);
+                // will grow and shrink with the content with minimum high of 2 lines
+                let maxValue = 56;
+                let currentHeight = e.target.scrollHeight;
+
+                // assign currentHeight to maxValue if its bigger
+                if (currentHeight > maxValue) maxValue = currentHeight;
+
+                e.target.style.height = maxValue + "px";
               }}
-              defaultValue={comment.content}
+              onFocus={(e) => {
+                // will grow and shrink with the content
+                let maxValue = 56;
+                let currentHeight = e.target.scrollHeight;
+
+                console.log({ currentHeight, maxValue });
+                // assign currentHeight to maxValue if its bigger
+                if (currentHeight > maxValue) maxValue = currentHeight;
+
+                e.target.style.height = maxValue + "px";
+              }}
+              defaultValue={isEditing ? comment.content : ""}
               maxLength={255}
               minLength={1}
               className="flex-grow resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] p-1 outline-gray-300"
             ></textarea>
           </div>
           <div className="flex justify-end gap-2">
+            <p className="text-sm text-gray-500">{editValue.length}/255</p>
             <button
               className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
               onClick={() => {
