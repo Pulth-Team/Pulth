@@ -10,6 +10,8 @@ import {
 import { TRPCError } from "@trpc/server";
 import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
+import { S3 } from "aws-sdk";
+import { env } from "~/env.mjs";
 
 export const articleRouter = createTRPCRouter({
   // takes a slug and returns an article without isPublished value
@@ -195,7 +197,7 @@ export const articleRouter = createTRPCRouter({
       // create a slug
       const slug = slugified(input.title);
 
-      // maybe we should check if the slug already exists
+      // TODO: maybe we should check if the slug already exists
       // YAGNI for now
 
       // create the article
@@ -363,6 +365,51 @@ export const articleRouter = createTRPCRouter({
           code: "NOT_FOUND",
           message: "Article not found in current user's articles",
         });
+
+      // gets the current image blocks in the article
+      const currentImageBlocks = (
+        article.bodyData as unknown as OutputBlockData<any>[]
+      ).filter((block) => block.type === "Image") as OutputBlockData<"Image">[];
+
+      console.log("current images", currentImageBlocks);
+
+      // gets the new image blocks in the article
+      const newImageBlocks = input.bodyData.filter(
+        (block) => block.type === "Image"
+      ) as OutputBlockData<"Image">[];
+
+      // gets the image blocks that are not in the article anymore
+      const deletedImageBlocks = currentImageBlocks.filter(
+        (block) => !newImageBlocks.find((newBlock) => newBlock.id === block.id)
+      );
+
+      // create a s3 cdn connection Object
+      const s3 = new S3({
+        region: env.AWS_REGION,
+        credentials: {
+          accessKeyId: env.AWS_ACCESS_KEY_CDN,
+          secretAccessKey: env.AWS_SECRET_KEY_CDN,
+        },
+      });
+      console.log("deletedImageBlocks ", deletedImageBlocks);
+      // delete the images that are not in the article anymore
+      await Promise.all(
+        deletedImageBlocks.map((block) => {
+          const url = new URL(block.data.file.url);
+          console.log("url Pathname", url.pathname);
+          return s3
+            .deleteObject({
+              Bucket: env.AWS_S3_BUCKET,
+              Key: url.pathname.slice(1),
+            })
+            .promise();
+        })
+      ).then((res) =>
+        console.log(
+          "deleted images",
+          res.map((r) => r.$response.data)
+        )
+      );
 
       // update the article
       const updatedArticle = await ctx.prisma?.article.update({
