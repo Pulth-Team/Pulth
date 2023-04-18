@@ -391,24 +391,18 @@ export const articleRouter = createTRPCRouter({
           secretAccessKey: env.AWS_SECRET_KEY_CDN,
         },
       });
-      console.log("deletedImageBlocks ", deletedImageBlocks);
-      // delete the images that are not in the article anymore
+
       await Promise.all(
         deletedImageBlocks.map((block) => {
           const url = new URL(block.data.file.url);
           console.log("url Pathname", url.pathname);
           return s3
             .deleteObject({
-              Bucket: env.AWS_S3_BUCKET,
-              Key: url.pathname.slice(1),
+              Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
+              Key: url.pathname.slice(1), // remove the first slash
             })
             .promise();
         })
-      ).then((res) =>
-        console.log(
-          "deleted images",
-          res.map((r) => r.$response.data)
-        )
       );
 
       // update the article
@@ -551,6 +545,34 @@ export const articleRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
           message: "Something went wrong",
         });
+
+      // get the image blocks in the deleted article
+      const imageBlocks = (
+        article.bodyData as unknown as OutputBlockData<any>[]
+      ).filter((block) => block.type === "Image") as OutputBlockData<"Image">[];
+
+      // create a s3 cdn connection Object
+      const s3 = new S3({
+        region: env.AWS_REGION,
+        credentials: {
+          accessKeyId: env.AWS_ACCESS_KEY_CDN,
+          secretAccessKey: env.AWS_SECRET_KEY_CDN,
+        },
+      });
+
+      // delete the images from the s3 bucket
+      await Promise.all(
+        imageBlocks.map((block) => {
+          const url = new URL(block.data.file.url);
+          console.log("url Pathname", url.pathname);
+          return s3
+            .deleteObject({
+              Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
+              Key: url.pathname.slice(1), // remove the first slash
+            })
+            .promise();
+        })
+      );
 
       // delete the article from the algolia index
       await ctx.algolia.deleteObject(article.id);
