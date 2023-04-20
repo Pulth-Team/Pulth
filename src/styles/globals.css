@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700;800;900&display=swap");
+::-webkit-scrollbar {
+  height: 4px;
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+/* Support for editor styling in editorjs component (Not in rendering) */
+h1.ce-header {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+h2.ce-header {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+h3.ce-header {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+h4.ce-header {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+h5.ce-header {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+h6.ce-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+@media screen and (max-width: 650px, min-width: 0px) {
+  .ce-popover--opened {
+    /* transform: translateY(-72px); */
+    bottom: 77px;
+  }
+}
+html {
+  background-color: rgb(31 41 55);
+}
