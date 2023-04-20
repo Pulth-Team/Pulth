@@ -38,7 +38,7 @@ const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
     return s3.putObject(
       {
         Bucket: env.AWS_S3_BUCKET,
-        Key: session.user?.id + "/" + file.originalFilename,
+        Key: session.user?.id + "/" + file.newFilename,
         Body: fs.createReadStream(file.filepath),
         ACL: "public-read",
       },
@@ -49,7 +49,7 @@ const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         return res.send({
           url: `https://cdn.pulth.com/${
-            session.user?.id + "/" + file.originalFilename
+            session.user?.id + "/" + file.newFilename
           }`,
         });
       }
