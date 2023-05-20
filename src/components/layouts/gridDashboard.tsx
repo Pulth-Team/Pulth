@@ -40,7 +40,10 @@ const GridDashboard: NextPage<{
   return (
     <>
       <Div100vh className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
-        <aside className="row-start-3 flex flex-col bg-gray-800 md:row-span-2">
+        <aside
+          className="row-start-3 flex flex-col bg-gray-800 md:row-span-2"
+          id="dashboard-sidebar"
+        >
           <div className=" mb-6 hidden flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
             <span className="text-xl font-bold text-indigo-500">PulthApp</span>
           </div>
