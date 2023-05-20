@@ -39,7 +39,7 @@ const Explore: NextPage = () => {
           <p className="px-5 text-2xl font-semibold md:px-0">
             {user ? "Selected for you..." : "Recent articles"}
           </p>
-          <DragScrollContainer>
+          <DragScrollContainer id="recom-scroll">
             {articles?.map((article) => (
               <ArticleCard
                 Title={article.title}
@@ -78,10 +78,11 @@ const Explore: NextPage = () => {
             }}
             tours={[
               {
-                targetQuery: ".drag-scroll > div:first-child",
+                targetQuery: "#recom-scroll",
                 message:
                   'This is a article recommendation for you. You can click "Go to Article" button to read the article.',
                 className: "my-2",
+                direction: "bottom",
               },
               {
                 targetQuery: "#current-account-box",
