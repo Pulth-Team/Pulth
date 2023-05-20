@@ -7,7 +7,8 @@ import React, { useRef, useState } from "react";
 const DragScrollContainer: NextPage<{
   children: React.ReactNode;
   className?: string;
-}> = ({ children, className }) => {
+  id?: string;
+}> = ({ children, className,id}) => {
   // i sacrificed my first son to the gods of copilot to make them happy (nearly all of the code below is copilot's doing)
   const container = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -67,6 +68,7 @@ const DragScrollContainer: NextPage<{
   // returns a React component
   return (
     <div
+      id={id}
       className={`flex flex-nowrap overflow-x-scroll gap-x-4 ${
         className || ""
       } scroll-pb-2 drag-scroll`}
