@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  pointer-events: auto;
+}
+
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700;800;900&display=swap");
 ::-webkit-scrollbar {
   height: 4px;
