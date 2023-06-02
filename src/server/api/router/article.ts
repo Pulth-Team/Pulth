@@ -213,7 +213,6 @@ export const articleRouter = createTRPCRouter({
 
       // we dont add it to the algolia index here
       // we will add it to the algolia index when the article is published
-
       return article;
     }),
 
@@ -329,7 +328,12 @@ export const articleRouter = createTRPCRouter({
         await ctx.algolia.deleteObject(updatedArticle.id);
       }
 
+      // everything went well, before returning the article
+      // we need to convert the bodyData from PrismaJson to OutputBlockData
       const { bodyData, ...rest } = updatedArticle;
+
+      // now we can revalidate the article
+      ctx.res?.revalidate(`/api/articles/${updatedArticle.slug}`);
 
       return {
         ...rest,
@@ -422,6 +426,9 @@ export const articleRouter = createTRPCRouter({
           message: "Something went wrong",
         });
 
+      // everything went well
+      ctx.res?.revalidate(`/articles/${updatedArticle.slug}`);
+
       return updatedArticle;
     }),
 
@@ -510,6 +517,10 @@ export const articleRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
           message: "Something went wrong",
         });
+
+      // everything went well
+      // now we can revalidate the article
+      ctx.res?.revalidate(`/articles/${updatedArticle.slug}`);
 
       return updatedArticle;
     }),

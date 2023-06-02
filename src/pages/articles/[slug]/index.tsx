@@ -331,7 +331,7 @@ export async function getStaticProps(
 ) {
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: createInnerTRPCContext({ session: null }),
+    ctx: createInnerTRPCContext({ session: null,req: null, res: null }),
     transformer: superjson, // optional - adds superjson serialization
   });
 
@@ -344,10 +344,6 @@ export async function getStaticProps(
     props: {
       trpcState: helpers.dehydrate(),
     },
-    // we will attempt to re-generate the page:
-    // - when a request comes in
-    // - at most once every 60 seconds
-    revalidate: 60,
   };
 }
 

@@ -23,6 +23,8 @@ import algolia from "algoliasearch";
 
 type CreateContextOptions = {
   session: Session | null;
+  req: NextApiRequest | null;
+  res: NextApiResponse | null;
 };
 
 /**
@@ -46,6 +48,8 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
     session: opts.session,
     prisma,
     algolia: algoliaClient,
+    req: opts.req,
+    res: opts.res,
   };
 };
 
@@ -63,6 +67,8 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return createInnerTRPCContext({
     session,
+    req,
+    res
   });
 };
 
@@ -77,6 +83,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { env } from "~/env.mjs";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
