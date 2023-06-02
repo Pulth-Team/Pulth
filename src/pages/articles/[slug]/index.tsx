@@ -6,11 +6,12 @@ import Image from "next/legacy/image";
 import Link from "next/link";
 
 import { signIn, useSession } from "next-auth/react";
-import { useMemo, useState } from "react";
+import { useMemo, useState,useEffect } from "react";
 import {
   SparklesIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  // TODO: later add these icons to use
   BookmarkIcon,
   ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
@@ -23,8 +24,16 @@ import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
 import Loading from "~/components/Loading";
 
-// TODO: Add support for SSG
-// TODO: Add support for Loading State in CSR
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { GetStaticPaths, GetStaticPropsContext } from "next";
+
+// import { prisma } from "server/context";
+import { appRouter } from "~/server/api/root";
+
+import superjson from "superjson";
+import { createInnerTRPCContext } from "~/server/api/trpc";
+import { prisma } from "~/server/db";
+
 const Articles: NextPage = () => {
   const router = useRouter();
   const { data: userData, status: authStatus } = useSession();
@@ -38,6 +47,7 @@ const Articles: NextPage = () => {
       setVoteRank(data.voteRank);
     },
   });
+
   // mutation to add a comment
   const commentAddMutation = api.comment.create.useMutation();
   // mutation to add a vote
@@ -46,8 +56,9 @@ const Articles: NextPage = () => {
       setVoteRank(data.newRank);
     },
   });
-  // query to get my vote
-  const myVoteData = api.vote.checkMyVoteByArticleId.useQuery(
+
+  // query to get my vote automatically
+  api.vote.checkMyVoteByArticleId.useQuery(
     articleData.data?.id as string,
     {
       enabled: authStatus === "authenticated" && articleData.data?.id !== null,
@@ -203,7 +214,7 @@ const Articles: NextPage = () => {
 
       {/* About the author */}
       {articleData.data?.author && (
-        <div className="mt-4 flex items-center justify-between px-4">
+        <div className="mt-4 flex items-center justify-between md:px-4">
           <div className="flex items-center gap-x-3">
             <div className="relative h-12 w-12 ">
               <Image
@@ -213,13 +224,13 @@ const Articles: NextPage = () => {
                 className=" rounded-full"
               />
             </div>
-            <p className="text-lg font-semibold">
+            <p className="sm:text-base md:text-lg font-semibold ">
               {articleData.data?.author.name || "unknown"}
             </p>
           </div>
 
           <div className="flex gap-2">
-            {/* TODO ADD subs icon (prime like) */}
+            {/* TODO: ADD subs icon (prime like) */}
             {articleData.data?.author.id === userData?.user.id && (
               <Link
                 // href={`/user/${articleData.data?.author.id}`}
@@ -314,3 +325,48 @@ const Articles: NextPage = () => {
 };
 
 export default Articles;
+
+export async function getStaticProps(
+  context: GetStaticPropsContext<{ slug: string }>
+) {
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: createInnerTRPCContext({ session: null }),
+    transformer: superjson, // optional - adds superjson serialization
+  });
+
+  const slug = context.params?.slug as string;
+
+  // prefetch `article.getBySlug`
+  await helpers.article.getBySlug.prefetch(slug);
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+    // we will attempt to re-generate the page:
+    // - when a request comes in
+    // - at most once every 60 seconds
+    revalidate: 60,
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const articles = await prisma.article.findMany({
+    select: {
+      slug: true,
+    },
+  });
+
+  // Get the paths we want to pre-render based on posts
+  // currently we only give the slug but we can also give the locale or params
+  const paths: string[] = articles.map(
+    (article) => `/articles/${article.slug}`
+  );
+
+  return {
+    paths: paths,
+    // https://nextjs.org/docs/pages/api-reference/functions/get-static-paths#fallback-blocking
+    fallback: "blocking",
+  };
+};
