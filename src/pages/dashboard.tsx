@@ -33,21 +33,25 @@ const Dashboard: NextPage = () => {
       </Head>
       <div className="p-4">
         <button onClick={showTour}>start Tour</button>
+        <br />
         <Tour
           start={tour}
-          className="mx-4 w-64"
+          onClosed={() => {
+            setTour(false);
+          }}
+          className="mx-4 my-2 w-64"
           tours={[
             {
-              targetQuery: "#dashboard-sidebar",
-              direction: "right",
-              message:
-                "This is the sidebar. You can navigate to different pages from here and you can also see your profile here",
+              targetQuery: "#search-button",
+              message: "This is the dashboard. You can see your overall stats",
+              align: "end",
             },
             {
               targetQuery: "#dashboard-menu-item",
               direction: "right",
               align: "start",
               message: "This is the dashboard. You can see your overall stats",
+              skip: true,
             },
             {
               targetQuery: "#explore-menu-item",
@@ -59,10 +63,22 @@ const Dashboard: NextPage = () => {
           ]}
           onFinished={(e, message) => {
             setTour(false);
-            if (e === "error")
-              console.log("Error happened while Touring", {
-                message: message,
-              });
+            switch (e) {
+              case "error":
+                console.log("Error happened while Touring", {
+                  message: message,
+                });
+                break;
+              case "redirect":
+                console.log("Redirecting to", message);
+                break;
+              case "skipped":
+                console.log("Tour skipped");
+                break;
+              default:
+                console.log("Touring finished");
+                break;
+            }
           }}
         />
       </div>

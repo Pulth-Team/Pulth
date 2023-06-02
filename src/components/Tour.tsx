@@ -2,21 +2,10 @@
 import { NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, {
-  useRef,
-  useState,
-  useLayoutEffect,
-  useCallback,
-  useEffect,
-} from "react";
+import React, { useRef, useState, useLayoutEffect } from "react";
 
 import { twMerge } from "tailwind-merge";
-
-import {
-  isHidden,
-  calculatePositionLeft,
-  calculatePositionTop,
-} from "./helpers/Tour";
+import { calculatePositionLeft, calculatePositionTop } from "./helpers/Tour";
 
 ///
 /// Tour Component
@@ -31,284 +20,226 @@ import {
 ///  [ ]   - for example parent may want to skip some steps according to the user's knowledge
 ///  [X] - add MultiPage support
 
+type StartProps =
+  | {
+      start: boolean;
+      onClosed: () => void;
+    }
+  | {
+      start: "redirect";
+      onClosed?: () => void;
+    };
+
 // creates a NextFunctionComponent
-const Tour: NextPage<{
-  start: boolean | "redirect";
-  className?: string;
-  tours: {
-    targetQuery: string;
-    message: string;
-
-    //optionals
-    skip?: boolean;
-    redirect?: string;
-
-    // default is bottom
-    direction?: "top" | "bottom" | "left" | "right";
-    // default is center
-    align?: "start" | "center" | "end";
+const Tour: NextPage<
+  {
     className?: string;
-  }[];
-  onFinished: (
-    e: "success" | "backdrop" | "skipped" | "error" | "redirect",
-    message?: string
-  ) => void;
-}> = ({ start, className, tours, onFinished }) => {
-  const tourRef = useRef<HTMLDivElement>(null);
-  const [tourIndex, setTourIndex] = useState(0);
-  const [lastTarget, setLastTarget] = useState<HTMLElement | null>(null);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isDone, setIsDone] = useState(false);
+    tours: {
+      targetQuery: string;
+      message: string;
+
+      //optionals
+      skip?: boolean;
+      redirect?: string;
+
+      // default is bottom
+      direction?: "top" | "bottom" | "left" | "right";
+      // default is center
+      align?: "start" | "center" | "end";
+      className?: string;
+    }[];
+    onFinished?: (
+      e: "success" | "backdrop" | "skipped" | "error" | "redirect",
+      message?: string
+    ) => void;
+  } & StartProps
+> = ({ start, className, tours, onFinished, onClosed }) => {
+  // creates a ref for the content model
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (start === "redirect") {
-      if (!router.isReady) {
-        setIsRunning(false);
-        return;
-      }
-
-      if (router.query.tour === "true" && tourIndex === 0 && !isDone) {
-        setIsRunning(true);
-        return;
-      }
-
-      if (router.query.tour !== "true") {
-        setIsRunning(false);
-        return;
-      }
-
-      // if()
-      console.log({ tourIndex, tour: router.query.tour });
-      // setIsRunning(false);
-    } else {
-      setIsRunning(start);
-    }
-  }, [router.isReady, router.query, start, tourIndex]);
-
-  function setZIndex(
-    target: HTMLElement,
-    zIndex: number | undefined = undefined
-  ) {
-    console.log(target);
-    target.style.setProperty("z-index", zIndex ? zIndex.toString() : "");
-  }
-
-  const clearTour = useCallback(
-    (
-      e: "success" | "backdrop" | "skipped" | "error" | "redirect",
-      message?: string,
-      report: boolean = true
-    ) => {
-      if (lastTarget) {
-        setZIndex(lastTarget);
-      }
-
-      setTourIndex(0);
-      setLastTarget(null);
-      if (report) onFinished(e, message);
-      setIsRunning(false);
-
-      if (start === "redirect" && e !== "error") {
-        setIsDone(true);
-        // router.replace(router.pathname, undefined, { shallow: true });
-      }
-    },
-    [onFinished, lastTarget, router, start]
+  const [tourIndex, setTourIndex] = useState(0);
+  const [isRunning, setIsRunning] = useState(
+    start === "redirect" ? true : start
   );
+  const currentTour = tours[tourIndex];
 
   useLayoutEffect(() => {
-    // if tour is not started then return
-    if (!isRunning) return clearTour("error", "Tour is not started", false);
-    // if tour is finished then clear the tour
-    if (tourIndex >= tours.length) {
-      return clearTour("success");
-    }
-    // if tour data is not valid then clear the tour with error code
-    // if there is no tour element then return
-    if (!tourRef.current) return;
+    // if (start === false || start !== "redirect" || router.query.tour !== "true") return;
+    if (start === false) return;
+    if (start === "redirect" && router.query.tour !== "true") return;
 
-    const currentTour = tours[tourIndex];
-    if (!currentTour) {
-      console.log(currentTour);
-      return clearTour("error", "Tour data is not valid");
-    }
-    // resets the z-index of the last target
-    if (lastTarget) {
-      setZIndex(lastTarget);
-    }
+    if (!currentTour) return;
 
-    // if alignment is not set then set it to center
-    if (!currentTour.align) {
-      currentTour.align = "center";
-    }
-    // if direction is not set then set it to bottom
-    if (!currentTour.direction) {
-      currentTour.direction = "bottom";
+    // creates id for the backdrop element targetQuery will be alphanumerical
+    const backdropId =
+      "tour-backdrop-" + currentTour.targetQuery.replace(/\W+/g, "");
+
+    let backdropTemp: HTMLElement | null = null;
+
+    // finds the target element
+    const target = document.querySelector<HTMLElement>(currentTour.targetQuery);
+    if (!target) {
+      if (onFinished) onFinished("error", "Target element not found");
+      if (start === "redirect") router.query.tour = "";
+      return;
     }
 
-    // if tour is started then
-    //  - get the target element
-    //  - calculate the position of the tour element according to alignment and direction
-    //  - set the position of the tour element
-    //  - set the z-index of the target element
-    //  - if tour is finished then clear the tour
-
-    // - get the target element
-    const QueryTargets = document.querySelectorAll<HTMLElement>(
-      currentTour.targetQuery
+    // FIX: if the backdrop is already exists then do not create a new one, just use the existing one
+    const backdropQuery = target?.parentNode?.querySelector<HTMLElement>(
+      "#" + backdropId
     );
 
-    // if there is no target then clear the tour with error code
-    if (QueryTargets.length === 0) {
-      return clearTour("error", "There is no target element", false);
-    }
-
-    if (!QueryTargets[0]) {
-      return clearTour("error", "The first target element is null");
-    }
-    let visibleTarget: HTMLElement;
-    // if there is more than one target then clear try to find the target which is not hidden
-    if (QueryTargets.length > 1) {
-      const visibleTargetArray = Array.from(QueryTargets).filter((target) => {
-        return !isHidden(target);
-      });
-
-      // if there is no visible target then clear the tour with error code
-      if (visibleTargetArray.length === 0) {
-        return clearTour("error", "There is no visible target");
-      }
-
-      if (!visibleTargetArray[0]) {
-        return clearTour("error", "There is no visible target");
-      }
-      if (visibleTargetArray.length > 1) {
-        // if there is more than one visible target then warn the user and use the first one
-        console.warn(
-          "There is more than one visible target, using the first one"
-        );
-        console.log(visibleTargetArray);
-      }
-
-      visibleTarget = visibleTargetArray[0];
+    if (backdropQuery) {
+      console.warn("backdrop exists");
+      backdropTemp = backdropQuery;
+      // remove previous display:none; style
+      backdropTemp.style.display = "";
     } else {
-      visibleTarget = QueryTargets[0];
+      backdropTemp = document.createElement("div");
+      backdropTemp.id = backdropId;
+      backdropTemp.classList.add(
+        "fixed",
+        "inset-0",
+        "bg-black",
+        "bg-opacity-50",
+        "backdrop-blur-sm",
+        "backdrop-brightness-50"
+      );
+
+      backdropTemp.onclick = (e) => {
+        // if the user clicks to the backdrop then remove the div element
+        if (e.target === backdropTemp) {
+          target!.style.zIndex = ""; // Reset the z-index of the important element
+          backdropTemp!.style.display = "none";
+          if (onFinished) onFinished("backdrop");
+          setTourIndex(0);
+          if (start === "redirect") {
+            router.query.tour = "";
+            setIsRunning(false);
+          }
+        }
+      };
+      target.parentNode?.insertBefore(backdropTemp, target);
     }
+    // adds the div element to the parent of a target element
+    const backdrop: HTMLElement = backdropTemp;
+    // target.parentNode?.insertBefore(contentRef.current!, target);
 
-    // now we have the target element in the visibleTarget variable
-    // - calculate the position of the tour element according to alignment and direction
+    // for testing
+    // target!.style.backgroundColor = "red";
+    target.style.position = "relative";
+    target.style.zIndex = "10001";
 
-    const targetBounding = visibleTarget.getBoundingClientRect();
-    const { width, height } = tourRef.current.getBoundingClientRect();
+    backdrop.style.display = "block";
+    backdrop.style.zIndex = "10000";
+
+    contentRef.current!.style.display = "block";
+    contentRef.current!.style.zIndex = "10001";
+
+    const { width, height } = contentRef.current!.getBoundingClientRect();
 
     const left = calculatePositionLeft(
-      targetBounding,
-      currentTour.direction,
-      currentTour.align,
+      target.getBoundingClientRect(),
+      currentTour.direction || "bottom",
+      currentTour.align || "center",
       width
     );
     const top = calculatePositionTop(
-      targetBounding,
-      currentTour.direction,
-      currentTour.align,
+      target.getBoundingClientRect(),
+      currentTour.direction || "bottom",
+      currentTour.align || "center",
       height
     );
-    console.log({ top, left });
 
-    // - set the position of the tour element
-    tourRef.current.style.setProperty("left", left.toString() + "px");
-    tourRef.current.style.setProperty("top", top.toString() + "px");
+    contentRef.current!.style.left = left + "px";
+    contentRef.current!.style.top = top + "px";
 
-    // - set the z-index of the target element
-    setZIndex(visibleTarget, 43);
-    setZIndex(tourRef.current, 50);
+    console.log(backdrop);
 
-    // set the last target
-    setLastTarget(visibleTarget);
-
-    const lastTourRef = tourRef.current;
+    var varyingNode = contentRef.current!;
     return () => {
-      if (lastTarget) {
-        setZIndex(lastTarget);
-      }
-      if (lastTourRef) setZIndex(lastTourRef, 50);
+      console.log("removed Tour");
+      target.style.zIndex = ""; // Reset the z-index of the target element
+      backdrop.style.display = "none"; // hide the backdrop
+
+      target.style.backgroundColor = ""; // Reset the background color of the target element
+
+      // reset the style of the content element
+      varyingNode.style.display = "";
+      varyingNode.style.left = "";
+      varyingNode.style.top = "";
+      varyingNode.style.zIndex = "";
+
+      // remove the div element from the parent of a target element
+      // target.parentNode?.removeChild(backdrop);
     };
+  }, [start, currentTour, onFinished, tourIndex, router.query, isRunning]);
+  if (!currentTour) return null;
 
-    // HACK: this dependency array is not correct
-    // FIXME: eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tourIndex, isRunning]);
-  //  lastTarget, clearTour, tours,
-
-  const showSkip =
-    typeof tours[tourIndex]?.skip === "undefined" ? "" : "hidden";
   return (
-    <>
-      <div
-        className={twMerge(
-          "z-50 rounded bg-white p-2 shadow-md",
-          className,
-          tours[tourIndex]?.className,
-          !isRunning && "hidden",
-          "absolute"
-        )}
-        ref={tourRef}
-      >
-        {tours[tourIndex]?.message}
+    <div
+      className={twMerge(
+        "fixed rounded bg-white p-2 shadow-md",
+        start === false && "hidden",
+        (start === "redirect" && router.isReady && router.query.tour) ||
+          "hidden",
+        className,
+        currentTour!.className
+      )}
+      ref={contentRef}
+    >
+      {currentTour!.message}
+      <hr className="mb-1 mt-2" />
+      <div className="mx-4 my-1 flex justify-between">
+        <button
+          onClick={() => {
+            // close
+            if (onClosed) onClosed();
+            if (onFinished) onFinished("skipped");
+            setTourIndex(0);
+            if (start === "redirect") router.query.tour = "";
+          }}
+          className={"text-black/70 " + (currentTour?.skip ? "" : "hidden")}
+        >
+          Skip
+        </button>
 
-        <hr className="mb-1 mt-2" />
-        <div className="mx-4 my-1 flex justify-between">
+        {tours[tourIndex]?.redirect ? (
+          <Link
+            href={{
+              pathname: tours[tourIndex]?.redirect,
+              query: { tour: true },
+            }}
+            className={
+              "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+            }
+          >
+            Next Tour
+          </Link>
+        ) : (
           <button
             onClick={() => {
-              clearTour("skipped");
-              setIsRunning(false);
-            }}
-            className={"text-black/70 " + showSkip}
-          >
-            Skip
-          </button>
-
-          {tours[tourIndex]?.redirect ? (
-            <Link
-              href={{
-                pathname: tours[tourIndex]?.redirect,
-                query: { tour: true },
-              }}
-              shallow={true}
-              passHref
-              // HACK: this should be fixed
-              legacyBehavior
-            >
-              <a
-                className={
-                  "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+              setTourIndex(tourIndex + 1);
+              if (tours.length <= tourIndex + 1) {
+                if (onClosed) onClosed();
+                if (onFinished) onFinished("success");
+                if (start === "redirect") {
+                  router.query.tour = "";
+                  setIsRunning(false);
                 }
-              >
-                Next Tour
-              </a>
-            </Link>
-          ) : (
-            <button
-              onClick={() => {
-                setTourIndex(tourIndex + 1);
-              }}
-              className={
-                "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+                setTourIndex(0);
               }
-            >
-              Next Tour
-            </button>
-          )}
-        </div>
+            }}
+            className={
+              "font-semibold" + (tours[tourIndex]?.skip ? "" : " ml-auto")
+            }
+          >
+            {tours.length <= tourIndex + 1 ? "Finish Tour" : "Next Tour"}
+          </button>
+        )}
       </div>
-      <div
-        id="backdrop-shadow"
-        className={`absolute left-0 top-0 z-40 h-screen w-screen backdrop-blur-sm backdrop-brightness-50 ${
-          isRunning || "hidden"
-        }`}
-        onClick={() => clearTour("backdrop")}
-      ></div>
-    </>
+    </div>
   );
 };
 

@@ -66,7 +66,7 @@ const ProfileIndex: NextPage = () => {
               <p>follows</p>
             </div>
             <div>
-              <button className="flex items-center gap-x-2 rounded-lg bg-black py-1.5 px-5 text-lg font-semibold text-white">
+              <button className="flex items-center gap-x-2 rounded-lg bg-black px-5 py-1.5 text-lg font-semibold text-white">
                 <UserPlusIcon className="h-6 w-6 stroke-white" />
                 Follow
               </button>

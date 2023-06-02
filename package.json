@@ -34,7 +34,7 @@
     "formidable": "^2.1.1",
     "framer-motion": "^10.11.2",
     "heroicons": "^2.0.12",
-    "next": "^13.3.0",
+    "next": "^13.4.3",
     "next-auth": "^4.19.2",
     "react": "18.2.0",
     "react-div-100vh": "^0.7.0",

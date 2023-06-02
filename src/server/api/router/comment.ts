@@ -56,6 +56,18 @@ export const commentRouter = createTRPCRouter({
         },
       });
 
+      if (newComment)
+        ctx.prisma.article
+          .findUnique({
+            where: { id: input.articleId },
+            select: {
+              slug: true,
+            },
+          })
+          .then((article) => {
+            ctx.res?.revalidate(`/articles/${article?.slug}`);
+          });
+
       await ctx.prisma.comment.update({
         where: {
           id: input.parentId,
@@ -85,6 +97,14 @@ export const commentRouter = createTRPCRouter({
           id: input.id,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          id: true,
+          Article: {
+            select: {
+              slug: true,
+            },
+          },
+        },
       });
 
       // If the comment doesn't exist, return an error
@@ -103,6 +123,8 @@ export const commentRouter = createTRPCRouter({
           },
         },
       });
+
+      ctx.res?.revalidate(`/articles/${commentData.Article.slug}`);
 
       // Delete the comment
       await ctx.prisma?.comment.delete({
@@ -129,6 +151,14 @@ export const commentRouter = createTRPCRouter({
           id: input.id,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          id: true,
+          Article: {
+            select: {
+              slug: true,
+            },
+          },
+        },
       });
 
       // If the comment doesn't exist, return an error
@@ -137,6 +167,9 @@ export const commentRouter = createTRPCRouter({
           message: "Comment not found, make sure you are the author",
           code: "NOT_FOUND",
         });
+
+      // Revalidate the article page
+      ctx.res?.revalidate(`/articles/${commentData.Article.slug}`);
 
       // Update the comment
       // and set isEdited to true
