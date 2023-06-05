@@ -64,14 +64,6 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
-            onClick={() => onMenuClick("privacy")}
-          >
-            <LockClosedIcon className="h-5 w-5" />
-            <p>Privacy</p>
-          </Menu.Item>
-          <Menu.Item
-            className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
-            as="button"
             onClick={() => onMenuClick("configure")}
           >
             <PencilSquareIcon className="h-5 w-5" />
