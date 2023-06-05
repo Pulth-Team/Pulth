@@ -20,6 +20,8 @@ const ProfileIndex: NextPage = () => {
 
   const { data: profileData, status } = api.user.getUserById.useQuery({
     id: userId?.toString() || "",
+  },{
+    enabled: !!userId,// if there is no userId, don't fetch
   });
 
   if (status === "loading")

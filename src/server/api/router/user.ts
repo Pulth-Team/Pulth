@@ -29,6 +29,9 @@ export const userRouter = createTRPCRouter({
           id: true,
           description: true,
           Articles: {
+            where: {
+              isPublished: true,
+            },
             select: {
               id: true,
               title: true,
