@@ -131,21 +131,21 @@ const Articles: NextPage = () => {
                           className="peer w-full rounded-lg border border-gray-200 p-2"
                           value={dialogTitle}
                           onChange={(e) => setDialogTitle(e.target.value)}
-                          minLength={8}
                           maxLength={100}
+                          minLength={12}
                           required
                           //
                           aria-invalid={
-                            dialogTitle.length < 8 || dialogTitle.length > 100
+                            dialogTitle.length < 12 || dialogTitle.length > 100
                           }
                           aria-describedby="articleNameError"
-                          aria-errormessage="Article's name must be between 8 and 100 characters long."
+                          aria-errormessage="Article's name must be between 12 and 100 characters long."
                         />
                         <p
                           id="articleNameError"
                           className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-focus-visible:hidden "
                         >
-                          Article&apos;s name must be between 8 and 100
+                          Article&apos;s name must be between 12 and 100
                           characters long.
                         </p>
                       </div>
@@ -166,21 +166,21 @@ const Articles: NextPage = () => {
                           className="peer w-full rounded-lg border border-gray-200 p-2 "
                           value={dialogDescription}
                           onChange={(e) => setDialogDescription(e.target.value)}
-                          minLength={8}
-                          maxLength={128}
+                          maxLength={320}
+                          minLength={40}
                           required
                           //
                           aria-invalid={
-                            dialogTitle.length < 8 || dialogTitle.length > 128
+                            dialogTitle.length < 40 || dialogTitle.length > 320
                           }
                           aria-describedby="articleDescriptionError"
-                          aria-errormessage="Article's description must be between 8 and 128 characters long."
+                          aria-errormessage="Article's description must be between 40 and 320 characters long."
                         ></textarea>
                         <p
                           id="articleDescriptionError"
                           className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-empty:hidden peer-focus:hidden"
                         >
-                          Article&apos;s description must be between 8 and 128
+                          Article&apos;s description must be between 40 and 320
                           characters long.
                         </p>
                       </div>
@@ -202,7 +202,8 @@ const Articles: NextPage = () => {
                           disabled={
                             createMutation.isLoading ||
                             dialogTitle.length < 12 ||
-                            dialogDescription.length < 24
+                            dialogDescription.length < 40
+
                           }
                         >
                           {createMutation.isLoading ? (
@@ -217,6 +218,7 @@ const Articles: NextPage = () => {
                   </div>
                 </Dialog>
               </div>
+
             )}
           </>
         )}

@@ -63,7 +63,7 @@ const Articles: NextPage = ({}) => {
       setDeleteModal(false);
       router.push("/profile");
     } else {
-      // TODO: add error message more than just an alert
+      // TODO: Remove alert and add a proper error message
       alert("Wrong Title Name");
     }
   };
@@ -151,9 +151,7 @@ const Articles: NextPage = ({}) => {
                     }
                   );
                 }}
-                onMenuClick={(type) => {
-                  OnMenuClick(type);
-                }}
+                onMenuClick={OnMenuClick}
                 saveLoading={updateArticleMutation.isLoading}
                 publishLoading={publishArticleMutation.isLoading}
               />

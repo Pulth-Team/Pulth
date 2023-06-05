@@ -191,10 +191,11 @@ const Inspect: NextPage = () => {
                           "text-red-500"
                         )}
                       >
-                        Description is too long. It should be at most 320 charecters long.
+                        Description is too long. It should be at most 320
+                        charecters long.
                       </li>
                     </ul>
-                    
+
                     <div className="flex justify-end gap-2">
                       <button
                         className="my-2 flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white disabled:bg-indigo-400"
@@ -202,7 +203,9 @@ const Inspect: NextPage = () => {
                           title === "" ||
                           description === "" ||
                           (title === articleInfo.data?.title &&
-                            description === articleInfo.data?.description)
+                            description === articleInfo.data?.description) ||
+                          (description?.length || 0) < 40 ||
+                          (description?.length || 0) > 320
                         }
                         onClick={() => {
                           console.log({
