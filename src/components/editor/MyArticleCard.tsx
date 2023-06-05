@@ -28,14 +28,14 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
                          !isPublished
                            ? "border-2 border-dashed border-gray-300 bg-white hover:border-indigo-500 hover:bg-gray-100"
                            : "hover:bg-indigo-500"
-                       }`}
+                       } h-full` }
       >
         <p
           className={`text-lg font-medium  ${
             !isPublished
               ? "group-hover:text-indigo-500"
               : "group-hover:text-white"
-          } `}
+          } line-clamp-1`}
         >
           {title}
         </p>
