@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -157,18 +158,46 @@ const Inspect: NextPage = () => {
                         <Loading className="h-7 w-7 border-2" />
                       ) : (
                         <textarea
-                          className="border-2 p-3 outline-indigo-500"
+                          className="h-auto border-2 p-3 outline-indigo-500"
                           value={description || ""}
                           onChange={(e) => {
                             setDescription(e.target.value);
                           }}
                         />
                       )}
+                      <div
+                        className={twMerge(
+                          "ml-1 text-xs italic text-gray-500",
+                          (description?.length || 0) > 320 && "text-red-500",
+                          (description?.length || 0) < 120 && "text-red-500"
+                        )}
+                      >
+                        {description?.length}/320
+                      </div>
                     </div>
-
+                    <ul id="errors" className="mt-2">
+                      <li
+                        className={twMerge(
+                          (description?.length || 0) > 120 && "hidden",
+                          "text-red-500"
+                        )}
+                      >
+                        Description is too short. It should be at least 120
+                        charecters long.
+                      </li>
+                      <li
+                        className={twMerge(
+                          (description?.length || 0) < 320 && "hidden",
+                          "text-red-500"
+                        )}
+                      >
+                        Description is too long. It should be at most 320 charecters long.
+                      </li>
+                    </ul>
+                    
                     <div className="flex justify-end gap-2">
                       <button
-                        className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white disabled:bg-indigo-400"
+                        className="my-2 flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white disabled:bg-indigo-400"
                         disabled={
                           title === "" ||
                           description === "" ||
@@ -223,7 +252,7 @@ const Inspect: NextPage = () => {
                         )}
                       </button>
                       <button
-                        className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400"
+                        className="my-2 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400"
                         disabled={
                           title === articleInfo.data?.title &&
                           description === articleInfo.data?.description
