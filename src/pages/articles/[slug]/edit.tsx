@@ -272,12 +272,28 @@ const Articles: NextPage = ({}) => {
                   <div className="flex flex-col gap-y-2">
                     <p>Share this article via</p>
                     <div className="flex gap-x-4">
-                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-500 bg-transparent transition-colors duration-150 hover:bg-blue-500">
+                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-500 bg-transparent transition-colors duration-150 hover:bg-blue-500"
+                      onClick={()=>{
+                      //   const shareURL = `${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`
+                      //   const shareObject = {
+                      //     title: articleAuthorFetch.data?.title,
+                      //     text: articleAuthorFetch.data?.description,
+                      //     url: shareURL,
+                      //   };
+
+                      //   if(navigator.canShare(shareObject))
+                      //   {
+                      //     navigator.share(shareObject);
+                      //   }else{
+                      //     alert("Your browser does not support sharing");
+                      //   }
+                        window.open(`https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`, '_blank');
+                      }}>
                         <TwitterIcon className="mt-0.5 fill-blue-500 stroke-none transition-colors duration-150 group-hover:fill-white group-hover:stroke-none" />
                       </div>
-                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-900 bg-transparent transition-colors duration-150 hover:bg-blue-900">
+                      {/* <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-900 bg-transparent transition-colors duration-150 hover:bg-blue-900">
                         <FacebookIcon className="mt-0.5 fill-blue-900 stroke-none transition-colors duration-150 group-hover:fill-white group-hover:stroke-none" />
-                      </div>
+                      </div> */}
                     </div>
                     <p>You can use link</p>
                     <div className="flex gap-x-3 rounded-md bg-black/10 p-2">
