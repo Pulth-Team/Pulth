@@ -498,18 +498,31 @@ export const articleRouter = createTRPCRouter({
           slug: newSlug,
         },
       });
-      // update the algolia index
-      await ctx.algolia.partialUpdateObject(
-        {
-          objectID: updatedArticle.id,
-          slug: updatedArticle.slug,
-          title: updatedArticle.title,
-          description: updatedArticle.description,
-        },
-        {
-          createIfNotExists: true,
-        }
-      );
+
+      if (updatedArticle.isPublished) {
+        await ctx.algolia.partialUpdateObject(
+          {
+            objectID: updatedArticle.id,
+            slug: updatedArticle.slug,
+            title: updatedArticle.title,
+            description: updatedArticle.description,
+
+            author: {
+              id: ctx.session?.user.id,
+              name: ctx.session?.user.name,
+              image: ctx.session?.user.image,
+            },
+            publishedAt: updatedArticle.createdAt.getTime(),
+            updatedAt: updatedArticle.updatedAt.getTime(),
+          },
+          {
+            createIfNotExists: true,
+          }
+        );
+      } else {
+        // if the article is unpublished, remove it from the algolia index
+        await ctx.algolia.deleteObject(updatedArticle.id);
+      }
 
       //check if the article was updated
       if (!updatedArticle)
