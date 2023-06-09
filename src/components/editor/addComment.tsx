@@ -88,9 +88,9 @@ const CommentAdd = ({
         <div
           className={twMerge(
             "justify-end gap-2 ",
-            collapsable ? (val.length > 0
-              ? "group-focus-within:flex flex"
-              : "hidden") : "flex"
+            !collapsable && "flex",
+            collapsable && "group-focus-within:flex ",
+            collapsable && val.length > 0 ? "flex":"hidden"
           )}
         >
           <span className="text-sm text-gray-500">
@@ -117,7 +117,6 @@ const CommentAdd = ({
               setVal("");
             }}
           >
-            
             {cancelText}
           </button>
         </div>
