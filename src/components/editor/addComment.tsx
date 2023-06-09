@@ -1,5 +1,6 @@
 import Image from "next/legacy/image";
 import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 import Loading from "~/components/Loading";
 
@@ -16,6 +17,8 @@ const CommentAdd = ({
   parentId = null,
   className,
   maxLength = 255,
+  collapsable = false,
+  cancelText = "Cancel",
 }: {
   // user: the current use who writes this comment
   user: {
@@ -34,6 +37,8 @@ const CommentAdd = ({
   //           only used to give as an argument to OnComment
   parentId?: string | null;
 
+  collapsable?: boolean;
+  cancelText?: "Cancel" | "Reset" | string;
   // className: the class name of the root div
   className?: string;
   maxLength?: number;
@@ -69,7 +74,7 @@ const CommentAdd = ({
           className="absolute rounded-full"
         />
       </div>
-      <div className="flex flex-grow flex-col gap-1">
+      <div className="group flex flex-grow flex-col gap-1 ">
         <div className="font-semibold leading-5">{user.name}</div>
         <textarea
           className="w-full resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] px-2 py-1 outline-gray-300"
@@ -80,7 +85,14 @@ const CommentAdd = ({
           maxLength={maxLength}
           minLength={1}
         ></textarea>
-        <div className="flex justify-end gap-2">
+        <div
+          className={twMerge(
+            "justify-end gap-2 ",
+            !collapsable && "flex",
+            collapsable && "group-focus-within:flex ",
+            collapsable && val.length > 0 ? "flex":"hidden"
+          )}
+        >
           <span className="text-sm text-gray-500">
             {val.length}/{maxLength}
           </span>
@@ -105,7 +117,7 @@ const CommentAdd = ({
               setVal("");
             }}
           >
-            Cancel
+            {cancelText}
           </button>
         </div>
       </div>
