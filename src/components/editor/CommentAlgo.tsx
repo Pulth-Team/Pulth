@@ -9,6 +9,8 @@ import { useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { twMerge } from "tailwind-merge";
 
 interface Comment {
   id: string;
@@ -226,21 +228,35 @@ const Comment: NextPage<{
   return (
     <div className="">
       <div className="flex gap-2">
-        <div className="relative h-8 w-8 flex-shrink-0 flex-grow-0">
-          <Image
-            src={comment.author.image || "/default_profile.jpg"}
-            alt={comment.author.image + " profile image"}
-            layout="fill"
-            className="absolute rounded-full"
-          ></Image>
+        <div className="flex flex-col justify-between">
+          <div className="relative h-8 w-8 flex-shrink-0 flex-grow-0 ">
+            <Image
+              src={comment.author.image || "/default_profile.jpg"}
+              alt={comment.author.image + " profile image"}
+              layout="fill"
+              className="absolute rounded-full"
+            ></Image>
+          </div>
+          <div
+            className={twMerge(
+              "ml-3 flex w-min flex-grow border-l-4 bg-cyan-300",
+              !isEditing &&"mt-2"
+            )}
+          ></div>
         </div>
         <div className="flex-grow">
-          <p className="font-semibold leading-5">
-            {comment.author.name}{" "}
-            <span className="font-normal text-black/70">
-              {isEdited ? "edited" : ""}
-            </span>
-          </p>
+          <Link
+            href={{
+              pathname: "/user/[userId]",
+              query: { userId: comment.author.id },
+            }}
+            className="pr-2 font-semibold leading-5 hover:underline"
+          >
+            {comment.author.name}
+          </Link>
+          <span className="font-normal text-black/70">
+            {isEdited ? "edited" : ""}
+          </span>
 
           {!isEditing && <p className="break-all">{comment.content}</p>}
         </div>
@@ -283,7 +299,7 @@ const Comment: NextPage<{
       </div>
       {isEditing && (
         <>
-          <div className="my-2 ml-10 flex">
+          <div className="ml-3 mt-2 flex border-l-4 pb-2 pl-7">
             {/* will height change when present */}
             <textarea
               onChange={(e) => {
@@ -314,7 +330,7 @@ const Comment: NextPage<{
               className="flex-grow resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] p-1 outline-gray-300"
             ></textarea>
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="ml-3 flex justify-end gap-2 border-l-4">
             <p className="text-sm text-gray-500">{editValue.length}/255</p>
             <button
               className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
@@ -335,7 +351,7 @@ const Comment: NextPage<{
               }}
               disabled={editValue === comment.content || editValue === ""}
             >
-              Save
+              Update
             </button>
             <button
               className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
@@ -350,7 +366,12 @@ const Comment: NextPage<{
         </>
       )}
 
-      <div className="flex flex-col gap-2 pl-10 pt-2">
+      <div
+        className={twMerge(
+          "ml-3 flex flex-col gap-2 pl-3 md:pl-6",
+          (comment.children.length > 0 || reply) && "border-l-4 pt-4"
+        )}
+      >
         {reply && isAuthed && (
           <CommentAdd
             user={{
