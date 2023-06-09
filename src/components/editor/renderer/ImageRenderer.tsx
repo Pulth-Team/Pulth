@@ -12,7 +12,7 @@ const ImageRenderer: NextPage<{ url: string; caption: string }> = ({
   const [ratio, setRatio] = useState(16 / 9);
 
   return (
-    <div className="my-4">
+    <figure className="my-4">
       <div
         className={`relative my-3
            overflow-hidden
@@ -34,10 +34,10 @@ const ImageRenderer: NextPage<{ url: string; caption: string }> = ({
           }}
         />
       </div>
-      <div className="text-center text-sm italic">
-        <p>{caption}</p>
-      </div>
-    </div>
+      <figcaption className="text-center text-sm italic">
+        {caption}
+      </figcaption>
+    </figure>
   );
 };
 
