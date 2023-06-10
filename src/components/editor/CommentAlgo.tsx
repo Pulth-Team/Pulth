@@ -239,8 +239,10 @@ const Comment: NextPage<{
           </div>
           <div
             className={twMerge(
-              "ml-3 flex w-min flex-grow border-l-4 bg-cyan-300",
-              !isEditing &&"mt-2"
+              "ml-3 flex w-min flex-grow bg-cyan-300",
+              !isEditing && "mt-2",
+
+              (isEditing || comment.children.length > 0) && "border-l-4"
             )}
           ></div>
         </div>
@@ -393,6 +395,7 @@ const Comment: NextPage<{
                 }
               );
             }}
+            collapsable={false}
             OnCancel={() => {
               setReply(false);
             }}

@@ -64,7 +64,7 @@ const CommentAdd = ({
   };
 
   return (
-    <div className={`flex gap-3 align-top ${className}`}>
+    <div className={`flex gap-3 align-top ${className || ""}`}>
       {/* next-image with fill and square layout */}
       <div className="relative h-8 w-8 flex-shrink-0">
         <Image
@@ -87,10 +87,10 @@ const CommentAdd = ({
         ></textarea>
         <div
           className={twMerge(
-            "justify-end gap-2 ",
-            !collapsable && "flex",
-            collapsable && "group-focus-within:flex ",
-            collapsable && val.length > 0 ? "flex":"hidden"
+            "justify-end gap-2",
+            collapsable
+              ? (val.length > 0 ? "flex" : "hidden") + " group-focus-within:flex"
+              : "flex"
           )}
         >
           <span className="text-sm text-gray-500">
