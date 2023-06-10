@@ -11,6 +11,7 @@ import { api } from "~/utils/api";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { Dialog } from "@headlessui/react";
 
 interface Comment {
   id: string;
@@ -219,6 +220,7 @@ const Comment: NextPage<{
   const [reply, setReply] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const addCommentMutation = api.comment.create.useMutation();
   const editCommentMutation = api.comment.update.useMutation();
@@ -286,14 +288,7 @@ const Comment: NextPage<{
             <TrashIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
-                deleteCommentMutation.mutate(
-                  { id: comment.id },
-                  {
-                    onSuccess: () => {
-                      revalidate();
-                    },
-                  }
-                );
+                setDeleteModal(true);
               }}
             />
           )}
@@ -418,6 +413,49 @@ const Comment: NextPage<{
           );
         })}
       </div>
+
+      <Dialog
+        open={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-white p-4">
+            <Dialog.Title className={"my-2 text-lg font-medium"}>Delete Comment</Dialog.Title>
+            <Dialog.Description>
+              Are you sure you want to delete this comment?
+            </Dialog.Description>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
+                onClick={() => {
+                  setDeleteModal(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex items-center gap-2 rounded-md bg-red-500 p-2 text-white hover:bg-red-400 active:bg-red-600"
+                onClick={() => {
+                  deleteCommentMutation.mutate(
+                    { id: comment.id },
+                    {
+                      onSuccess: () => {
+                        setDeleteModal(false);
+                        revalidate();
+                      },
+                    }
+                  );
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 };
