@@ -275,6 +275,7 @@ const Articles: NextPage = () => {
                 }}
                 OnComment={OnCommentAdd}
                 isLoading={commentAddMutation.isLoading}
+                collapsable={true}
               />
             ) : (
               <button
@@ -313,7 +314,7 @@ const Articles: NextPage = () => {
         <meta name="author" content={articleData.data?.author?.name!} />
         <meta name="generator" content="Pulth Engine" />
         <link rel="icon" href="/favicon.ico" />
-        {/* Add keywords */}
+        {/* TODO: Add keywords */}
       </Head>
       {/* read article container for our article renderer with media queries */}
       <div className="container mx-auto max-w-2xl p-4">
