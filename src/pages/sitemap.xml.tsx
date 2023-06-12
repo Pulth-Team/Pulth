@@ -1,4 +1,5 @@
 import type { GetServerSideProps } from "next";
+import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import { getBaseUrl } from "~/utils/api";
 
@@ -20,19 +21,19 @@ export const generateSiteMap = (pages: { path: string }[]) => {
        .map((path) => {
          return `
                 <url>
-                    <loc>${getBaseUrl() + path}</loc>
+                    <loc>${env.DEPLOYMENT_URL + path}</loc>
                 </url>
             `;
        })
        .join("")}
      <url>
-       <loc>${getBaseUrl() + ""}</loc>
+       <loc>${env.DEPLOYMENT_URL + ""}</loc>
      </url>
      ${pages
        .map(({ path }) => {
          return `
        <url>
-           <loc>${getBaseUrl() + path}</loc>
+           <loc>${env.DEPLOYMENT_URL + path}</loc>
        </url>
      `;
        })
