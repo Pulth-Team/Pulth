@@ -26,9 +26,6 @@ export const generateSiteMap = (pages: { path: string }[]) => {
             `;
        })
        .join("")}
-     <url>
-       <loc>${env.DEPLOYMENT_URL + ""}</loc>
-     </url>
      ${pages
        .map(({ path }) => {
          return `
