@@ -15,7 +15,14 @@ const EditorTopbar: NextPage<{
   onPublish: () => void;
   onMenuClick: (type: "delete" | "privacy" | "share" | "configure") => void;
   saveLoading: boolean;
+
+  // is this article published to the public
   isPublished: boolean;
+  // is this article has unpublished changes (saved/remote changes)
+  isDraft: boolean;
+  // is this article has unpublished changes (local changes)
+  isChanged: boolean;
+
   publishLoading: boolean;
 }> = ({
   title,
@@ -24,8 +31,43 @@ const EditorTopbar: NextPage<{
   onMenuClick,
   saveLoading,
   isPublished,
+  isDraft,
+  isChanged,
   publishLoading,
 }) => {
+  type SaveText = "Save Draft" | "Saved" | "Save & Publish" | "Published"| "Unknown";
+  type PublishText = "Publish" | "Publish Draft" | "Save & Publish" | "Published"| "Unknown";
+
+  let saveText: SaveText = "Unknown";
+  let publishText: PublishText = "Unknown";
+
+
+  // if the article is published and has no changes (local or remote)
+  if( isPublished && !isDraft && !isChanged){
+    saveText = "Saved";
+    publishText = "Published";
+  }
+
+  // if the article is published and has local changes (not remote)
+  if( isPublished && !isDraft && isChanged){
+    saveText = "Save Draft";
+    publishText = "Save & Publish";
+  }
+
+  // if the article is published and has remote changes (not local)
+  if( isPublished && isDraft && !isChanged){
+    saveText = "Saved";
+    publishText = "Publish Draft";
+  }
+
+  // if the article is published and has local and remote changes
+  if( isPublished && isDraft && isChanged){
+    saveText = "Save Draft";
+    publishText = "Save & Publish";
+  }
+
+
+
   return (
     <div className="sticky top-0 z-10 mb-4 flex items-center gap-x-2 bg-white px-4 py-2 shadow-md">
       <h1 className="mr-auto">
@@ -37,14 +79,14 @@ const EditorTopbar: NextPage<{
         onClick={() => onSave()}
       >
         {saveLoading && <Loading className="w-4 border-2" />}
-        {isPublished ? "Update" : "Save"}
+        {saveText}
       </button>
       <button
         className="flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white"
         onClick={() => onPublish()}
       >
         {publishLoading && <Loading className="w-4 border-2" />}
-        {isPublished ? "Unpublish" : "Publish"}
+        {publishText}
       </button>
       <Menu as="div" className="">
         <Menu.Button className="flex items-center">
@@ -52,7 +94,7 @@ const EditorTopbar: NextPage<{
             <EllipsisVerticalIcon className="h-6 w-6" />
           </div>
         </Menu.Button>
-        <Menu.Items className="absolute z-10 flex w-36 translate-y-5 -translate-x-28 flex-col items-start justify-start rounded bg-white py-2 shadow-md">
+        <Menu.Items className="absolute z-10 flex w-36 -translate-x-28 translate-y-5 flex-col items-start justify-start rounded bg-white py-2 shadow-md">
           <Menu.Item
             className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"

@@ -12,6 +12,8 @@ import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
 import { S3 } from "aws-sdk";
 import { env } from "~/env.mjs";
+import { exclude } from "~/utils/api";
+import { Article } from "@prisma/client";
 
 export const articleRouter = createTRPCRouter({
   // takes a slug and returns an article without isPublished value
@@ -207,6 +209,7 @@ export const articleRouter = createTRPCRouter({
           description: input.description,
           slug,
           bodyData: [],
+          draftBodyData: [],
           authorId: ctx.session?.user.id,
         },
       });
@@ -236,15 +239,44 @@ export const articleRouter = createTRPCRouter({
           message: "Article not found in your account",
         });
 
-      const { bodyData, ...rest } = article;
+      const bodylessArticle = exclude(article, ["bodyData", "draftBodyData"]);
+      return {
+        ...bodylessArticle,
+        // bodyData: bodyData as unknown as OutputBlockData<string, any>[],
+      };
+    }),
+
+  // gives article's slug
+  editData: protectedProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const article = await ctx.prisma?.article.findUnique({
+        where: {
+          slug: input,
+        },
+        select: {
+          title: true,
+          bodyData: true,
+          draftBodyData: true,
+          isPublished: true,
+          authorId: true,
+        },
+      });
+
+      if (ctx.session.user.id != article?.authorId)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not allowed to request this data",
+        });
 
       return {
-        ...rest,
-        // bodyData: JSON.parse(
-        //   { bodyData: bodyData?.toString() || "[]" }.toString()
-        // ).bodyData as OutputBlockData<string, any>[],
-        // bodyData: JSON.parse(bodyData?.toString()).bodyData,
-        bodyData: bodyData as unknown as OutputBlockData<string, any>[],
+        title: article.title,
+        bodyData: article.bodyData as unknown as OutputBlockData<string, any>[],
+        draftBodyData: article.draftBodyData as unknown as OutputBlockData<
+          string,
+          any
+        >[],
+        isPublished: article.isPublished,
       };
     }),
 
@@ -252,84 +284,146 @@ export const articleRouter = createTRPCRouter({
     .input(
       z.object({
         slug: z.string(),
-        setUnpublished: z.boolean(),
+        editorData: z.array(
+          z.object({
+            id: z.string().optional(),
+            type: z.string(),
+            data: z.any().optional(),
+          })
+        ),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // find the article
+      // find the article with that userID and slug
       const article = await ctx.prisma?.article.findFirst({
         where: {
           slug: input.slug,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          id: true,
+          draftBodyData: true,
+          // for algolia
+          title: true,
+          description: true,
+        },
       });
 
-      // if the article doesn't exist, return an error
       if (!article)
+        // if the article doesn't exist, return an error
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Article with given slug not found",
         });
 
-      // check if the article is already published
-      if (article.isPublished && !input.setUnpublished)
+      let updatedArticle: Article | null = null;
+
+      // if unsaved changes exists
+      if (article?.draftBodyData !== input.editorData)
+        // then update draftBodyData and bodyData
+        updatedArticle = await ctx.prisma?.article
+          .update({
+            where: {
+              id: article.id,
+            },
+            data: {
+              isPublished: true,
+              bodyData: input.editorData || [],
+              draftBodyData: input.editorData,
+            },
+          })
+          .catch(() => {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Something went wrong",
+            });
+          });
+      // if there isnt any unsaved changes then swap draftBodyData to bodyData
+      else
+        updatedArticle = await ctx.prisma?.article
+          .update({
+            where: {
+              id: article.id,
+            },
+            data: {
+              isPublished: true,
+              bodyData: article.draftBodyData || [],
+            },
+          })
+          .catch(() => {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Something went wrong",
+            });
+          });
+
+      await ctx.algolia.partialUpdateObject(
+        {
+          objectID: updatedArticle.id,
+          slug: updatedArticle.slug,
+          title: updatedArticle.title,
+          description: updatedArticle.description,
+
+          author: {
+            id: ctx.session?.user.id,
+            name: ctx.session?.user.name,
+            image: ctx.session?.user.image,
+          },
+          publishedAt: updatedArticle.createdAt.getTime(),
+          updatedAt: updatedArticle.updatedAt.getTime(),
+        },
+        {
+          createIfNotExists: true,
+        }
+      );
+
+      // everything went well, before returning the article
+      // we need to convert the bodyData from PrismaJson to OutputBlockData
+      const { bodyData, ...rest } = updatedArticle;
+
+      // now we can revalidate the article
+      ctx.res?.revalidate(`/api/articles/${updatedArticle.slug}`);
+
+      return {
+        ...rest,
+        bodyData: bodyData as unknown as OutputBlockData<string, any>[],
+      };
+    }),
+
+  unpublish: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const article = await ctx.prisma?.article.findFirst({
+        where: {
+          slug: input,
+          authorId: ctx.session?.user.id,
+        },
+        select: {
+          id: true,
+          draftBodyData: true,
+        },
+      });
+
+      if (!article)
+        // if the article doesn't exist, return an error
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Article is already published",
+          code: "NOT_FOUND",
+          message: "Article with given slug not found",
         });
 
-      // check if the article is already unpublished
-      if (!article.isPublished && input.setUnpublished)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Article is already a draft",
-        });
-
-      // update the article
+      // if there isnt any unsaved changes then swap draftBodyData to bodyData
       const updatedArticle = await ctx.prisma?.article.update({
         where: {
           id: article.id,
         },
         data: {
-          isPublished: !input.setUnpublished,
+          isPublished: false,
+          bodyData: article.draftBodyData || [],
         },
       });
 
-      //check if the article was updated
-      if (!updatedArticle)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong",
-        });
+      await ctx.algolia.deleteObject(article.id);
 
-      // if the article is published, add it to the algolia index
-      if (!input.setUnpublished) {
-        await ctx.algolia.partialUpdateObject(
-          {
-            objectID: updatedArticle.id,
-            slug: updatedArticle.slug,
-            title: updatedArticle.title,
-            description: updatedArticle.description,
-
-            author: {
-              id: ctx.session?.user.id,
-              name: ctx.session?.user.name,
-              image: ctx.session?.user.image,
-            },
-            publishedAt: updatedArticle.createdAt.getTime(),
-            updatedAt: updatedArticle.updatedAt.getTime(),
-          },
-          {
-            createIfNotExists: true,
-          }
-        );
-      } else {
-        // if the article is unpublished, remove it from the algolia index
-        await ctx.algolia.deleteObject(updatedArticle.id);
-      }
-
-      // everything went well, before returning the article
-      // we need to convert the bodyData from PrismaJson to OutputBlockData
       const { bodyData, ...rest } = updatedArticle;
 
       // now we can revalidate the article
@@ -361,6 +455,11 @@ export const articleRouter = createTRPCRouter({
           slug: input.slug,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          authorId: true,
+          bodyData: true,
+          id: true,
+        },
       });
 
       // if the article doesn't exist, return an error
@@ -375,7 +474,7 @@ export const articleRouter = createTRPCRouter({
         article.bodyData as unknown as OutputBlockData<any>[]
       ).filter((block) => block.type === "Image") as OutputBlockData<"Image">[];
 
-      console.log("current images", currentImageBlocks);
+      // console.log("current images", currentImageBlocks);
 
       // gets the new image blocks in the article
       const newImageBlocks = input.bodyData.filter(
@@ -415,7 +514,7 @@ export const articleRouter = createTRPCRouter({
           id: article.id,
         },
         data: {
-          bodyData: input.bodyData,
+          draftBodyData: input.bodyData,
         },
       });
 

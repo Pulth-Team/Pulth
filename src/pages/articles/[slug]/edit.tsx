@@ -27,7 +27,7 @@ const Editor = dynamic(() => import("~/components/editor/Editor"), {
 const Articles: NextPage = ({}) => {
   const { status } = useSession({ required: true });
   const [isFetching, setIsFetching] = useState(true);
-  const [bodyData, setBodyData] = useState<
+  const [currentBodyData, setBodyData] = useState<
     OutputBlockData<string, any>[] | null
   >(null);
   const [titleInput, setTitleInput] = useState("");
@@ -39,7 +39,7 @@ const Articles: NextPage = ({}) => {
   // const [editor, setEditor] = useState<EditorJS | null>(null);
   const editor = useRef<EditorJS | null>(null);
 
-  const articleAuthorFetch = api.article.inspect.useQuery(slug as string, {
+  const articleAuthorFetch = api.article.editData.useQuery(slug as string, {
     enabled: status === "authenticated",
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -48,7 +48,7 @@ const Articles: NextPage = ({}) => {
     refetchIntervalInBackground: false,
     onSuccess: (data) => {
       if (data) {
-        setBodyData(data.bodyData);
+        setBodyData(data.draftBodyData);
       }
     },
   });
@@ -69,8 +69,9 @@ const Articles: NextPage = ({}) => {
   };
 
   useEffect(() => {
-    if (articleAuthorFetch.isSuccess && status === "authenticated")
+    if (articleAuthorFetch.isSuccess && status === "authenticated") {
       setIsFetching(false);
+    }
   }, [status, articleAuthorFetch.isSuccess]);
 
   const OnMenuClick = (menuType: string) => {
@@ -93,7 +94,11 @@ const Articles: NextPage = ({}) => {
     await navigator.clipboard.writeText(shareURL);
   };
 
-  const onChange = useCallback((api: API) => {}, []);
+  const onChange = useCallback((api: API) => {
+    api.saver.save().then((outputData) => {
+      setBodyData(outputData.blocks);
+    });
+  }, []);
 
   return (
     <DashboardLayout>
@@ -106,6 +111,14 @@ const Articles: NextPage = ({}) => {
             <div>
               <EditorTopbar
                 title={articleAuthorFetch.data.title}
+                isDraft={
+                  JSON.stringify(articleAuthorFetch.data.draftBodyData) !==
+                  JSON.stringify(articleAuthorFetch.data.bodyData)
+                }
+                isChanged={
+                  JSON.stringify(currentBodyData) !==
+                  JSON.stringify(articleAuthorFetch.data.draftBodyData)
+                }
                 onSave={() => {
                   editor.current?.save().then((outputData) => {
                     console.log("Saved Article Data", outputData);
@@ -141,7 +154,7 @@ const Articles: NextPage = ({}) => {
                   publishArticleMutation.mutate(
                     {
                       slug: slug as string,
-                      setUnpublished: articleAuthorFetch.data.isPublished,
+                      editorData: currentData.blocks,
                     },
                     {
                       onSuccess: () => {
@@ -158,9 +171,9 @@ const Articles: NextPage = ({}) => {
               <Editor
                 readonly={false}
                 data={JSON.stringify({
-                  time: articleAuthorFetch.data.updatedAt,
-                  blocks: articleAuthorFetch.data.bodyData,
-                  version: articleAuthorFetch.data.editorVersion,
+                  // time: articleAuthorFetch.data.updatedAt,
+                  blocks: articleAuthorFetch.data.draftBodyData,
+                  // version: articleAuthorFetch.data.editorVersion,
                 })}
                 editorRef={editor}
                 // OnInit={handleInit}
@@ -272,23 +285,28 @@ const Articles: NextPage = ({}) => {
                   <div className="flex flex-col gap-y-2">
                     <p>Share this article via</p>
                     <div className="flex gap-x-4">
-                      <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-500 bg-transparent transition-colors duration-150 hover:bg-blue-500"
-                      onClick={()=>{
-                      //   const shareURL = `${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`
-                      //   const shareObject = {
-                      //     title: articleAuthorFetch.data?.title,
-                      //     text: articleAuthorFetch.data?.description,
-                      //     url: shareURL,
-                      //   };
+                      <div
+                        className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-500 bg-transparent transition-colors duration-150 hover:bg-blue-500"
+                        onClick={() => {
+                          //   const shareURL = `${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`
+                          //   const shareObject = {
+                          //     title: articleAuthorFetch.data?.title,
+                          //     text: articleAuthorFetch.data?.description,
+                          //     url: shareURL,
+                          //   };
 
-                      //   if(navigator.canShare(shareObject))
-                      //   {
-                      //     navigator.share(shareObject);
-                      //   }else{
-                      //     alert("Your browser does not support sharing");
-                      //   }
-                        window.open(`https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`, '_blank');
-                      }}>
+                          //   if(navigator.canShare(shareObject))
+                          //   {
+                          //     navigator.share(shareObject);
+                          //   }else{
+                          //     alert("Your browser does not support sharing");
+                          //   }
+                          window.open(
+                            `https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`,
+                            "_blank"
+                          );
+                        }}
+                      >
                         <TwitterIcon className="mt-0.5 fill-blue-500 stroke-none transition-colors duration-150 group-hover:fill-white group-hover:stroke-none" />
                       </div>
                       {/* <div className="group flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-blue-900 bg-transparent transition-colors duration-150 hover:bg-blue-900">
