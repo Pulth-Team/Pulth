@@ -302,7 +302,7 @@ const Articles: NextPage = ({}) => {
                           //     alert("Your browser does not support sharing");
                           //   }
                           window.open(
-                            `https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${articleAuthorFetch.data?.slug}`,
+                            `https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${slug as string}`,
                             "_blank"
                           );
                         }}
