@@ -86,12 +86,13 @@ model Article {
     author   User   @relation("ArticleAuthor", fields: [authorId], references: [id])
     authorId String @db.ObjectId
 
-    title       String
-    description String
-    slug        String   @unique
-    bodyData    Json
-    isPublished Boolean  @default(false)
-    keywords    String[] @default([])
+    title         String
+    description   String
+    slug          String   @unique
+    bodyData      Json
+    draftBodyData Json?     
+    isPublished   Boolean  @default(false)
+    keywords      String[] @default([])
 
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
