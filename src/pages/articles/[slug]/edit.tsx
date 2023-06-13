@@ -54,8 +54,10 @@ const Articles: NextPage = ({}) => {
   });
 
   const publishArticleMutation = api.article.publish.useMutation();
+  const unpublishArticleMutation = api.article.unpublish.useMutation();
   const deleteArticleMutation = api.article.delete.useMutation();
   const updateArticleMutation = api.article.updateBody.useMutation();
+  const undoChangesArticleMutation = api.article.undoChanges.useMutation();
 
   const handleDeleteButton = () => {
     if (titleInput == articleAuthorFetch.data?.title) {
@@ -81,6 +83,14 @@ const Articles: NextPage = ({}) => {
         break;
       case "share":
         setShareModal(true);
+
+        break;
+      case "undo-changes":
+        undoChangesArticleMutation.mutate(slug as string, {
+          onSuccess: () => {
+            articleAuthorFetch.refetch();
+          },
+        });
         break;
       default:
         console.log("Menu Item onClick not defined");
@@ -163,6 +173,14 @@ const Articles: NextPage = ({}) => {
                       },
                     }
                   );
+                }}
+                onUnpublish={() => {
+                  unpublishArticleMutation.mutate(slug as string, {
+                    onSuccess: () => {
+                      // refetch the article data for updating the editor
+                      articleAuthorFetch.refetch();
+                    }
+                  });
                 }}
                 onMenuClick={OnMenuClick}
                 saveLoading={updateArticleMutation.isLoading}
@@ -302,7 +320,11 @@ const Articles: NextPage = ({}) => {
                           //     alert("Your browser does not support sharing");
                           //   }
                           window.open(
-                            `https://twitter.com/intent/tweet?text=${articleAuthorFetch.data?.title}&url=${window.location.origin}/articles/${slug as string}`,
+                            `https://twitter.com/intent/tweet?text=${
+                              articleAuthorFetch.data?.title
+                            }&url=${window.location.origin}/articles/${
+                              slug as string
+                            }`,
                             "_blank"
                           );
                         }}
