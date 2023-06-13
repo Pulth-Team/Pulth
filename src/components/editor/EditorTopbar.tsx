@@ -3,7 +3,7 @@ import {
   EllipsisVerticalIcon,
   ShareIcon,
   LockClosedIcon,
-  PencilSquareIcon,
+  ArrowUturnRightIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { Menu } from "@headlessui/react";
@@ -13,7 +13,8 @@ const EditorTopbar: NextPage<{
   title: string;
   onSave: () => void;
   onPublish: () => void;
-  onMenuClick: (type: "delete" | "privacy" | "share" | "configure") => void;
+  onUnpublish: () => void;
+  onMenuClick: (type: "delete" | "undo-changes" | "share") => void;
   saveLoading: boolean;
 
   // is this article published to the public
@@ -28,6 +29,7 @@ const EditorTopbar: NextPage<{
   title,
   onSave,
   onPublish,
+  onUnpublish,
   onMenuClick,
   saveLoading,
   isPublished,
@@ -35,36 +37,63 @@ const EditorTopbar: NextPage<{
   isChanged,
   publishLoading,
 }) => {
-  type SaveText = "Save Draft" | "Saved" | "Save & Publish" | "Published"| "Unknown";
-  type PublishText = "Publish" | "Publish Draft" | "Save & Publish" | "Published"| "Unknown";
+  type SaveText = "Save Draft" | "Saved" | "Saved / Published" | "Unknown";
+  type PublishText =
+    | "Publish"
+    | "Publish Draft"
+    | "Save & Publish"
+    | "Published"
+    | "Unpublish"
+    | "Unknown";
 
   let saveText: SaveText = "Unknown";
   let publishText: PublishText = "Unknown";
 
+  let isUnpublishAct = false;
 
   // if the article is published and has no changes (local or remote)
-  if( isPublished && !isDraft && !isChanged){
-    saveText = "Saved";
-    publishText = "Published";
+  if (isPublished && !isDraft && !isChanged) {
+    saveText = "Saved / Published";
+    publishText = "Unpublish";
+    isUnpublishAct = true;
   }
 
   // if the article is published and has local changes (not remote)
-  if( isPublished && !isDraft && isChanged){
+  if (isPublished && !isDraft && isChanged) {
     saveText = "Save Draft";
     publishText = "Save & Publish";
+    isUnpublishAct = false;
   }
 
   // if the article is published and has remote changes (not local)
-  if( isPublished && isDraft && !isChanged){
+  if (isPublished && isDraft && !isChanged) {
     saveText = "Saved";
     publishText = "Publish Draft";
+    isUnpublishAct = false;
   }
 
   // if the article is published and has local and remote changes
-  if( isPublished && isDraft && isChanged){
+  if (isPublished && isDraft && isChanged) {
     saveText = "Save Draft";
     publishText = "Save & Publish";
+    isUnpublishAct = false;
   }
+
+
+  // if the article is not published and has no changes (local or remote)
+  if (!isPublished  && !isChanged) {
+    saveText = "Saved";
+    publishText = "Publish Draft";
+    isUnpublishAct = false;
+  }
+
+  // if the article is not published and has local changes (not remote)
+  if (!isPublished  && isChanged) {
+    saveText = "Save Draft";
+    publishText = "Save & Publish";
+    isUnpublishAct = false;
+  }
+
 
 
 
@@ -83,7 +112,13 @@ const EditorTopbar: NextPage<{
       </button>
       <button
         className="flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white"
-        onClick={() => onPublish()}
+        onClick={() => {
+          if (isUnpublishAct) 
+          onUnpublish();
+          else
+
+          onPublish()
+        }}
       >
         {publishLoading && <Loading className="w-4 border-2" />}
         {publishText}
@@ -94,7 +129,7 @@ const EditorTopbar: NextPage<{
             <EllipsisVerticalIcon className="h-6 w-6" />
           </div>
         </Menu.Button>
-        <Menu.Items className="absolute z-10 flex w-36 -translate-x-28 translate-y-5 flex-col items-start justify-start rounded bg-white py-2 shadow-md">
+        <Menu.Items className="absolute z-10 flex w-48 -translate-x-40 translate-y-5 flex-col items-start justify-start rounded bg-white py-2 shadow-md">
           <Menu.Item
             className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
@@ -106,10 +141,10 @@ const EditorTopbar: NextPage<{
           <Menu.Item
             className="flex w-full items-center gap-x-3 self-start p-2 text-left hover:bg-gray-100"
             as="button"
-            onClick={() => onMenuClick("configure")}
+            onClick={() => onMenuClick("undo-changes")}
           >
-            <PencilSquareIcon className="h-5 w-5" />
-            <p>Configure</p>
+            <ArrowUturnRightIcon className="h-5 w-5" />
+            <p>Undo Changes</p>
           </Menu.Item>
           <hr className="" />
           <Menu.Item
