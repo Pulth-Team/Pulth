@@ -52,7 +52,7 @@ const Inspect: NextPage = () => {
               )}
             </h1>
           </div>
-          <div className="hidden gap-4 md:flex ">
+          <div className="hidden gap-4 md:flex md:gap-2">
             <Link
               //href={"/articles/" + slug + "/edit"}
               href={{
@@ -312,13 +312,13 @@ const Inspect: NextPage = () => {
                   pathname: "/articles/[slug]",
                   query: { slug: slug },
                 }}
-                className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
               >
                 View
               </Link>
             ) : (
               <button
-                className="mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                 disabled={!articleInfo.data?.isPublished}
               >
                 View
@@ -330,17 +330,17 @@ const Inspect: NextPage = () => {
                 pathname: "/articles/[slug]/edit",
                 query: { slug: slug },
               }}
-              className=" mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden"
+              className=" md:mb-2 md:mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden"
             >
               Edit
             </Link>
-            <button
+            {/* <button
               onClick={() => {
                 if (typeof articleInfo.data?.isPublished !== "undefined")
                   articlePublishMutation.mutate(
                     {
-                      setUnpublished: articleInfo.data?.isPublished,
                       slug: slug as string,
+
                     },
                     {
                       onSuccess: (data) => {
@@ -357,11 +357,11 @@ const Inspect: NextPage = () => {
                 ""
               )}
               {articleInfo.data?.isPublished ? "Unpublish" : "Publish"}
-            </button>
+            </button> */}
 
             {/* This Should open a model for confirmation */}
             <button
-              className="flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:hidden"
+              className="md:mb-2 md:mt-6 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:hidden"
               onClick={() => setDeleteDialogOpen(true)}
             >
               Delete
