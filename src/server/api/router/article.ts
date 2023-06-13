@@ -411,7 +411,9 @@ export const articleRouter = createTRPCRouter({
           message: "Article with given slug not found",
         });
 
-      // if there isnt any unsaved changes then swap draftBodyData to bodyData
+      // reset the bodyData to the draftBodyData,
+      // so that the user can continue editing the article without losing their progress
+      // and set isPublished to false
       const updatedArticle = await ctx.prisma?.article.update({
         where: {
           id: article.id,
@@ -422,19 +424,58 @@ export const articleRouter = createTRPCRouter({
         },
       });
 
+      // delete the article from algolia
+      // so that it doesn't show up in search results anymore
       await ctx.algolia.deleteObject(article.id);
 
-      const { bodyData, ...rest } = updatedArticle;
-
+      
       // now we can revalidate the article
       ctx.res?.revalidate(`/api/articles/${updatedArticle.slug}`);
-
+      
+      const { bodyData, ...rest } = updatedArticle;
       return {
         ...rest,
         bodyData: bodyData as unknown as OutputBlockData<string, any>[],
       };
     }),
 
+  undoChanges: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const article = await ctx.prisma?.article.findFirst({
+        where: {
+          slug: input,
+          authorId: ctx.session?.user.id,
+        },
+        select: {
+          id: true,
+          bodyData: true,
+        },
+      });
+
+      if (!article)
+        // if the article doesn't exist, return an error
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article with given slug not found",
+        });
+
+      // reset draftBodyData to bodyData
+      const updatedArticle = await ctx.prisma?.article.update({
+        where: {
+          id: article.id,
+        },
+        data: {
+          draftBodyData: article.bodyData || [],
+        },
+      });
+
+      const { bodyData, ...rest } = updatedArticle;
+      return {
+        ...rest,
+        bodyData: bodyData as unknown as OutputBlockData<string, any>[],
+      };
+    }),
   updateBody: protectedProcedure
     .input(
       z.object({
