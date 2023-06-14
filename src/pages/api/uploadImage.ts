@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions as nextAuthOptions } from "~/server/auth";
-import { S3 } from "aws-sdk";
-import { env } from "~/env.mjs";
 import formidable from "formidable";
+
+import { authOptions as nextAuthOptions } from "~/server/auth";
+import { env } from "~/env.mjs";
+
 import fs from "fs";
+// import { S3 } from "aws-sdk";
+import { S3 } from "@aws-sdk/client-s3";
 
 const s3 = new S3({
   region: env.AWS_REGION,

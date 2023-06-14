@@ -10,7 +10,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
-import { S3 } from "aws-sdk";
+import { S3 } from "@aws-sdk/client-s3";
 import { env } from "~/env.mjs";
 import { exclude } from "~/utils/api";
 import { Article } from "@prisma/client";
@@ -545,7 +545,6 @@ export const articleRouter = createTRPCRouter({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
         })
       );
 
@@ -734,7 +733,6 @@ export const articleRouter = createTRPCRouter({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
         })
       );
 

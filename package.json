@@ -10,7 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.348.0",
+    "@aws-sdk/client-s3": "^3.352.0",
     "@editorjs/editorjs": "^2.26.4",
     "@editorjs/header": "^2.7.0",
     "@editorjs/image": "^2.8.1",
@@ -27,7 +27,6 @@
     "@trpc/server": "^10.18.0",
     "@types/formidable": "^2.0.5",
     "algoliasearch": "^4.17.0",
-    "aws-sdk": "^2.1354.0",
     "bson": "^5.0.1",
     "dayjs": "^1.11.7",
     "eslint-config-next": "^13.3.0",
