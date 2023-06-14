@@ -34,7 +34,8 @@ const MyApp: AppType<{ session: Session }> = ({
   // });
 
   return (
-    <div className="bg-white">
+    // Not sure of the purpose of the div below
+    <div className="bg-white h-screen">
       <Head>
         {/* used for safari tab color */}
         <meta name="theme-color" content="#1F2937"></meta>
