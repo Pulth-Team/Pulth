@@ -4,7 +4,7 @@ import Image from "next/legacy/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
-import { Hits, InstantSearch } from "react-instantsearch-dom";
+import { Hits, InstantSearch } from "react-instantsearch";
 
 import CustomSearchBox from "./CustomSearchBox";
 import { env } from "~/env.mjs";
@@ -97,10 +97,10 @@ function Hit({ hit }: HitProps) {
         // onClick={() => setSearchModal(false)}
       >
         <div className="flex flex-col gap-y-1">
-          <p className="text-lg font-bold text-white line-clamp-1 md:text-xl">
+          <p className="line-clamp-1 text-lg font-bold text-white md:text-xl">
             {hit.title}
           </p>
-          <p className="text-base font-semibold italic text-gray-400 line-clamp-2 md:line-clamp-1">
+          <p className="line-clamp-2 text-base font-semibold italic text-gray-400 md:line-clamp-1">
             {hit.description}
           </p>
           <div className="mt-2 flex items-center gap-x-2">
