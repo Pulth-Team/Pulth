@@ -35,10 +35,12 @@ const MyApp: AppType<{ session: Session }> = ({
 
   return (
     // Not sure of the purpose of the div below
-    <div className="bg-white h-screen">
+    <div className="h-screen bg-white">
       <Head>
         {/* used for safari tab color */}
-        <meta name="theme-color" content="#1F2937"></meta>
+        <meta name="theme-color" content="#1F2937" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       {showAnalytics ? (
         <>
@@ -48,12 +50,12 @@ const MyApp: AppType<{ session: Session }> = ({
           />
           <Script id="google-analytics" strategy="afterInteractive">
             {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){window.dataLayer.push(arguments);}
-          gtag('js', new Date());
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){window.dataLayer.push(arguments);}
+              gtag('js', new Date());
 
-          gtag('config', '${GOOGLE_ANALYTICS_ID}');
-        `}
+              gtag('config', '${GOOGLE_ANALYTICS_ID}');
+            `}
           </Script>
         </>
       ) : (
