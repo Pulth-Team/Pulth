@@ -34,7 +34,6 @@ import { appRouter } from "~/server/api/root";
 import superjson from "superjson";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
-import { env } from "~/env.mjs";
 
 const Articles: NextPage = () => {
   const router = useRouter();
@@ -298,6 +297,7 @@ const Articles: NextPage = () => {
       )}
     </>
   );
+
   return (
     <DashboardLayout>
       <Head>

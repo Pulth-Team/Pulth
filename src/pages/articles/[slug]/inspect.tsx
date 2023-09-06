@@ -1,4 +1,9 @@
-import type { NextPage } from "next";
+import type {
+  GetServerSideProps,
+  NextApiRequest,
+  NextApiResponse,
+  NextPage,
+} from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Loading from "~/components/Loading";
@@ -9,8 +14,16 @@ import { Tab, Dialog } from "@headlessui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+
+import superjson from "superjson";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { GetStaticPropsContext } from "next";
+import { createInnerTRPCContext, createTRPCContext } from "~/server/api/trpc";
+import { appRouter } from "~/server/api/root";
+import { DehydratedState } from "@tanstack/react-query";
+import { getServerSession } from "next-auth";
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -34,9 +47,13 @@ const Inspect: NextPage = () => {
   const [deleteModalInput, setDeleteModalInput] = useState("");
 
   useEffect(() => {
-    setTitle(articleInfo.data?.title);
-    setDescription(articleInfo.data?.description);
-  }, [articleInfo.data]);
+    if (articleInfo.isError && articleInfo.error.data?.httpStatus === 404) {
+      router.replace("/articles");
+    } else {
+      setTitle(articleInfo.data?.title);
+      setDescription(articleInfo.data?.description);
+    }
+  }, [articleInfo.data, articleInfo.isError, router, articleInfo.error]);
 
   return (
     <Dashboard>
@@ -330,7 +347,7 @@ const Inspect: NextPage = () => {
                 pathname: "/articles/[slug]/edit",
                 query: { slug: slug },
               }}
-              className=" md:mb-2 md:mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:hidden"
+              className=" flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white md:mb-2 md:mt-6 md:hidden"
             >
               Edit
             </Link>
@@ -361,7 +378,7 @@ const Inspect: NextPage = () => {
 
             {/* This Should open a model for confirmation */}
             <button
-              className="md:mb-2 md:mt-6 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:hidden"
+              className="flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:mb-2 md:mt-6 md:hidden"
               onClick={() => setDeleteDialogOpen(true)}
             >
               Delete
@@ -444,6 +461,30 @@ const Inspect: NextPage = () => {
       </div>
     </Dashboard>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<{
+  trpcState: DehydratedState;
+}> = async ({ req, query, res }) => {
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: await createTRPCContext({
+      req: req as NextApiRequest,
+      res: res as NextApiResponse,
+    }),
+    transformer: superjson, // optional - adds superjson serialization
+  });
+
+  const slug = query.slug as string;
+
+  // prefetch `article.getBySlug`
+  await helpers.article.inspect.prefetch((slug as string) || "");
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+  };
 };
 
 export default Inspect;
