@@ -34,7 +34,6 @@ const Inspect: NextPage = () => {
   const articleInfo = api.article.inspect.useQuery((slug as string) || "", {
     retry: false,
   });
-  const infoIsLoading = articleInfo.isLoading;
 
   const articleUpdateInfoMutation = api.article.updateInfo.useMutation();
   const articlePublishMutation = api.article.publish.useMutation();
@@ -77,11 +76,7 @@ const Inspect: NextPage = () => {
             <div className="flex-grow">
               <p className="text-xs text-black/70">Inspect Article</p>
               <h1 className="mt-1 text-2xl font-bold">
-                {infoIsLoading ? (
-                  <Loading className="h-7 w-7 border-2" />
-                ) : (
-                  articleInfo.data?.title
-                )}
+                {articleInfo.data?.title}
               </h1>
             </div>
             <div className="hidden gap-4 md:flex md:gap-2">
@@ -112,18 +107,11 @@ const Inspect: NextPage = () => {
               <div className="mt-4">
                 <span className="text-black/70">Description:</span>
 
-                {infoIsLoading ? (
-                  <Loading className="h-7 w-7 border-2" />
-                ) : (
-                  <p>{articleInfo.data?.description}</p>
-                )}
+                <p>{articleInfo.data?.description}</p>
 
                 <span className="text-black/70">Tags:</span>
-                {infoIsLoading ? (
-                  <Loading className="h-7 w-7 border-2" />
-                ) : (
-                  <p>{articleInfo.data?.keywords.join(", ")}</p>
-                )}
+
+                <p>{articleInfo.data?.keywords.join(", ")}</p>
               </div>
 
               <div className="mt-4">
@@ -171,32 +159,25 @@ const Inspect: NextPage = () => {
                       <div className="mt-4 flex flex-col">
                         <span className="text-black/70">Title:</span>
 
-                        {infoIsLoading ? (
-                          <Loading className="h-7 w-7 border-2" />
-                        ) : (
-                          <input
-                            className="border-2 p-3 outline-indigo-500"
-                            value={title || ""}
-                            onChange={(e) => {
-                              setTitle(e.target.value);
-                            }}
-                          />
-                        )}
+                        <input
+                          className="border-2 p-3 outline-indigo-500"
+                          value={title || ""}
+                          onChange={(e) => {
+                            setTitle(e.target.value);
+                          }}
+                        />
                       </div>
                       <div className="mt-4 flex flex-col">
                         <span className="text-black/70">Description:</span>
 
-                        {infoIsLoading ? (
-                          <Loading className="h-7 w-7 border-2" />
-                        ) : (
-                          <textarea
-                            className="h-auto border-2 p-3 outline-indigo-500"
-                            value={description || ""}
-                            onChange={(e) => {
-                              setDescription(e.target.value);
-                            }}
-                          />
-                        )}
+                        <textarea
+                          className="h-auto border-2 p-3 outline-indigo-500"
+                          value={description || ""}
+                          onChange={(e) => {
+                            setDescription(e.target.value);
+                          }}
+                        />
+
                         <div
                           className={twMerge(
                             "ml-1 text-xs italic text-gray-500",
@@ -309,15 +290,12 @@ const Inspect: NextPage = () => {
 
             <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 self-start p-2 shadow-md md:order-last md:w-auto md:min-w-fit md:flex-shrink md:flex-grow-0">
               <span className="text-black/70">status:</span>
-              {infoIsLoading ? (
-                <Loading className="h-7 w-7 border-2" />
-              ) : (
-                <p>
-                  {articleInfo.data?.isPublished
-                    ? "published"
-                    : "unpublished/draft"}
-                </p>
-              )}
+
+              <p>
+                {articleInfo.data?.isPublished
+                  ? "published"
+                  : "unpublished/draft"}
+              </p>
 
               {/* <span className="text-black/70">visibility:</span>
               Private, Public, Unlisted
@@ -325,18 +303,12 @@ const Inspect: NextPage = () => {
               for subscribers only, for everyone, for subscribers and people with link */}
 
               <span className="text-black/70">published at:</span>
-              {infoIsLoading ? (
-                <Loading className="h-7 w-7 border-2" />
-              ) : (
-                <p>{dayjs(articleInfo.data?.updatedAt).fromNow()}</p>
-              )}
+
+              <p>{dayjs(articleInfo.data?.updatedAt).fromNow()}</p>
 
               <span className="text-black/70">created at:</span>
-              {infoIsLoading ? (
-                <Loading className="h-7 w-7 border-2" />
-              ) : (
-                <p>{dayjs(articleInfo.data?.createdAt).fromNow()}</p>
-              )}
+
+              <p>{dayjs(articleInfo.data?.createdAt).fromNow()}</p>
 
               {articleInfo.data?.isPublished ? (
                 <Link
