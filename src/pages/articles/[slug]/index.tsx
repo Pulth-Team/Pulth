@@ -4,9 +4,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Image from "next/legacy/image";
 import Link from "next/link";
+import { getBaseUrl } from "~/utils/api";
 
 import { signIn, useSession } from "next-auth/react";
-import { useMemo, useState,useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   SparklesIcon,
   ChevronUpIcon,
@@ -58,21 +59,18 @@ const Articles: NextPage = () => {
   });
 
   // query to get my vote automatically
-  api.vote.checkMyVoteByArticleId.useQuery(
-    articleData.data?.id as string,
-    {
-      enabled: authStatus === "authenticated" && articleData.data?.id !== null,
-      onSuccess: (data) => {
-        // check if there is a msg prop
-        if ("msg" in data) {
-          setMyVote("none");
-        } else {
-          // otherwise set the vote to the data vote
-          setMyVote(data.upVote ? "up" : "down");
-        }
-      },
-    }
-  );
+  api.vote.checkMyVoteByArticleId.useQuery(articleData.data?.id as string, {
+    enabled: authStatus === "authenticated" && articleData.data?.id !== null,
+    onSuccess: (data) => {
+      // check if there is a msg prop
+      if ("msg" in data) {
+        setMyVote("none");
+      } else {
+        // otherwise set the vote to the data vote
+        setMyVote(data.upVote ? "up" : "down");
+      }
+    },
+  });
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // todo open a modal  for the comment
@@ -106,11 +104,6 @@ const Articles: NextPage = () => {
 
   let body = (
     <>
-      {/* this might be a bad idea but lets keep that here for now */}
-      <h1 className="m-0 mb-2 p-0 text-3xl font-bold">
-        {!articleData.data?.title && "Article Not Found"}
-      </h1>
-
       {!articleData.data?.id && (
         <div>
           <p className="mb-4">
@@ -224,7 +217,7 @@ const Articles: NextPage = () => {
                 className=" rounded-full"
               />
             </div>
-            <p className="sm:text-base md:text-lg font-semibold ">
+            <p className="font-semibold sm:text-base md:text-lg ">
               {articleData.data?.author.name || "unknown"}
             </p>
           </div>
@@ -304,6 +297,7 @@ const Articles: NextPage = () => {
       )}
     </>
   );
+
   return (
     <DashboardLayout>
       <Head>
@@ -313,7 +307,12 @@ const Articles: NextPage = () => {
         <meta name="description" content={articleData.data?.description} />
         <meta name="author" content={articleData.data?.author?.name!} />
         <meta name="generator" content="Pulth Engine" />
-        <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="canonical"
+          href={`https://${
+            getBaseUrl() == "" ? window.location.hostname : getBaseUrl()
+          }/articles/${slug}`}
+        />
         {/* TODO: Add keywords */}
       </Head>
       {/* read article container for our article renderer with media queries */}
@@ -332,7 +331,7 @@ export async function getStaticProps(
 ) {
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: createInnerTRPCContext({ session: null,req: null, res: null }),
+    ctx: createInnerTRPCContext({ session: null, req: null, res: null }),
     transformer: superjson, // optional - adds superjson serialization
   });
 

@@ -14,7 +14,7 @@ const Explore: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
 
-  const { data: articles } = api.article.getLatest.useQuery({
+  const { data: articles, isLoading } = api.article.getLatest.useQuery({
     limit: 10,
     skip: 0,
   });
@@ -40,24 +40,54 @@ const Explore: NextPage = () => {
             {user ? "Selected for you..." : "Recent articles"}
           </p>
           <DragScrollContainer id="recom-scroll">
-            {articles?.map((article) => (
-              <ArticleCard
-                Title={article.title}
-                // Topics={article.topics}
-                Author={{
-                  // Title: article.author.title,
-                  Name: article.author.name!,
-                  Image: article.author.image!,
-                  UserId: article.author.id,
-                }}
-                createdAt={article.createdAt}
-                isRecommended={false}
-                key={article.slug}
-                slug={article.slug}
-              >
-                {article.description}
-              </ArticleCard>
-            ))}
+            {isLoading
+              ? [0, 1, 2, 3].map((val, index) => (
+                  <div
+                    className={`flex min-w-[256px] max-w-xs flex-shrink-0 animate-pulse flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
+                    key={index}
+                  >
+                    <p className="mb-1 line-clamp-1 h-6 w-full cursor-pointer rounded-lg bg-gray-300 text-xl font-semibold"></p>
+                    <div className="mt-2 flex flex-col gap-y-1">
+                      <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                      <div className="flex gap-2">
+                        <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                        <div className="h-4 w-24 rounded-full bg-gray-200"></div>
+                      </div>
+                      <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                      <div className="flex gap-2">
+                        <div className="h-4 w-24  rounded-full bg-gray-200"></div>
+                        <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                      </div>
+                      <div className="h-4 w-3/5 rounded-full bg-gray-200"></div>
+                    </div>
+
+                    <div className="mt-4 flex flex-row items-center justify-center gap-2">
+                      <div className="h-9 w-9 flex-shrink-0 rounded-full bg-gray-300"></div>
+                      <div className="flex w-full flex-col gap-y-2">
+                        <div className="h-3 w-3/4 rounded-full bg-gray-300"></div>
+                        <div className="h-3 w-2/5 rounded-full bg-gray-300"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              : articles?.map((article) => (
+                  <ArticleCard
+                    Title={article.title}
+                    // Topics={article.topics}
+                    Author={{
+                      // Title: article.author.title,
+                      Name: article.author.name!,
+                      Image: article.author.image!,
+                      UserId: article.author.id,
+                    }}
+                    createdAt={article.createdAt}
+                    isRecommended={false}
+                    key={article.slug}
+                    slug={article.slug}
+                  >
+                    {article.description}
+                  </ArticleCard>
+                ))}
 
             {/* <ArticleCard
               Title="Next.js Auth Errors"
