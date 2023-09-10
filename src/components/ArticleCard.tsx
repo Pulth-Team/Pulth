@@ -40,19 +40,20 @@ const ArticleCard: NextPage<
     <div
       className={`${
         className || ""
-      } flex min-w-[256px] max-w-xs flex-shrink-0 flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
+      } flex min-w-[256px]  max-w-xs flex-shrink-0 flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
     >
-      <div className="flex justify-between whitespace-nowrap  ">
-        <div className="flex gap-1">
-          {isRecommended && (
+      {isRecommended && (
+        <div className="flex justify-between whitespace-nowrap  ">
+          <div className="flex gap-1">
             <div className="bg-gradient-to-r from-[#7b4397] to-[#dc2430] bg-clip-text text-sm font-light capitalize text-transparent">
               #recommended
             </div>
-          )}
-          {/* add */}
-          {/* <div className="capitalize  font-light text-sm">#Javascript</div> */}
+
+            {/* add */}
+            {/* <div className="capitalize  font-light text-sm">#Javascript</div> */}
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex items-baseline justify-between">
         <Link
           // href={`/articles/${slug}`}
@@ -60,7 +61,7 @@ const ArticleCard: NextPage<
             pathname: `/articles/[slug]`,
             query: { slug: slug },
           }}
-          className="mb-1 cursor-pointer text-xl font-semibold line-clamp-1 "
+          className="line-clamp-1 cursor-pointer text-xl font-semibold "
         >
           {Title}
         </Link>
@@ -68,27 +69,10 @@ const ArticleCard: NextPage<
           {dayjs(createdAt).fromNow()}
         </div> */}
       </div>
-      <p className=" mb-4 line-clamp-4">{children}</p>
+      <p className="mb-2 line-clamp-4">{children}</p>
 
-      <div className="mt-auto flex gap-2">
-        <Link
-          // href={`/user/${Author?.UserId}`}
-          href={{
-            pathname: `/user/[userId]`,
-            query: { userId: Author?.UserId },
-          }}
-        >
-          <div className="relative h-9 w-9 cursor-pointer">
-            <Image
-              src={Author?.Image || "/default-profile.png"}
-              alt="profile"
-              height={64}
-              width={64}
-              className="aspect-square rounded-full"
-            ></Image>
-          </div>
-        </Link>
-        <div>
+      <div className="mt-auto flex justify-between">
+        <div className="flex gap-2">
           <Link
             // href={`/user/${Author?.UserId}`}
             href={{
@@ -96,14 +80,32 @@ const ArticleCard: NextPage<
               query: { userId: Author?.UserId },
             }}
           >
-            <p className="cursor-pointer text-sm">{Author?.Name}</p>
+            <div className="relative h-9 w-9 cursor-pointer">
+              <Image
+                src={Author?.Image || "/default-profile.png"}
+                alt="profile"
+                height={64}
+                width={64}
+                className="aspect-square rounded-full"
+              ></Image>
+            </div>
           </Link>
-          <p className="text-xs text-black/70">
-            {/* {Author?.Title} */}
-            {dayjs(createdAt).fromNow()}
-          </p>
+          <div>
+            <Link
+              // href={`/user/${Author?.UserId}`}
+              href={{
+                pathname: `/user/[userId]`,
+                query: { userId: Author?.UserId },
+              }}
+            >
+              <p className="cursor-pointer text-sm">{Author?.Name}</p>
+            </Link>
+            <p className="text-xs text-black/70">
+              {/* {Author?.Title} */}
+              {dayjs(createdAt).fromNow()}
+            </p>
+          </div>
         </div>
-
         {/* TODO Add more actions menu including "Dont Recommend me", "I Loved This","Cancel" */}
         <Link
           // href={`/articles/${slug}`}
@@ -111,7 +113,7 @@ const ArticleCard: NextPage<
             pathname: `/articles/[slug]`,
             query: { slug: slug },
           }}
-          className="ml-auto flex cursor-pointer items-center gap-x-2 rounded-md bg-indigo-500 p-1"
+          className="flex items-center rounded-lg bg-indigo-500 p-2"
         >
           <p className="text-white">Go to Article</p>
           <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
