@@ -18,6 +18,7 @@ const MobileAccountBox = ({ image }: { image: string }) => {
           src={image || "/default_profile.jpg"}
           alt="profile"
           fill
+          sizes="40px"
           className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
