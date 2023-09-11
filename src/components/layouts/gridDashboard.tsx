@@ -98,16 +98,14 @@ const GridDashboard: NextPage<{
             </Link>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {userStatus !== "authenticated" ? (
+            {userStatus !== "authenticated" && (
               <Link href="/api/auth/signin">
-                <button className="m-2 flex rounded-md bg-gray-700 p-2">
+                <button className="m-2 flex rounded-md bg-gray-700 p-2 md:hidden">
                   <p className="flex items-center justify-center text-center font-semibold text-gray-200 ">
                     Login
                   </p>
                 </button>
               </Link>
-            ) : (
-              ""
             )}
             <button
               className={`ml-auto flex flex-row items-center gap-2 rounded-lg bg-gray-600 p-2 text-white hover:bg-gray-500 active:bg-gray-700 `}
@@ -119,16 +117,11 @@ const GridDashboard: NextPage<{
               <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
               <p className="sr-only">Search</p>
             </button>
-
-            <div>
-              {userData?.user?.image ? (
-                <MobileAccountBox
-                  image={userData?.user?.image ?? "/default_profile.jpg"}
-                />
-              ) : (
-                ""
-              )}
-            </div>
+            {userStatus == "authenticated" && (
+              <MobileAccountBox
+                image={userData?.user?.image ?? "/default_profile.jpg"}
+              />
+            )}
           </div>
         </header>
         <main
