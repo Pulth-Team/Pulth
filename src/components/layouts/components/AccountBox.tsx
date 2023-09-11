@@ -8,7 +8,6 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
-
 import { twMerge } from "tailwind-merge";
 import { signOut } from "next-auth/react";
 
@@ -38,8 +37,9 @@ const AccountBox = ({
         <Menu.Button className="relative h-12 w-12 overflow-hidden rounded-full">
           <Image
             src={image || "/default_profile.jpg"}
-            layout="fill"
             className="rounded-full"
+            fill
+            sizes="48px"
             alt="Profile Picture"
           />
         </Menu.Button>
