@@ -26,10 +26,10 @@ import { env } from "~/env.mjs";
 
 import MobileAccountBox from "./components/MobileAccountBox";
 import AccountBox from "./components/AccountBox";
+import Search from "./components/Search";
 
 // i guess i lost my sanity
 import Div100vh from "react-div-100vh";
-import SearchModal from "../SearchModal";
 
 const GridDashboard: NextPage<{
   children: ReactNode;
@@ -107,16 +107,7 @@ const GridDashboard: NextPage<{
                 </button>
               </Link>
             )}
-            <button
-              className={`ml-auto flex flex-row items-center gap-2 rounded-lg bg-gray-600 p-2 text-white hover:bg-gray-500 active:bg-gray-700 `}
-              id="search-button"
-              onClick={() => {
-                setSearchModal(true);
-              }}
-            >
-              <MagnifyingGlassIcon className={`h-6 w-6`}></MagnifyingGlassIcon>
-              <p className="sr-only">Search</p>
-            </button>
+            <Search />
             {userStatus == "authenticated" && (
               <MobileAccountBox
                 image={userData?.user?.image ?? "/default_profile.jpg"}
@@ -132,8 +123,6 @@ const GridDashboard: NextPage<{
         >
           {children}
         </main>
-
-        <SearchModal isOpen={searchModal} setOpen={setSearchModal} />
       </Div100vh>
     </>
   );
