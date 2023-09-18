@@ -1,11 +1,11 @@
+// TODO: Add Animation to
+// [ ] Image
+// [ ] Text
+
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import FacebookIcon from "~/components/icons/FacebookIcon";
-import TwitterIcon from "~/components/icons/TwitterIcon";
 
 import {
   QuestionMarkCircleIcon,
