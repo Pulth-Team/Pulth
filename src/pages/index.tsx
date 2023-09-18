@@ -185,29 +185,61 @@ const Home: NextPage = () => {
               <Tab.Panel className="text-">
                 {/* FIXME: Change inner html with something informative */}
                 <p>
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                  Ipsum eius aliquam odio sunt eaque harum velit! Aspernatur non
-                  velit ad perferendis, veniam sit? Rerum unde, itaque quis ex
-                  fugiat velit.
+                  Quizzes are a great way to test your knowledge and learn in a
+                  fun way. You can find quizzes about any topic you want to
+                  learn. You can also create your own quizzes and share them
+                  with the community.
                 </p>
-                <ol className="list-disc pl-4">
-                  <li>Sit amet</li>
-                  <li>Consectetur adipisicing</li>
-                  <li>elit ipsum aliquam odio </li>
-                  <li>harum velit aspernatir</li>
-                  <li>fugiat perferenads</li>
-                </ol>
+                <ul className="list-disc pl-4 pt-2">
+                  <li>Easy to take</li>
+                  <li>You can learn your percentage</li>
+                  <li>Learn from your mistakes</li>
+                  <li>Go back to related video or topic</li>
+                  <li>Find out Why&apos;s and How&apos;s</li>
+                </ul>
               </Tab.Panel>
               <Tab.Panel className="">
-                <p>Two</p>
+                <p>
+                  Articles are the fastest way to learn something new. You can
+                  find articles that are most relevant to your interest. You can
+                  also ask questions to the authors and get answers from them.
+                </p>
+                <ul className="list-disc pl-4 pt-2">
+                  <li>Fastest way to learn</li>
+                  <li>Be in touch with the authors</li>
+                  <li>Always stay up to date with newest updates</li>
+                </ul>
               </Tab.Panel>
               <Tab.Panel className="">
-                <p>Three</p>
+                <p>
+                  Courses are the dedicated way to learn something new. You can
+                  find courses with a cirriculum. Cirriculums are being managed
+                  by the community and Pulth itself.
+                </p>
+                <ul className="list-disc pl-4 pt-2">
+                  <li>Learn with a cirriculum</li>
+                  <li>Choose between the best instructors</li>
+                  <li>Practice with projects</li>
+                  <li>Get support from instructor and community</li>
+                  <li>Get a certificate after you finish the course</li>
+                  <li>Continue from corresponding cirriculum</li>
+                </ul>
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
 
-          <Link href="/" className="mt-4">
+          <Link
+            href={
+              selectedIndex === 0
+                ? "/quizzes"
+                : selectedIndex === 1
+                ? "/explore" // should be "/articles" but for some reason it is "/explore"
+                : selectedIndex === 2
+                ? "/courses"
+                : "/error"
+            }
+            className="mt-4"
+          >
             <button className=" mt-4 rounded-lg bg-indigo-500 px-3 py-2 text-white">
               Go to{" "}
               {selectedIndex === 0
