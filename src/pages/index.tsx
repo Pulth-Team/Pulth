@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { useState } from "react";
-import { Tab } from "@headlessui/react";
+import { Tab, Transition } from "@headlessui/react";
 
 // Icons for the Information Cards
 import {
@@ -24,6 +24,7 @@ import Search from "~/components/layouts/components/Search";
 const Home: NextPage = () => {
   // for selected tab in the tab group
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   return (
     <div className="bg-pink-500">
@@ -145,7 +146,7 @@ const Home: NextPage = () => {
 
       {/* TODO: Add Tabs here about [Quizzes, Articles, Courses] */}
       <div className="mt-10 flex flex-row justify-center gap-x-8 bg-gray-800 pb-64 pt-16">
-        <div className="max-w-xl flex-grow px-16">
+        <div className="max-w-xl flex-grow px-16 md:mx-auto">
           <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
             <Tab.List className="mb-4 flex justify-around border-b-2 border-gray-500 pb-2 text-2xl">
               <Tab
@@ -183,48 +184,76 @@ const Home: NextPage = () => {
               </Tab>
             </Tab.List>
             <Tab.Panels className="mt-2 text-white">
-              <Tab.Panel className="text-">
-                {/* FIXME: Change inner html with something informative */}
-                <p>
-                  Quizzes are a great way to test your knowledge and learn in a
-                  fun way. You can find quizzes about any topic you want to
-                  learn. You can also create your own quizzes and share them
-                  with the community.
-                </p>
-                <ul className="list-disc pl-4 pt-2">
-                  <li>Easy to take</li>
-                  <li>You can learn your percentage</li>
-                  <li>Learn from your mistakes</li>
-                  <li>Go back to related video or topic</li>
-                  <li>Find out Why&apos;s and How&apos;s</li>
-                </ul>
+              <Tab.Panel className="" static>
+                <Transition
+                  show={selectedIndex === 0}
+                  unmount={false}
+                  enter="transition duration-700"
+                  enterFrom="opacity-0 "
+                  enterTo="opacity-100 "
+                  leave="hidden"
+                >
+                  {/* FIXME: Change inner html with something informative */}
+                  <p>
+                    Quizzes are a great way to test your knowledge and learn in
+                    a fun way. You can find quizzes about any topic you want to
+                    learn. You can also create your own quizzes and share them
+                    with the community.
+                  </p>
+                  <ul className="list-disc pl-4 pt-2">
+                    <li>Easy to take</li>
+                    <li>You can learn your percentage</li>
+                    <li>Learn from your mistakes</li>
+                    <li>Go back to related video or topic</li>
+                    <li>Find out Why&apos;s and How&apos;s</li>
+                  </ul>
+                </Transition>
               </Tab.Panel>
-              <Tab.Panel className="">
-                <p>
-                  Articles are the fastest way to learn something new. You can
-                  find articles that are most relevant to your interest. You can
-                  also ask questions to the authors and get answers from them.
-                </p>
-                <ul className="list-disc pl-4 pt-2">
-                  <li>Fastest way to learn</li>
-                  <li>Be in touch with the authors</li>
-                  <li>Always stay up to date with newest updates</li>
-                </ul>
+              <Tab.Panel className="" static>
+                <Transition
+                  show={selectedIndex === 1}
+                  unmount={false}
+                  enter="transition duration-700"
+                  enterFrom="opacity-0 "
+                  enterTo="opacity-100 "
+                  leave="hidden"
+                >
+                  <p>
+                    Articles are the fastest way to learn something new. You can
+                    find articles that are most relevant to your interest. You
+                    can also ask questions to the authors and get answers from
+                    them.
+                  </p>
+                  <ul className="list-disc pl-4 pt-2">
+                    <li>Fastest way to learn</li>
+                    <li>Be in touch with the authors</li>
+                    <li>Always stay up to date with newest updates</li>
+                  </ul>
+                </Transition>
               </Tab.Panel>
-              <Tab.Panel className="">
-                <p>
-                  Courses are the dedicated way to learn something new. You can
-                  find courses with a cirriculum. Cirriculums are being managed
-                  by the community and Pulth itself.
-                </p>
-                <ul className="list-disc pl-4 pt-2">
-                  <li>Learn with a cirriculum</li>
-                  <li>Choose between the best instructors</li>
-                  <li>Practice with projects</li>
-                  <li>Get support from instructor and community</li>
-                  <li>Get a certificate after you finish the course</li>
-                  <li>Continue from corresponding cirriculum</li>
-                </ul>
+              <Tab.Panel className="" static>
+                <Transition
+                  show={selectedIndex === 2}
+                  unmount={false}
+                  enter="transition duration-700 order-first"
+                  enterFrom="opacity-0 "
+                  enterTo="opacity-100 "
+                  leave="hidden"
+                >
+                  <p>
+                    Courses are the dedicated way to learn something new. You
+                    can find courses with a cirriculum. Cirriculums are being
+                    managed by the community and Pulth itself.
+                  </p>
+                  <ul className="list-disc pl-4 pt-2">
+                    <li>Learn with a cirriculum</li>
+                    <li>Choose between the best instructors</li>
+                    <li>Practice with projects</li>
+                    <li>Get support from instructor and community</li>
+                    <li>Get a certificate after you finish the course</li>
+                    <li>Continue from corresponding cirriculum</li>
+                  </ul>
+                </Transition>
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
@@ -255,7 +284,47 @@ const Home: NextPage = () => {
         </div>
 
         {/* FIXME: instead of an image there is a solid box with bg-color for now. (testing purposes only) */}
-        <div className="h-96 w-1/2 bg-gradient-to-r from-gray-700 to-indigo-600"></div>
+
+        <div className="ml-auto h-96 w-full max-w-2xl">
+          <Transition
+            show={selectedIndex === 0}
+            unmount={false}
+            enter="transition duration-700"
+            enterFrom="opacity-0 "
+            enterTo="opacity-100 "
+            leave="hidden"
+          >
+            <div className="h-96 w-full rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
+          </Transition>
+          <Transition
+            show={selectedIndex === 1}
+            unmount={false}
+            enter="transition duration-700"
+            enterFrom="opacity-0 "
+            enterTo="opacity-100 "
+            leave="hidden"
+          >
+            <div className="h-96 w-full rounded-lg bg-gradient-to-r from-stone-700 to-red-600 shadow-lg shadow-gray-700"></div>
+          </Transition>
+          <Transition
+            show={selectedIndex === 2}
+            unmount={false}
+            enter="transition duration-700"
+            enterFrom="opacity-0 "
+            enterTo="opacity-100 "
+            leave="hidden"
+          >
+            <div className="h-96 w-full rounded-lg bg-gradient-to-r from-gray-700 to-green-600 shadow-lg shadow-gray-700"></div>
+          </Transition>
+        </div>
+        {/* 
+        {selectedIndex === 0 ? (
+          <div className="h-96 w-1/2 rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
+        ) : selectedIndex === 1 ? (
+          <div className="h-96 w-1/2 rounded-lg bg-gradient-to-r from-stone-700 to-red-600 shadow-lg shadow-gray-700"></div>
+        ) : (
+          <div className="h-96 w-1/2 rounded-lg bg-gradient-to-r from-gray-700 to-green-600 shadow-lg shadow-gray-700"></div>
+        )} */}
       </div>
 
       {/* TODO: Add Footer  */}
