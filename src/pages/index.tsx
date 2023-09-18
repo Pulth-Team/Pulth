@@ -1,6 +1,7 @@
 // TODO: Add Animation to
 // [ ] Image
 // [ ] Text
+// [ ] Tabs
 
 import type { NextPage } from "next";
 import Head from "next/head";
