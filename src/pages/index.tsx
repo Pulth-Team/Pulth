@@ -7,14 +7,23 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
+import { useState } from "react";
+import { Tab } from "@headlessui/react";
+
+// Icons for the Information Cards
 import {
   QuestionMarkCircleIcon,
   DocumentTextIcon,
   ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
+
+// Used in navbar for search Button
 import Search from "~/components/layouts/components/Search";
 
 const Home: NextPage = () => {
+  // for selected tab in the tab group
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   return (
     <div className="bg-pink-500">
       <Head>
@@ -116,8 +125,8 @@ const Home: NextPage = () => {
           </p>
         </div>
       </div>
-      <div className="relative">
-        <div className="wave absolute left-0 top-0 w-full  overflow-hidden leading-none">
+      <div className="relative ">
+        <div className="wave absolute left-0 top-0 w-full overflow-hidden  bg-gray-800 leading-none">
           <svg
             data-name="Layer 1"
             xmlns="http://www.w3.org/2000/svg"
@@ -134,6 +143,88 @@ const Home: NextPage = () => {
       </div>
 
       {/* TODO: Add Tabs here about [Quizzes, Articles, Courses] */}
+      <div className="mt-10 flex flex-row justify-center gap-x-8 bg-gray-800 pb-64 pt-16">
+        <div className="max-w-xl flex-grow px-16">
+          <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+            <Tab.List className="mb-4 flex justify-around border-b-2 border-gray-500 pb-2 text-2xl">
+              <Tab
+                className={({ selected }) =>
+                  `${
+                    selected
+                      ? " font-bold text-white"
+                      : "font-semibold text-gray-400"
+                  } `
+                }
+              >
+                Quizzes
+              </Tab>
+              <Tab
+                className={({ selected }) =>
+                  `${
+                    selected
+                      ? "font-bold text-white"
+                      : "font-semibold text-gray-400"
+                  }`
+                }
+              >
+                Articles
+              </Tab>
+              <Tab
+                className={({ selected }) =>
+                  `${
+                    selected
+                      ? "font-bold text-white"
+                      : "font-semibold text-gray-400"
+                  }`
+                }
+              >
+                Courses
+              </Tab>
+            </Tab.List>
+            <Tab.Panels className="mt-2 text-white">
+              <Tab.Panel className="text-">
+                {/* FIXME: Change inner html with something informative */}
+                <p>
+                  Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                  Ipsum eius aliquam odio sunt eaque harum velit! Aspernatur non
+                  velit ad perferendis, veniam sit? Rerum unde, itaque quis ex
+                  fugiat velit.
+                </p>
+                <ol className="list-disc pl-4">
+                  <li>Sit amet</li>
+                  <li>Consectetur adipisicing</li>
+                  <li>elit ipsum aliquam odio </li>
+                  <li>harum velit aspernatir</li>
+                  <li>fugiat perferenads</li>
+                </ol>
+              </Tab.Panel>
+              <Tab.Panel className="">
+                <p>Two</p>
+              </Tab.Panel>
+              <Tab.Panel className="">
+                <p>Three</p>
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
+
+          <Link href="/" className="mt-4">
+            <button className=" mt-4 rounded-lg bg-indigo-500 px-3 py-2 text-white">
+              Go to{" "}
+              {selectedIndex === 0
+                ? "Quizzes"
+                : selectedIndex === 1
+                ? "Articles"
+                : selectedIndex === 2
+                ? "Courses"
+                : "Error"}
+            </button>
+          </Link>
+        </div>
+
+        {/* FIXME: instead of an image there is a solid box with bg-color for now. (testing purposes only) */}
+        <div className="h-96 w-1/2 bg-gradient-to-r from-gray-700 to-indigo-600"></div>
+      </div>
+
       {/* TODO: Add Footer  */}
     </div>
   );
