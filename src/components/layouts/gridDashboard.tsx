@@ -48,7 +48,12 @@ const GridDashboard: NextPage<{
           id="dashboard-sidebar"
         >
           <div className="  hidden flex-row items-center gap-2 rounded-md bg-gray-800 p-4 text-gray-400 md:flex">
-            <span className="text-xl font-bold text-indigo-500">PulthApp</span>
+            {/* Desktop PulthApp (also link) */}
+            <Link href="/">
+              <span className="text-xl font-bold text-indigo-500">
+                PulthApp
+              </span>
+            </Link>
           </div>
           <nav className="flex h-full flex-row items-center justify-evenly px-2 md:h-auto  md:flex-col md:items-stretch md:justify-start">
             {menuItems.map((item) => (
@@ -85,7 +90,12 @@ const GridDashboard: NextPage<{
         </aside>
         <header className="row-start-1 flex h-14 items-center bg-gray-800 p-2 md:row-span-1 ">
           <div className="my-auto self-stretch px-2 text-xl font-bold text-indigo-500 md:hidden">
-            <span className="text-xl font-bold text-indigo-500">PulthApp</span>
+            {/* Mobile PulthApp (also link) */}
+            <Link href="/">
+              <span className="text-xl font-bold text-indigo-500">
+                PulthApp
+              </span>
+            </Link>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {userStatus !== "authenticated" && (
