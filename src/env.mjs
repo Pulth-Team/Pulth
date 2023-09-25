@@ -29,6 +29,11 @@ const server = z.object({
   AWS_REGION: z.string().default("us-east-1"),
 
   AWS_S3_BUCKET: z.string(),
+
+  SMTP_API_USERNAME: z.string(),
+  SMTP_API_KEY: z.string(),
+  SMTP_HOST: z.string(),
+  SMTP_PORT: z.string(),
 });
 
 /**
@@ -68,6 +73,11 @@ const processEnv = {
   AWS_SECRET_KEY_CDN: process.env.AWS_SECRET_KEY_CDN,
   AWS_REGION: process.env.AWS_REGION,
   AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
+  SMTP_API_USERNAME: process.env.SMTP_API_USERNAME,
+  SMTP_API_KEY: process.env.SMTP_API_KEY,
+  SMTP_HOST: process.env.SMTP_HOST,
+  SMTP_PORT: process.env.SMTP_PORT,
+
   NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
   NEXT_PUBLIC_ALGOLIA_API_KEY: process.env.NEXT_PUBLIC_ALGOLIA_API_KEY,
   NEXT_PUBLIC_ALGOLIA_INDEX_NAME: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME,
