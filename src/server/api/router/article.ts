@@ -716,7 +716,7 @@ export const articleRouter = createTRPCRouter({
       ).filter((block) => block.type === "Image") as OutputBlockData<"Image">[];
 
       // create a s3 cdn connection Object
-      const s3 = new S3({
+      const s3client = new S3Client({
         region: env.AWS_REGION,
         credentials: {
           accessKeyId: env.AWS_ACCESS_KEY_CDN,
@@ -729,12 +729,12 @@ export const articleRouter = createTRPCRouter({
         imageBlocks.map((block) => {
           const url = new URL(block.data.file.url);
           console.log("url Pathname", url.pathname);
-          return s3
-            .deleteObject({
+          return s3client.send(
+            new DeleteObjectCommand({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
+          );
         })
       );
 
