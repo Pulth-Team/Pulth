@@ -1,18 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions as nextAuthOptions } from "~/server/auth";
-import { S3 } from "aws-sdk";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { env } from "~/env.mjs";
 import formidable from "formidable";
 import fs from "fs";
 
-const s3 = new S3({
+const s3config = {
   region: env.AWS_REGION,
   credentials: {
     accessKeyId: env.AWS_ACCESS_KEY_CDN,
     secretAccessKey: env.AWS_SECRET_KEY_CDN,
   },
-});
+};
 
 const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, nextAuthOptions);
@@ -34,26 +34,26 @@ const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
     let file: formidable.File = Array.isArray(files.imageFile)
       ? (files.imageFile[0] as formidable.File)
       : files.imageFile;
+    const client = new S3Client(s3config);
 
-    return s3.putObject(
-      {
-        Bucket: env.AWS_S3_BUCKET,
-        Key: session.user?.id + "/" + file.newFilename,
-        Body: fs.createReadStream(file.filepath),
-        ACL: "public-read",
-      },
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          return res.send({ error: "There was an error uploading the file." });
-        }
+    const putObjectResponse = await client
+      .send(
+        new PutObjectCommand({
+          Bucket: env.AWS_S3_BUCKET,
+          Key: session.user?.id + "/" + file.newFilename,
+          ACL: "public-read",
+          Body: fs.createReadStream(file.filepath),
+        })
+      )
+      .catch((err) => {
+        console.log(err);
         return res.send({
-          url: `https://cdn.pulth.com/${
-            session.user?.id + "/" + file.newFilename
-          }`,
+          error: "There was an error uploading the file.",
         });
-      }
-    );
+      });
+    return res.send({
+      url: `https://cdn.pulth.com/${session.user?.id + "/" + file.newFilename}`,
+    });
   });
 
   // res.send({ hi: "hi" });

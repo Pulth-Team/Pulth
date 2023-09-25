@@ -10,7 +10,8 @@ import {
 import { TRPCError } from "@trpc/server";
 import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
-import { S3 } from "aws-sdk";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 import { env } from "~/env.mjs";
 import { exclude } from "~/utils/api";
 import { Article } from "@prisma/client";
@@ -428,10 +429,9 @@ export const articleRouter = createTRPCRouter({
       // so that it doesn't show up in search results anymore
       await ctx.algolia.deleteObject(article.id);
 
-      
       // now we can revalidate the article
       ctx.res?.revalidate(`/api/articles/${updatedArticle.slug}`);
-      
+
       const { bodyData, ...rest } = updatedArticle;
       return {
         ...rest,
@@ -528,7 +528,7 @@ export const articleRouter = createTRPCRouter({
       );
 
       // create a s3 cdn connection Object
-      const s3 = new S3({
+      const s3client = new S3Client({
         region: env.AWS_REGION,
         credentials: {
           accessKeyId: env.AWS_ACCESS_KEY_CDN,
@@ -540,12 +540,12 @@ export const articleRouter = createTRPCRouter({
         deletedImageBlocks.map((block) => {
           const url = new URL(block.data.file.url);
           console.log("url Pathname", url.pathname);
-          return s3
-            .deleteObject({
+          return s3client.send(
+            new DeleteObjectCommand({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
+          );
         })
       );
 
