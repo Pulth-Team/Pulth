@@ -296,7 +296,7 @@ const Home: NextPage = () => {
             enterTo="opacity-100 "
             leave="hidden"
           >
-            <div className="h-96 w-full rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
+            <div className="h-[480px] w-full rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
           </Transition>
           <Transition
             show={selectedIndex === 1}
