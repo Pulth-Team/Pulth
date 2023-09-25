@@ -1,6 +1,6 @@
 import { Dispatch, Fragment, SetStateAction } from "react";
 import Link from "next/link";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
@@ -75,7 +75,7 @@ interface HitProps {
     author: {
       id: string;
       name: string;
-      image: string;
+      image?: string;
     };
     description: string;
     title: string;
@@ -108,7 +108,7 @@ function Hit({ hit }: HitProps) {
 
             <div className="relative h-8 w-8 ">
               <Image
-                src={hit.author.image}
+                src={hit.author.image ?? "/default_profile.jpg"}
                 alt={hit.author.name + "'s profile photo"}
                 layout="fill"
                 className="mr-2 rounded-full"

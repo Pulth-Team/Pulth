@@ -91,7 +91,7 @@ const Articles: NextPage = () => {
   };
 
   let userImage = userData?.user?.image;
-  if (userImage === null) userImage = undefined;
+  if (userImage === null) userImage = "/default_profile.jpg";
 
   // memoize the document renderer
   // if the blocks don't change

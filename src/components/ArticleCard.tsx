@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 // import {} from "heroicons/24/outline";
@@ -36,6 +36,7 @@ const ArticleCard: NextPage<
   createdAt,
 }) => {
   dayjs.extend(relativeTime);
+
   return (
     <div
       className={`${
@@ -82,7 +83,7 @@ const ArticleCard: NextPage<
           >
             <div className="relative h-9 w-9 cursor-pointer">
               <Image
-                src={Author?.Image || "/default-profile.png"}
+                src={Author?.Image ?? "/default_profile.jpg"}
                 alt="profile"
                 height={64}
                 width={64}
