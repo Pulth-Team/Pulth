@@ -39,22 +39,24 @@ const Articles: NextPage = () => {
   const router = useRouter();
   const { data: userData, status: authStatus } = useSession();
   const { slug } = router.query;
-  const [voteRank, setVoteRank] = useState(0);
   const [myVote, setMyVote] = useState<"up" | "down" | "none">("none");
 
   // query to get the article data
-  const articleData = api.article.getBySlug.useQuery((slug as string) || "", {
-    onSuccess: (data) => {
-      setVoteRank(data.voteRank);
-    },
-  });
+  const articleData = api.article.getBySlug.useQuery((slug as string) || "");
+  // query to get the vote rank
+  const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
+    articleData.data?.id as string,
+    {
+      enabled: articleData.data?.id !== null,
+    }
+  );
 
   // mutation to add a comment
   const commentAddMutation = api.comment.create.useMutation();
   // mutation to add a vote
   const voteAddMutation = api.vote.voteByArticleId.useMutation({
     onSuccess: (data) => {
-      setVoteRank(data.newRank);
+      voteRankQuery.refetch();
     },
   });
 
@@ -130,10 +132,10 @@ const Articles: NextPage = () => {
               {/* {voteAddMutation.data
               ? voteAddMutation.data.newRank
               : articleData.data?.voteRank || 0} */}
-              {voteAddMutation.isLoading ? (
+              {voteAddMutation.isLoading || voteRankQuery.isLoading ? (
                 <Loading className="h-6 w-6 border-2" />
               ) : (
-                voteRank
+                voteRankQuery.data
               )}
             </div>
             <button
