@@ -13,7 +13,6 @@ import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-da
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 import { env } from "~/env.mjs";
-import { exclude } from "~/utils/api";
 import { Article } from "@prisma/client";
 
 export const articleRouter = createTRPCRouter({
@@ -228,6 +227,14 @@ export const articleRouter = createTRPCRouter({
           slug: input,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          title: true,
+          description: true,
+          keywords: true,
+          isPublished: true,
+          updatedAt: true,
+          createdAt: true,
+        },
       });
 
       // if the article doesn't exist, return an error
@@ -237,11 +244,7 @@ export const articleRouter = createTRPCRouter({
           message: "Article not found in your account",
         });
 
-      const bodylessArticle = exclude(article, ["bodyData", "draftBodyData"]);
-      return {
-        ...bodylessArticle,
-        // bodyData: bodyData as unknown as OutputBlockData<string, any>[],
-      };
+      return article;
     }),
 
   // gives article's slug
