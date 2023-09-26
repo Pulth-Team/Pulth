@@ -87,8 +87,10 @@ model Article {
     updatedAt     DateTime @updatedAt
     editorVersion String?
 
-    voteRank Int       @default(0)
-    votes    VotedBy[] @relation("ArticleVotes")
+    // artifical field for the frontend
+    // this is the number of votes the article has received so far (upvotes - downvotes)
+    // voteRank Int       @default(0)
+    votes VotedBy[] @relation("ArticleVotes")
 
     Comments Comment[]
 }
