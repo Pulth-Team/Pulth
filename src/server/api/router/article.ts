@@ -160,12 +160,15 @@ export const articleRouter = createTRPCRouter({
     .input(
       z
         .object({
-          limit: z.number().optional().default(10),
-          skip: z.number().optional().default(0),
+          limit: z.number(),
+          page: z.number(),
         })
-        .optional()
+        .default({
+          limit: 9,
+          page: 0,
+        })
     )
-    .query(async ({ ctx }) => {
+    .query(async ({ input, ctx }) => {
       const articles = await ctx.prisma?.article.findMany({
         where: {
           authorId: ctx.session?.user.id,
@@ -180,6 +183,8 @@ export const articleRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
+        skip: input.page * input.limit,
+        take: input.limit,
       });
 
       return articles;
