@@ -14,7 +14,7 @@ import { Tab, Dialog } from "@headlessui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import superjson from "superjson";
@@ -24,6 +24,7 @@ import { createInnerTRPCContext, createTRPCContext } from "~/server/api/trpc";
 import { appRouter } from "~/server/api/root";
 import { DehydratedState } from "@tanstack/react-query";
 import { getServerSession } from "next-auth";
+import { analyzeMetadata } from "~/utils/analyzeArticle";
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -46,6 +47,19 @@ const Inspect: NextPage = () => {
   const [description, setDescription] = useState(articleInfo.data?.description);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteModalInput, setDeleteModalInput] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<{
+    titleScore: number;
+    titleChecks: string[];
+    descriptionScore: number;
+    descriptionChecks: string[];
+    totalScore: number;
+  }>({
+    titleScore: 0,
+    titleChecks: [],
+    descriptionScore: 0,
+    descriptionChecks: [],
+    totalScore: 0,
+  });
 
   useEffect(() => {
     if (articleInfo.isError && articleInfo.error.data?.httpStatus === 404) {
@@ -54,6 +68,22 @@ const Inspect: NextPage = () => {
       setDescription(articleInfo.data?.description);
     }
   }, [articleInfo.data, articleInfo.isError, router, articleInfo.error]);
+
+  useEffect(() => {
+    const result = analyzeMetadata(title || " ", description || " ");
+    setAnalysisResult(result);
+  }, []);
+
+  // shoulde define with memo
+  // const analysisResult = analyzeMetadata(title || " ", description || " ");
+
+  useMemo(() => {
+    //analyze metadata
+    if (updateInfoIsLoading) {
+      const result = analyzeMetadata(title || " ", description || " ");
+      setAnalysisResult(result);
+    }
+  }, [title, description, updateInfoIsLoading]);
 
   return (
     <Dashboard>
@@ -104,14 +134,35 @@ const Inspect: NextPage = () => {
           <hr className="mt-1 border-black" />
           <div className="flex flex-col gap-x-2 md:flex-row">
             <div className="flex-grow">
-              <div className="mt-4">
-                <span className="text-black/70">Description:</span>
+              <div className="mt-4 grid grid-cols-3 justify-between gap-4">
+                <div className="col-span-2">
+                  <span className="text-black/70">Description:</span>
 
-                <p>{articleInfo.data?.description}</p>
+                  <p>{articleInfo.data?.description}</p>
 
-                <span className="text-black/70">Tags:</span>
+                  <span className="text-black/70">Tags:</span>
 
-                <p>{articleInfo.data?.keywords.join(", ")}</p>
+                  <p>{articleInfo.data?.keywords.join(", ")}</p>
+                </div>
+                <div className="flex flex-col gap-2 rounded-2xl bg-gray-100 p-2">
+                  <span className={` text-xl font-bold text-black/70`}>
+                    Score
+                  </span>
+
+                  <div
+                    className={`pie flex aspect-square h-24 w-24 self-center rounded-full bg-gray-200 font-bold before:m-2`}
+                    // style={"--p:40;--c:darkblue;--b:10px"}
+                    style={{
+                      ["--p" as any]: analysisResult.titleScore.toString(),
+                      ["--c" as any]: "#6b7280",
+                      ["--b" as any]: "10px",
+                      ["--w" as any]: "96px",
+                      ["--m" as any]: "8px",
+                    }}
+                  >
+                    {analysisResult.titleScore.toFixed(2)}%
+                  </div>
+                </div>
               </div>
 
               <div className="mt-4">
@@ -283,12 +334,51 @@ const Inspect: NextPage = () => {
                         </button>
                       </div>
                     </Tab.Panel>
+                    <Tab.Panel>
+                      {/* Panel for SEO Analysis/Score */}
+                      <div className="flex justify-between">
+                        <div>
+                          <p>Title Score {analysisResult.titleScore}</p>
+                          {analysisResult.titleChecks.length > 0 && (
+                            <ul>
+                              {analysisResult.titleChecks.map(
+                                (check, index) => (
+                                  <li key={index} className="text-red-500">
+                                    {check}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p>
+                          Description Score {analysisResult.descriptionScore}
+                        </p>
+                        {analysisResult.descriptionChecks.length > 0 && (
+                          <ul>
+                            {analysisResult.descriptionChecks.map(
+                              (check, index) => (
+                                <li key={index} className="text-red-500">
+                                  {check}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        )}
+                      </div>
+                      <div>
+                        <p>Total Score</p>
+                        <p>{analysisResult.totalScore}</p>
+                      </div>
+                    </Tab.Panel>
                   </Tab.Panels>
                 </Tab.Group>
               </div>
             </div>
 
-            <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 self-start p-2 shadow-md md:order-last md:w-auto md:min-w-fit md:flex-shrink md:flex-grow-0">
+            <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 gap-y-1 self-start rounded-2xl bg-gray-100 px-4 pb-4 pt-6  md:order-last md:w-auto md:min-w-fit md:flex-shrink md:flex-grow-0">
               <span className="text-black/70">status:</span>
 
               <p>
@@ -317,13 +407,13 @@ const Inspect: NextPage = () => {
                     pathname: "/articles/[slug]",
                     query: { slug: slug },
                   }}
-                  className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                  className="col-span-2 mb-2 mt-8 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                 >
                   View
                 </Link>
               ) : (
                 <button
-                  className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                  className="col-span-2 mb-2 mt-8 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                   disabled={!articleInfo.data?.isPublished}
                 >
                   View
