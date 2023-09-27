@@ -179,7 +179,7 @@ const Articles: NextPage = ({}) => {
                     onSuccess: () => {
                       // refetch the article data for updating the editor
                       articleAuthorFetch.refetch();
-                    }
+                    },
                   });
                 }}
                 onMenuClick={OnMenuClick}
@@ -187,12 +187,11 @@ const Articles: NextPage = ({}) => {
                 publishLoading={publishArticleMutation.isLoading}
               />
               <Editor
-                readonly={false}
-                data={JSON.stringify({
-                  // time: articleAuthorFetch.data.updatedAt,
+                data={{
+                  //time: articleAuthorFetch.data.updatedAt,
                   blocks: articleAuthorFetch.data.draftBodyData,
-                  // version: articleAuthorFetch.data.editorVersion,
-                })}
+                  //version: articleAuthorFetch.data.editorVersion,
+                }}
                 editorRef={editor}
                 // OnInit={handleInit}
                 OnChange={onChange}

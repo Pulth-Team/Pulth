@@ -1,86 +1,65 @@
-import { MutableRefObject, memo, useLayoutEffect } from "react";
-import type { API } from "@editorjs/editorjs";
-
-import EditorJS from "@editorjs/editorjs";
-import { NextPage } from "next";
-import { useState, useEffect, useRef, useId } from "react";
+import { useRef, useEffect, useLayoutEffect, MutableRefObject } from "react";
+import type { API, EditorConfig } from "@editorjs/editorjs";
+import type EditorJS from "@editorjs/editorjs";
 import { getBaseUrl } from "~/utils/api";
 
-// todo add editorjs DataTypes
-const Editor: NextPage<{
+interface EditorProps {
+  data: EditorConfig["data"];
   className?: string;
-  data?: any;
   readonly: boolean;
 
   editorRef: MutableRefObject<EditorJS | null>;
   OnInit?: () => void;
 
   OnChange?: (editorAPI: API) => void;
-}> = memo(function EditorComp({
-  className,
-  data,
-  readonly,
-  OnInit,
-  editorRef,
-  OnChange,
-}) {
-  const id = useId();
+}
+export default function Editor({ data, editorRef }: EditorProps): JSX.Element {
+  const elmtRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    if (!editorRef.current) {
-      console.log("editorRef.current Init", editorRef.current);
-      editorRef.current = new EditorJS({
-        holder: id,
-        autofocus: true,
-        data: JSON.parse(data),
-        readOnly: readonly,
-        tools: editorTools,
-        onReady: OnInit ?? (() => {}),
-        onChange: OnChange ?? (() => {}),
-      });
-    } else {
-      console.log("editorRef.current", editorRef.current);
-    }
+  useEffect(() => {
+    let editorJs: EditorJS | null = null;
 
-    return () => {
-      if (editorRef.current && editorRef.current.destroy) {
-        editorRef.current.destroy();
-        editorRef.current = null;
+    const createEditor = async () => {
+      const { default: EditorJS } = await import("@editorjs/editorjs");
+
+      if (
+        typeof elmtRef.current === "undefined" ||
+        elmtRef.current === null ||
+        editorRef.current !== null ||
+        data === null
+      ) {
+        return;
       }
+
+      editorRef.current = new EditorJS({
+        tools: editorTools,
+        data: data,
+        // readOnly: false,
+        holder: elmtRef.current,
+      });
+      await editorRef.current.isReady.then(() => {
+        console.log("Editor.js is ready to work!");
+      });
     };
-  }, [readonly, OnInit, id, editorRef, OnChange, data]);
 
-  //data, readonly, OnInit, id, editorRef, OnChange
-  //data causes to reinit the editor
-  //it happens because of the referantial equality of the data object
+    createEditor().catch((error): void => console.error(error));
 
-  //the solution is give the data with a referantial equality
-  //so we can use the useEffect hook to update the data
-  // example prop will look like this
-  // data={JSON.stringify(data)}
+    return async () => {
+      // editorRef.current?.destroy();
+      // editorJs?.destroy();
+      // if (editorRef.current !== null) {
+      //   await editorRef.current.isReady.then(() => {
+      //     if (editorRef.current !== null) editorRef.current.destroy();
+      //   });
+      //   editorRef.current = null;
+      // }
+    };
+  }, [data, elmtRef, editorRef]);
 
-  return (
-    <div className="flex justify-center">
-      <div
-        id={id}
-        className={className ?? "" + "z-0 mx-16 flex-shrink flex-grow"}
-      ></div>
-    </div>
-  );
-});
-
-export default Editor;
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "4mb", // Set desired size of the body
-    },
-  },
-};
+  return <div ref={elmtRef} />;
+}
 
 const editorTools = {
-  //           tools: {
   header: {
     class: require("@editorjs/header"),
     inlineToolbar: ["link"],
@@ -93,6 +72,8 @@ const editorTools = {
     inlineToolbar: true,
     shortcut: "CMD+SHIFT+L",
   },
+  // Image Tool Deprecated and will be removed in the future
+  // DEPRECATED:
   Image: {
     class: require("@editorjs/image"),
     config: {
