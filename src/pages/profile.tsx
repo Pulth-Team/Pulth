@@ -3,7 +3,7 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { api } from "~/utils/api";
 
@@ -21,8 +21,8 @@ const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 enum OrderType {
   Newest = "Newest",
   Oldest = "Oldest",
-  PublishedFirst = "Published First",
-  UnpublishedFirst = "Unpublished First",
+  PublishedFirst = "Published",
+  UnpublishedFirst = "Unpublished",
 }
 
 const Articles: NextPage = () => {
@@ -54,6 +54,21 @@ const Articles: NextPage = () => {
       }
     );
   };
+
+  useMemo(() => {
+    articleData.data?.sort((a, b) => {
+      switch (selectedOrderType) {
+        case OrderType.Newest:
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        case OrderType.Oldest:
+          return a.createdAt.getTime() - b.createdAt.getTime();
+        case OrderType.PublishedFirst:
+          return b.isPublished ? 1 : -1;
+        case OrderType.UnpublishedFirst:
+          return b.isPublished ? -1 : 1;
+      }
+    });
+  }, [selectedOrderType, articleData.data]);
 
   return (
     <DashboardLayout>
@@ -99,13 +114,13 @@ const Articles: NextPage = () => {
                             value={selectedOrderType}
                             onChange={setOrderType}
                           >
-                            <div className="relative w-40 ">
+                            <div className="relative w-36 ">
                               <Listbox.Button className={"relative"}>
                                 {selectedOrderType}
                               </Listbox.Button>
                               <Listbox.Options
                                 className={
-                                  "boreder-gray-200 absolute right-0 rounded border bg-white py-2"
+                                  "boreder-gray-200 absolute right-0 w-36 rounded border bg-white py-2"
                                 }
                               >
                                 {[
