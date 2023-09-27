@@ -187,6 +187,7 @@ const Articles: NextPage = ({}) => {
                 publishLoading={publishArticleMutation.isLoading}
               />
               <Editor
+                readonly={false}
                 data={{
                   //time: articleAuthorFetch.data.updatedAt,
                   blocks: articleAuthorFetch.data.draftBodyData,
