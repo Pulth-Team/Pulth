@@ -51,6 +51,19 @@ const Inspect: NextPage = () => {
   const [description, setDescription] = useState(articleInfo.data?.description);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteModalInput, setDeleteModalInput] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<{
+    titleScore: number;
+    titleChecks: string[];
+    descriptionScore: number;
+    descriptionChecks: string[];
+    totalScore: number;
+  }>({
+    titleScore: 0,
+    titleChecks: [],
+    descriptionScore: 0,
+    descriptionChecks: [],
+    totalScore: 0,
+  });
 
   useEffect(() => {
     if (!articleInfo.isError || articleInfo.error.data?.httpStatus !== 404) {
@@ -228,9 +241,9 @@ const Inspect: NextPage = () => {
               <div className="mt-4 w-full break-all">
                 <span className="text-black/70">Description:</span>
 
-                <p>{articleInfo.data?.description}</p>
+                  <p>{articleInfo.data?.description}</p>
 
-                <span className="text-black/70">Tags:</span>
+                  <span className="text-black/70">Tags:</span>
 
                 {isTagsLoading ? (
                   <p>Loading...</p>
@@ -685,13 +698,13 @@ const Inspect: NextPage = () => {
                     pathname: "/articles/[slug]",
                     query: { slug: slug },
                   }}
-                  className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                  className="col-span-2 mb-2 mt-8 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                 >
                   View
                 </Link>
               ) : (
                 <button
-                  className="col-span-2 mb-2 mt-6 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
+                  className="col-span-2 mb-2 mt-8 flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white disabled:bg-gray-400 md:mb-0"
                   disabled={!articleInfo.data?.isPublished}
                 >
                   View
