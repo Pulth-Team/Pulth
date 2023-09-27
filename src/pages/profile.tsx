@@ -55,6 +55,8 @@ const Articles: NextPage = () => {
     );
   };
 
+  // TODO: Add Filter functionality
+
   useMemo(() => {
     articleData.data?.sort((a, b) => {
       switch (selectedOrderType) {
