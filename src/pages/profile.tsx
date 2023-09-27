@@ -1,21 +1,29 @@
 import type { NextPage } from "next";
-
-import { api } from "~/utils/api";
 import Head from "next/head";
-import Link from "next/link";
-import Image from "next/legacy/image";
 import dynamic from "next/dynamic";
 
-import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
+import { api } from "~/utils/api";
+
+import { Dialog, Popover, Transition, Listbox } from "@headlessui/react";
+import {
+  PlusIcon,
+  AdjustmentsHorizontalIcon,
+} from "@heroicons/react/24/outline";
+
+import Loading from "~/components/Loading";
 import DashboardLayout from "~/components/layouts/gridDashboard";
 import MyArticleCard from "~/components/editor/MyArticleCard";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { Dialog } from "@headlessui/react";
-import Loading from "~/components/Loading";
+enum OrderType {
+  Newest = "Newest",
+  Oldest = "Oldest",
+  PublishedFirst = "Published First",
+  UnpublishedFirst = "Unpublished First",
+}
 
 const Articles: NextPage = () => {
   const { status } = useSession({ required: true });
@@ -23,6 +31,9 @@ const Articles: NextPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
+  const [selectedOrderType, setOrderType] = useState<OrderType>(
+    OrderType.Newest
+  );
 
   const articleData = api.article.getMyArticles.useQuery();
   const createMutation = api.article.create.useMutation();
@@ -56,14 +67,83 @@ const Articles: NextPage = () => {
           <Loading className="mt-4 h-12 w-12 border-2" />
         ) : (
           <>
-            <h2>
-              <span className="text-2xl font-bold">My Articles</span>
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2>
+                <span className="text-2xl font-bold">My Articles</span>
+              </h2>
+              <div className="flex gap-2">
+                {/* TODO: Add "New" button */}
+                <div className="h-6 w-6 bg-gray-200"></div>
+                {/* TODO: Add Filter button */}
 
+                <Popover className="relative">
+                  <Popover.Button>
+                    <div className="rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 ">
+                      <AdjustmentsHorizontalIcon className="h-6 w-6" />
+                    </div>
+                  </Popover.Button>
+                  <Transition
+                    enter="transition duration-75 ease-in"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Popover.Panel className="absolute right-0  z-10 rounded-lg border border-gray-300 bg-gray-50  p-4 shadow-md">
+                      <div className="flex w-64 flex-col">
+                        {/* Order Selection */}
+                        <div className="flex justify-between">
+                          <p className="text-sm font-medium">Order</p>
+                          <Listbox
+                            value={selectedOrderType}
+                            onChange={setOrderType}
+                          >
+                            <div className="relative w-40 ">
+                              <Listbox.Button className={"relative"}>
+                                {selectedOrderType}
+                              </Listbox.Button>
+                              <Listbox.Options
+                                className={
+                                  "boreder-gray-200 absolute right-0 rounded border bg-white py-2"
+                                }
+                              >
+                                {[
+                                  OrderType.Newest,
+                                  OrderType.Oldest,
+                                  OrderType.PublishedFirst,
+                                  OrderType.UnpublishedFirst,
+                                ].map((orderType) => (
+                                  <Listbox.Option
+                                    key={orderType}
+                                    value={orderType}
+                                    className={({ active }) =>
+                                      `${
+                                        active
+                                          ? "bg-indigo-500 text-white"
+                                          : "text-gray-900"
+                                      }
+                                wo relative cursor-default select-none px-2`
+                                    }
+                                  >
+                                    {orderType}
+                                  </Listbox.Option>
+                                ))}
+                              </Listbox.Options>
+                            </div>
+                          </Listbox>
+                        </div>
+                      </div>
+                    </Popover.Panel>
+                  </Transition>
+                </Popover>
+              </div>
+            </div>
             {articleData.isLoading ? (
               <Loading className="mt-4 h-12 w-12 border-4" />
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {/* TODO: Add order functionality depending on selectedOrderType */}
                 {articleData.data?.map((article) => (
                   <MyArticleCard
                     key={article.slug}
@@ -77,18 +157,22 @@ const Articles: NextPage = () => {
                 ))}
 
                 {/* Add Project div */}
-                <button
-                  className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
-                  onClick={() => setIsOpen(true)}
-                  id="create-article-button"
-                >
-                  <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
-                  <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
-                    Create New Article
-                  </p>
-                </button>
+                {!articleData.isLoading &&
+                  articleData.data &&
+                  articleData.data.length < 9 && (
+                    <button
+                      className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
+                      onClick={() => setIsOpen(true)}
+                      id="create-article-button"
+                    >
+                      <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
+                      <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
+                        Create New Article
+                      </p>
+                    </button>
+                  )}
 
-                {/* Add Stepper dialog for Tag and topic selection */}
+                {/* TODO: Add Stepper dialog for Tag and topic selection */}
                 <Dialog
                   open={isOpen}
                   onClose={() => {
@@ -203,7 +287,6 @@ const Articles: NextPage = () => {
                             createMutation.isLoading ||
                             dialogTitle.length < 12 ||
                             dialogDescription.length < 40
-
                           }
                         >
                           {createMutation.isLoading ? (
@@ -218,7 +301,6 @@ const Articles: NextPage = () => {
                   </div>
                 </Dialog>
               </div>
-
             )}
           </>
         )}
