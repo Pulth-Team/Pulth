@@ -96,21 +96,28 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser({ user }) {
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          email: user.email,
-          name: user.email,
-          image: user.image ?? "/default_profile.jpg",
-          description: "I'm new here",
-        },
-      });
+      // check if user.name is undefined if not
+      if (user.name)
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            // if user.name is undefined then use the email address
+            // email => myusername@company.com
+            // name => myusername
+            email: user.email,
+            name: user.email?.substring(0, user.email.indexOf("@")),
+            image: user.image ?? "/default_profile.jpg",
+            description: "I'm new here",
+          },
+        });
     },
     session(message) {},
   },
   // Configure one or more authentication providers
+  // FIME:
+  // @ts-ignore
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
