@@ -52,7 +52,6 @@ const Articles: NextPage = () => {
   );
 
   // states for filters
-  // const [filterObjects, setFilterObjects] = useState<FilterObject[]>([]);
   const [filterObjects, modifyFilter] = useReducer(
     (
       state: (FilterObject.Published | FilterObject.Draft)[],
@@ -72,6 +71,7 @@ const Articles: NextPage = () => {
     FilterObject.lastMonth | FilterObject.lastWeek | FilterObject.AllTime
   >(FilterObject.AllTime);
 
+  // TODO: remove state syncing in onsuccess of query and use the query data directly
   const articleDataFetch = api.article.getMyArticles.useQuery(
     {
       limit: 9,
@@ -117,7 +117,6 @@ const Articles: NextPage = () => {
     );
   };
 
-  // TODO: Add Filter functionality
   // Ordering the articles based on the selectedOrderType
   useMemo(() => {
     articleData.sort((a, b) => {
@@ -133,43 +132,6 @@ const Articles: NextPage = () => {
       }
     });
   }, [selectedOrderType, articleData]);
-
-  useMemo(() => {
-    // const newArticleData = articleDataFetch.data?.filter((article) => {
-    //   if (!article.isPublished && filterObjects.includes(FilterObject.Draft))
-    //     return true;
-    //   if (article.isPublished && filterObjects.includes(FilterObject.Published))
-    //     return true;
-    //   return false;
-    // });
-    // if (newArticleData) setArticleData(newArticleData);
-  }, []);
-
-  useMemo(() => {
-    switch (dateRangeFilter) {
-      case FilterObject.lastWeek:
-        setArticleData(
-          articleDataFetch.data?.filter((article) => {
-            const date = new Date();
-            date.setDate(date.getDate() - 7);
-            return article.createdAt.getTime() > date.getTime();
-          }) || []
-        );
-        break;
-      case FilterObject.lastMonth:
-        setArticleData(
-          articleDataFetch.data?.filter((article) => {
-            const date = new Date();
-            date.setDate(date.getDate() - 30);
-            return article.createdAt.getTime() > date.getTime();
-          }) || []
-        );
-        break;
-      case FilterObject.AllTime:
-        setArticleData(articleDataFetch.data || []);
-        break;
-    }
-  }, [dateRangeFilter]);
 
   return (
     <DashboardLayout>
@@ -190,7 +152,6 @@ const Articles: NextPage = () => {
               <div className="flex gap-2">
                 {/* TODO: Add "New" button */}
                 <div className="h-6 w-6 bg-gray-200"></div>
-                {/* TODO: Add Filter button */}
 
                 <Popover className="relative">
                   <Popover.Button>
@@ -257,7 +218,11 @@ const Articles: NextPage = () => {
                             <button
                               onClick={() => {
                                 console.log("clicked");
-                                modifyFilter(FilterObject.Draft);
+                                if (
+                                  filterObjects.length == 2 ||
+                                  !filterObjects.includes(FilterObject.Draft)
+                                )
+                                  modifyFilter(FilterObject.Draft);
                               }}
                               className={`inline whitespace-nowrap rounded border ${
                                 filterObjects.includes(FilterObject.Draft)
@@ -271,7 +236,13 @@ const Articles: NextPage = () => {
                             <button
                               onClick={() => {
                                 console.log("clicked");
-                                modifyFilter(FilterObject.Published);
+                                if (
+                                  filterObjects.length == 2 ||
+                                  !filterObjects.includes(
+                                    FilterObject.Published
+                                  )
+                                )
+                                  modifyFilter(FilterObject.Published);
                               }}
                               className={`inline whitespace-nowrap rounded border ${
                                 filterObjects.includes(FilterObject.Published)
@@ -360,7 +331,6 @@ const Articles: NextPage = () => {
               <Loading className="mt-4 h-12 w-12 border-4" />
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {/* TODO: Add order functionality depending on selectedOrderType */}
                 {articleData.map((article) => (
                   <MyArticleCard
                     key={article.slug}
