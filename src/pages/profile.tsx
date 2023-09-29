@@ -3,11 +3,17 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useReducer } from "react";
 
 import { api } from "~/utils/api";
 
-import { Dialog, Popover, Transition, Listbox } from "@headlessui/react";
+import {
+  Dialog,
+  Popover,
+  Transition,
+  Listbox,
+  RadioGroup,
+} from "@headlessui/react";
 import {
   PlusIcon,
   AdjustmentsHorizontalIcon,
@@ -25,6 +31,16 @@ enum OrderType {
   UnpublishedFirst = "Unpublished",
 }
 
+// objects should be given only if they are excluded from the filter
+enum FilterObject {
+  Draft = "Draft",
+  Published = "Published",
+  lastWeek = "lastWeek",
+  lastMonth = "lastMonth",
+  AllTime = "all",
+  // TODO: Add between dates
+}
+
 const Articles: NextPage = () => {
   const { status } = useSession({ required: true });
 
@@ -35,8 +51,54 @@ const Articles: NextPage = () => {
     OrderType.Newest
   );
 
-  const articleData = api.article.getMyArticles.useQuery();
+  // states for filters
+  // const [filterObjects, setFilterObjects] = useState<FilterObject[]>([]);
+  const [filterObjects, modifyFilter] = useReducer(
+    (
+      state: (FilterObject.Published | FilterObject.Draft)[],
+      action: FilterObject.Published | FilterObject.Draft
+    ): (FilterObject.Published | FilterObject.Draft)[] => {
+      console.log("Modify called with", state, action);
+      const isAlreadyAdded = state.includes(action);
+      console.log("isAlreadyAdded is", isAlreadyAdded);
+
+      if (isAlreadyAdded) return state.filter((filter) => filter !== action);
+      else return [...state, action];
+    },
+    [FilterObject.Draft, FilterObject.Published]
+  );
+
+  const [dateRangeFilter, SetDateRangeFilter] = useState<
+    FilterObject.lastMonth | FilterObject.lastWeek | FilterObject.AllTime
+  >(FilterObject.AllTime);
+
+  const articleDataFetch = api.article.getMyArticles.useQuery(
+    {
+      limit: 9,
+      page: 0,
+      filters: {
+        isPublished: filterObjects.includes(FilterObject.Published),
+        isDraft: filterObjects.includes(FilterObject.Draft),
+        timePeriod: dateRangeFilter,
+      },
+    },
+    {
+      onSuccess(data) {
+        setArticleData(data);
+      },
+    }
+  );
   const createMutation = api.article.create.useMutation();
+
+  const [articleData, setArticleData] = useState<
+    {
+      title: string;
+      description: string;
+      slug: string;
+      isPublished: boolean;
+      createdAt: Date;
+    }[]
+  >([]);
 
   const onSubmitDialog = () => {
     createMutation.mutate(
@@ -46,7 +108,7 @@ const Articles: NextPage = () => {
       },
       {
         onSuccess: () => {
-          articleData.refetch();
+          articleDataFetch.refetch();
           setDialogDescription("");
           setDialogTitle("");
           setIsOpen(false);
@@ -56,9 +118,9 @@ const Articles: NextPage = () => {
   };
 
   // TODO: Add Filter functionality
-
+  // Ordering the articles based on the selectedOrderType
   useMemo(() => {
-    articleData.data?.sort((a, b) => {
+    articleData.sort((a, b) => {
       switch (selectedOrderType) {
         case OrderType.Newest:
           return b.createdAt.getTime() - a.createdAt.getTime();
@@ -70,7 +132,44 @@ const Articles: NextPage = () => {
           return b.isPublished ? -1 : 1;
       }
     });
-  }, [selectedOrderType, articleData.data]);
+  }, [selectedOrderType, articleData]);
+
+  useMemo(() => {
+    // const newArticleData = articleDataFetch.data?.filter((article) => {
+    //   if (!article.isPublished && filterObjects.includes(FilterObject.Draft))
+    //     return true;
+    //   if (article.isPublished && filterObjects.includes(FilterObject.Published))
+    //     return true;
+    //   return false;
+    // });
+    // if (newArticleData) setArticleData(newArticleData);
+  }, []);
+
+  useMemo(() => {
+    switch (dateRangeFilter) {
+      case FilterObject.lastWeek:
+        setArticleData(
+          articleDataFetch.data?.filter((article) => {
+            const date = new Date();
+            date.setDate(date.getDate() - 7);
+            return article.createdAt.getTime() > date.getTime();
+          }) || []
+        );
+        break;
+      case FilterObject.lastMonth:
+        setArticleData(
+          articleDataFetch.data?.filter((article) => {
+            const date = new Date();
+            date.setDate(date.getDate() - 30);
+            return article.createdAt.getTime() > date.getTime();
+          }) || []
+        );
+        break;
+      case FilterObject.AllTime:
+        setArticleData(articleDataFetch.data || []);
+        break;
+    }
+  }, [dateRangeFilter]);
 
   return (
     <DashboardLayout>
@@ -110,8 +209,10 @@ const Articles: NextPage = () => {
                     <Popover.Panel className="absolute right-0  z-10 rounded-lg border border-gray-300 bg-gray-50  p-4 shadow-md">
                       <div className="flex w-64 flex-col">
                         {/* Order Selection */}
-                        <div className="flex justify-between">
-                          <p className="text-sm font-medium">Order</p>
+                        <div className="flex justify-between ">
+                          <p className="text-sm font-medium text-black/70">
+                            Order
+                          </p>
                           <Listbox
                             value={selectedOrderType}
                             onChange={setOrderType}
@@ -122,7 +223,7 @@ const Articles: NextPage = () => {
                               </Listbox.Button>
                               <Listbox.Options
                                 className={
-                                  "boreder-gray-200 absolute right-0 w-36 rounded border bg-white py-2"
+                                  "boreder-gray-200 absolute right-0 w-36 rounded border bg-white px-2 py-4"
                                 }
                               >
                                 {[
@@ -140,7 +241,7 @@ const Articles: NextPage = () => {
                                           ? "bg-indigo-500 text-white"
                                           : "text-gray-900"
                                       }
-                                wo relative cursor-default select-none px-2`
+                                   relative cursor-default select-none rounded px-2`
                                     }
                                   >
                                     {orderType}
@@ -150,18 +251,117 @@ const Articles: NextPage = () => {
                             </div>
                           </Listbox>
                         </div>
+                        <div>
+                          <p>Filters</p>
+                          <div className="flex flex-wrap gap-2 text-sm">
+                            <button
+                              onClick={() => {
+                                console.log("clicked");
+                                modifyFilter(FilterObject.Draft);
+                              }}
+                              className={`inline whitespace-nowrap rounded border ${
+                                filterObjects.includes(FilterObject.Draft)
+                                  ? "bg-white"
+                                  : "bg-gray-200"
+                              } border} p-1
+                                p-1`}
+                            >
+                              Unpublished
+                            </button>
+                            <button
+                              onClick={() => {
+                                console.log("clicked");
+                                modifyFilter(FilterObject.Published);
+                              }}
+                              className={`inline whitespace-nowrap rounded border ${
+                                filterObjects.includes(FilterObject.Published)
+                                  ? "bg-white"
+                                  : "bg-gray-200"
+                              } border} p-1
+                                p-1`}
+                            >
+                              Published
+                            </button>
+                          </div>
+                          <p>Date Range</p>
+                          <RadioGroup
+                            value={dateRangeFilter}
+                            onChange={SetDateRangeFilter}
+                            as={"div"}
+                            className={"flex flex-wrap gap-2 text-sm"}
+                          >
+                            <RadioGroup.Option
+                              value={FilterObject.lastWeek}
+                              className={"inline"}
+                            >
+                              {({ checked }) => (
+                                <button
+                                  onClick={() => {
+                                    console.log("clicked");
+                                    SetDateRangeFilter(FilterObject.lastWeek);
+                                  }}
+                                  className={`inline whitespace-nowrap rounded border ${
+                                    checked ? "bg-white" : "bg-gray-200"
+                                  } border} p-1
+                              p-1`}
+                                >
+                                  Last Week
+                                </button>
+                              )}
+                            </RadioGroup.Option>
+
+                            <RadioGroup.Option
+                              value={FilterObject.lastMonth}
+                              className={"inline"}
+                            >
+                              {({ checked }) => (
+                                <button
+                                  onClick={() => {
+                                    console.log("clicked");
+                                    SetDateRangeFilter(FilterObject.lastMonth);
+                                  }}
+                                  className={`inline whitespace-nowrap rounded border ${
+                                    checked ? "bg-white" : "bg-gray-200"
+                                  } border} p-1
+                                p-1`}
+                                >
+                                  Last Month
+                                </button>
+                              )}
+                            </RadioGroup.Option>
+                            <RadioGroup.Option
+                              value={FilterObject.AllTime}
+                              className={"inline"}
+                            >
+                              <button
+                                onClick={() => {
+                                  console.log("clicked");
+                                  SetDateRangeFilter(FilterObject.AllTime);
+                                }}
+                                className={`inline whitespace-nowrap rounded border ${
+                                  dateRangeFilter === FilterObject.AllTime
+                                    ? "bg-white"
+                                    : "bg-gray-200"
+                                } border} p-1
+                                p-1`}
+                              >
+                                All Time
+                              </button>
+                            </RadioGroup.Option>
+                          </RadioGroup>
+                        </div>
                       </div>
                     </Popover.Panel>
                   </Transition>
                 </Popover>
               </div>
             </div>
-            {articleData.isLoading ? (
+            {articleDataFetch.isLoading ? (
               <Loading className="mt-4 h-12 w-12 border-4" />
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {/* TODO: Add order functionality depending on selectedOrderType */}
-                {articleData.data?.map((article) => (
+                {articleData.map((article) => (
                   <MyArticleCard
                     key={article.slug}
                     title={article.title}
@@ -174,9 +374,9 @@ const Articles: NextPage = () => {
                 ))}
 
                 {/* Add Project div */}
-                {!articleData.isLoading &&
-                  articleData.data &&
-                  articleData.data.length < 9 && (
+                {!articleDataFetch.isLoading &&
+                  articleDataFetch.data &&
+                  articleData.length < 9 && (
                     <button
                       className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
                       onClick={() => setIsOpen(true)}
