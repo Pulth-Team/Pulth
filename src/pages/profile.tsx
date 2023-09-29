@@ -71,25 +71,6 @@ const Articles: NextPage = () => {
     FilterObject.lastMonth | FilterObject.lastWeek | FilterObject.AllTime
   >(FilterObject.AllTime);
 
-  // TODO: remove state syncing in onsuccess of query and use the query data directly
-  const articleDataFetch = api.article.getMyArticles.useQuery(
-    {
-      limit: 9,
-      page: 0,
-      filters: {
-        isPublished: filterObjects.includes(FilterObject.Published),
-        isDraft: filterObjects.includes(FilterObject.Draft),
-        timePeriod: dateRangeFilter,
-      },
-    },
-    {
-      onSuccess(data) {
-        setArticleData(data);
-      },
-    }
-  );
-  const createMutation = api.article.create.useMutation();
-
   const [articleData, setArticleData] = useState<
     {
       title: string;
@@ -133,6 +114,26 @@ const Articles: NextPage = () => {
     });
   }, [selectedOrderType, articleData]);
 
+  const createMutation = api.article.create.useMutation();
+
+  // TODO: remove state syncing in onsuccess of query and use the query data directly
+  const articleDataFetch = api.article.getMyArticles.useQuery(
+    {
+      limit: 9,
+      page: 0,
+      filters: {
+        isPublished: filterObjects.includes(FilterObject.Published),
+        isDraft: filterObjects.includes(FilterObject.Draft),
+        timePeriod: dateRangeFilter,
+      },
+    },
+    {
+      onSuccess(data) {
+        setArticleData(data);
+      },
+    }
+  );
+
   return (
     <DashboardLayout>
       <Head>
@@ -151,11 +152,17 @@ const Articles: NextPage = () => {
               </h2>
               <div className="flex gap-2">
                 {/* TODO: Add "New" button */}
-                <div className="h-6 w-6 bg-gray-200"></div>
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="flex h-12 items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                >
+                  New Article
+                  <PlusIcon className="h-6 w-6" />
+                </button>
 
                 <Popover className="relative">
                   <Popover.Button>
-                    <div className="rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 ">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 ">
                       <AdjustmentsHorizontalIcon className="h-6 w-6" />
                     </div>
                   </Popover.Button>
