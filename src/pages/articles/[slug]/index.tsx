@@ -75,7 +75,7 @@ const Articles: NextPage = () => {
   });
 
   const OnCommentAdd = (comment: AddCommentData) => {
-    // todo open a modal  for the comment
+    // TODO: open a modal  for the comment
     commentAddMutation.mutate(
       {
         articleId: articleData.data?.id as string,

@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { Dialog } from "@headlessui/react";
+import Loading from "../Loading";
 
 interface Comment {
   id: string;
@@ -423,11 +424,13 @@ const Comment: NextPage<{
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-white p-4">
-            <Dialog.Title className={"my-2 text-lg font-medium"}>Delete Comment</Dialog.Title>
+            <Dialog.Title className={"my-2 text-lg font-medium"}>
+              Delete Comment
+            </Dialog.Title>
             <Dialog.Description>
               Are you sure you want to delete this comment?
             </Dialog.Description>
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="mt-4 flex justify-end gap-2">
               <button
                 className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
                 onClick={() => {
@@ -450,6 +453,11 @@ const Comment: NextPage<{
                   );
                 }}
               >
+                {deleteCommentMutation.isLoading ? (
+                  <Loading className="h-5 w-5 border-2" />
+                ) : (
+                  <TrashIcon className="h-5 w-5" />
+                )}
                 Delete
               </button>
             </div>
