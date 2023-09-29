@@ -162,6 +162,18 @@ export const articleRouter = createTRPCRouter({
         .object({
           limit: z.number(),
           page: z.number(),
+          filters: z
+            .object({
+              isPublished: z.boolean(),
+              isDraft: z.boolean(),
+              timePeriod: z.enum(["all", "lastWeek", "lastMonth"]),
+            })
+            .optional()
+            .default({
+              isPublished: true,
+              isDraft: true,
+              timePeriod: "all",
+            }),
         })
         .default({
           limit: 9,
@@ -172,6 +184,32 @@ export const articleRouter = createTRPCRouter({
       const articles = await ctx.prisma?.article.findMany({
         where: {
           authorId: ctx.session?.user.id,
+          // if isPublished is true only return published articles
+          // if isDraft is true only return draft articles
+          // if both are true return both
+          // if both are false return both
+          isPublished: ((): boolean | undefined => {
+            if (input.filters?.isPublished && !input.filters?.isDraft)
+              return true;
+            if (!input.filters?.isPublished && input.filters?.isDraft)
+              return false;
+
+            return undefined;
+          })(),
+          // if timePeriod is all, then return all articles
+          // if timePeriod is lastWeek, then return articles that are created in the last week
+          // if timePeriod is lastMonth, then return articles that are created in the last month
+          createdAt: (() => {
+            if (input.filters?.timePeriod === "all") return undefined;
+            if (input.filters?.timePeriod === "lastWeek")
+              return {
+                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              };
+            if (input.filters?.timePeriod === "lastMonth")
+              return {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              };
+          })(),
         },
         select: {
           title: true,
@@ -180,6 +218,7 @@ export const articleRouter = createTRPCRouter({
           isPublished: true,
           createdAt: true,
         },
+
         orderBy: {
           createdAt: "desc",
         },
