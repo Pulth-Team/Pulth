@@ -125,8 +125,21 @@ export const voteRouter = createTRPCRouter({
           userId,
         },
       });
+      let voteEnum: "up" | "down" | "none" = "none";
 
-      return vote || { msg: "no vote found" };
+      if (!vote) voteEnum = "none";
+      else voteEnum = vote?.upVote ? "up" : "down";
+
+      return {
+        voteDirection: voteEnum,
+        details: vote
+          ? {
+              id: vote.id,
+              articleId: vote.articleId,
+              userId: vote.userId,
+            }
+          : undefined,
+      };
     }),
   getVoteRankByArticleId: publicProcedure
     .input(z.string().refine((id) => ObjectId.isValid(id), {}))
