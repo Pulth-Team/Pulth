@@ -42,6 +42,9 @@ const Articles: NextPage = () => {
 
   // query to get the article data
   const articleData = api.article.getBySlug.useQuery((slug as string) || "");
+  //query to get the comment data
+  const commentData = api.comment.getBySlug.useQuery((slug as string) || "");
+
   // query to get the vote rank
   const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
     articleData.data?.id as string,
@@ -66,11 +69,14 @@ const Articles: NextPage = () => {
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // TODO: open a modal  for the comment
-    commentAddMutation.mutate({
+    commentAddMutation.mutateAsync({
       articleId: articleData.data?.id as string,
       content: comment.content,
       parentId: comment.parent,
     });
+    // .then(() => {
+    //   commentData.refetch();
+    // });
   };
 
   let userImage = userData?.user?.image;
@@ -245,11 +251,12 @@ const Articles: NextPage = () => {
         </div>
       )}
 
-      {articleData.data?.Comments && (
+      {/* Comments should have a separate api */}
+      {commentData.data?.rootCommentsCount !== 0 && (
         <div className="py-4">
           <p className="text-lg font-semibold">
             <span className="font-medium">
-              {articleData.data?.Comments?.length + " "}
+              {/* {commentData.data?.rootCommentsCount + " "} */}
             </span>
             Comments
           </p>
@@ -277,7 +284,6 @@ const Articles: NextPage = () => {
             <hr className="my-2" />
 
             <CommentAlgo
-              comments={articleData.data?.Comments || []}
               user={{
                 id: userData?.user?.id as string,
                 name: userData?.user?.name as string,
@@ -285,7 +291,7 @@ const Articles: NextPage = () => {
               }}
               isAuthed={authStatus == "authenticated"}
               articleId={articleData.data?.id as string}
-              revalidate={articleData.refetch}
+              slug={slug as string}
             />
           </div>
         </div>
