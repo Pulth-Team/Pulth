@@ -17,12 +17,21 @@ import Loading from "../Loading";
 import { structureComments } from "~/utils/commentHelpers";
 import type { CommentData, CommentNode } from "~/utils/commentHelpers";
 
+type ActivitySettings =
+  | {
+      isActive: true;
+      id: string;
+      activity: "edit" | "reply";
+    }
+  | {
+      isActive: false;
+    };
+
 const CommentContext = createContext<{
-  isActivelyEditing: boolean;
-  currentEditingCommentId?: string;
-  setIsActivelyEditing: (
-    obj: { isActive: true; id: string } | { isActive: false }
-  ) => void;
+  isActive: boolean;
+  activity: "edit" | "reply" | "none";
+  setActivity: (obj: ActivitySettings) => void;
+  currentActiveCommentId?: string;
 
   isAuthed: boolean;
   user: {
@@ -33,9 +42,10 @@ const CommentContext = createContext<{
   articleId: string;
   requestDelete: (id: string) => void;
 }>({
-  isActivelyEditing: false,
-  currentEditingCommentId: undefined,
-  setIsActivelyEditing: () => {},
+  isActive: false,
+  activity: "none",
+  setActivity: () => {},
+  currentActiveCommentId: undefined,
 
   isAuthed: false,
   user: {
@@ -103,8 +113,8 @@ const CommentAlgo: NextPage<{
     isRevalidating,
   ]);
 
-  const [isActivelyEditing, setIsActivelyEditing] = useState(false);
-  const [currentEditingCommentId, setCurrentEditingCommentId] = useState<
+  const [activity, setActivity] = useState<"edit" | "reply" | "none">("none");
+  const [currentActiveCommentId, setCurrentActiveCommentId] = useState<
     string | undefined
   >(undefined);
 
@@ -112,20 +122,20 @@ const CommentAlgo: NextPage<{
     <div className="flex flex-col gap-2">
       <CommentContext.Provider
         value={{
-          isActivelyEditing,
-          currentEditingCommentId: currentEditingCommentId,
-          setIsActivelyEditing: (
-            obj: { isActive: true; id: string } | { isActive: false }
-          ) => {
-            if (obj.isActive) {
-              setIsActivelyEditing(true);
-              // set the current editing comment id
-              setCurrentEditingCommentId(obj.id);
-            } else {
-              setIsActivelyEditing(false);
-              // set the current editing comment id
-              setCurrentEditingCommentId(undefined);
+          isActive: activity !== "none",
+          activity,
+          currentActiveCommentId,
+          setActivity: (obj: ActivitySettings) => {
+            if (!obj.isActive) {
+              setCurrentActiveCommentId(undefined);
+              setActivity("none");
+              return;
             }
+
+            const { id, activity } = obj;
+
+            setCurrentActiveCommentId(id);
+            setActivity(activity);
           },
           isAuthed,
           user,
@@ -207,22 +217,23 @@ const Comment: NextPage<{
   revalidate: () => void;
 }> = ({ comment, isEditedBefore, depth, revalidate }) => {
   const {
-    isActivelyEditing,
-    setIsActivelyEditing,
-    currentEditingCommentId,
+    isActive,
+    activity,
+    setActivity,
+    currentActiveCommentId,
     articleId,
     isAuthed,
     requestDelete,
     user,
   } = useContext(CommentContext);
-
-  const [reply, setReply] = useState(false);
-  // const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
 
   const addCommentMutation = api.comment.create.useMutation();
   const editCommentMutation = api.comment.update.useMutation();
-  const isEditing = isActivelyEditing && currentEditingCommentId === comment.id;
+
+  const isItThisComment = currentActiveCommentId === comment.id;
+  const isEditing = isItThisComment && activity === "edit";
+  const isReplying = isItThisComment && activity === "reply";
 
   const amITheAuthor = comment.author.id === user.id;
 
@@ -233,20 +244,13 @@ const Comment: NextPage<{
       editCommentMutation.reset();
 
       // set isEditing to false and update comment content
-      //setIsEditing(false);
-      setIsActivelyEditing({ isActive: false });
+      setActivity({ isActive: false });
       comment.content = editValue;
 
       // revalidate the comments
       revalidate();
     }
-  }, [
-    editCommentMutation,
-    editValue,
-    comment,
-    revalidate,
-    setIsActivelyEditing,
-  ]);
+  }, [editCommentMutation, editValue, comment, revalidate, setActivity]);
 
   return (
     <div className="">
@@ -291,7 +295,14 @@ const Comment: NextPage<{
             <ArrowUturnLeftIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
-                if (isAuthed) setReply(!reply);
+                if (isAuthed)
+                  if (isReplying) setActivity({ isActive: false });
+                  else
+                    setActivity({
+                      isActive: true,
+                      id: comment.id,
+                      activity: "reply",
+                    });
                 else signIn();
               }}
             />
@@ -300,10 +311,15 @@ const Comment: NextPage<{
             <PencilSquareIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
-                //editCallback(comment.id, "toggle");
-                //setIsEditing(!isEditing);
-                if (isEditing) setIsActivelyEditing({ isActive: false });
-                else setIsActivelyEditing({ isActive: true, id: comment.id });
+                // If its already editing, then cancel editing
+                if (isEditing) setActivity({ isActive: false });
+                // else set it to editing
+                else
+                  setActivity({
+                    isActive: true,
+                    id: comment.id,
+                    activity: "edit",
+                  });
               }}
             />
           )}
@@ -375,8 +391,8 @@ const Comment: NextPage<{
             <button
               className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
               onClick={() => {
-                // setIsEditing(false);
-                setIsActivelyEditing({ isActive: false });
+                // set it to not doing anything
+                setActivity({ isActive: false });
                 setEditValue(comment.content);
               }}
             >
@@ -389,10 +405,10 @@ const Comment: NextPage<{
       <div
         className={twMerge(
           "ml-3 flex flex-col gap-2 pl-3 md:pl-6",
-          (comment.children.length > 0 || reply) && "border-l-4 pt-4"
+          (comment.children.length > 0 || isReplying) && "border-l-4 pt-4"
         )}
       >
-        {reply && isAuthed && (
+        {isReplying && isAuthed && (
           <CommentAdd
             user={{
               name: user.name as string,
@@ -407,7 +423,8 @@ const Comment: NextPage<{
                 },
                 {
                   onSuccess: () => {
-                    setReply(false);
+                    // set it to not doing anything
+                    setActivity({ isActive: false });
                     revalidate();
                   },
                 }
@@ -415,7 +432,8 @@ const Comment: NextPage<{
             }}
             collapsable={false}
             OnCancel={() => {
-              setReply(false);
+              // set it to not doing anything
+              setActivity({ isActive: false });
             }}
             isLoading={addCommentMutation.isLoading}
           />
