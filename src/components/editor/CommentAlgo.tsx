@@ -5,7 +5,7 @@ import {
   TrashIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
 import { signIn } from "next-auth/react";
@@ -17,8 +17,38 @@ import Loading from "../Loading";
 import { structureComments } from "~/utils/commentHelpers";
 import type { CommentData, CommentNode } from "~/utils/commentHelpers";
 
+const CommentContext = createContext<{
+  isActivelyEditing: boolean;
+  currentEditingCommentId?: string;
+  setIsActivelyEditing: (
+    obj: { isActive: true; id: string } | { isActive: false }
+  ) => void;
+
+  isAuthed: boolean;
+  user: {
+    id: string;
+    name: string;
+    image: string;
+  };
+  articleId: string;
+  requestDelete: (id: string) => void;
+}>({
+  isActivelyEditing: false,
+  currentEditingCommentId: undefined,
+  setIsActivelyEditing: () => {},
+
+  isAuthed: false,
+  user: {
+    id: "",
+    name: "",
+    image: "",
+  },
+  articleId: "",
+  requestDelete: () => {},
+});
+CommentContext.displayName = "Comment Context";
+
 const CommentAlgo: NextPage<{
-  // comments: Comment[];
   user: {
     id: string;
     name: string;
@@ -27,7 +57,6 @@ const CommentAlgo: NextPage<{
   articleId: string;
   isAuthed: boolean;
   slug: string;
-  // commentQuery: ReturnType<typeof api.comment.getBySlug.useQuery>;
 }> = ({ user, articleId, isAuthed, slug }) => {
   const commentQuery = api.comment.getBySlug.useQuery(slug);
   const [isDeleteRequested, setIsDeleteRequested] = useState(false);
@@ -74,26 +103,51 @@ const CommentAlgo: NextPage<{
     isRevalidating,
   ]);
 
+  const [isActivelyEditing, setIsActivelyEditing] = useState(false);
+  const [currentEditingCommentId, setCurrentEditingCommentId] = useState<
+    string | undefined
+  >(undefined);
+
   return (
     <div className="flex flex-col gap-2">
-      {structuredComment.rootComments.map((comment) => {
-        return (
-          <Comment
-            comment={comment}
-            key={comment.id}
-            user={user}
-            articleId={articleId}
-            isEdited={comment.isEdited}
-            isAuthed={isAuthed}
-            revalidate={commentQuery.refetch}
-            depth={0}
-            requestDelete={(id: string) => {
-              setDeleteCommentId(id);
-              setIsDeleteRequested(true);
-            }}
-          />
-        );
-      })}
+      <CommentContext.Provider
+        value={{
+          isActivelyEditing,
+          currentEditingCommentId: currentEditingCommentId,
+          setIsActivelyEditing: (
+            obj: { isActive: true; id: string } | { isActive: false }
+          ) => {
+            if (obj.isActive) {
+              setIsActivelyEditing(true);
+              // set the current editing comment id
+              setCurrentEditingCommentId(obj.id);
+            } else {
+              setIsActivelyEditing(false);
+              // set the current editing comment id
+              setCurrentEditingCommentId(undefined);
+            }
+          },
+          isAuthed,
+          user,
+          articleId,
+          requestDelete: (id: string) => {
+            setDeleteCommentId(id);
+            setIsDeleteRequested(true);
+          },
+        }}
+      >
+        {structuredComment.rootComments.map((comment) => {
+          return (
+            <Comment
+              comment={comment}
+              key={comment.id}
+              isEditedBefore={comment.isEdited}
+              revalidate={commentQuery.refetch}
+              depth={0}
+            />
+          );
+        })}
+      </CommentContext.Provider>
 
       <Dialog
         open={isDeleteRequested}
@@ -146,36 +200,29 @@ const CommentAlgo: NextPage<{
     </div>
   );
 };
-
 const Comment: NextPage<{
   comment: CommentNode;
-  user: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  articleId: string;
-  isAuthed: boolean;
-  isEdited: boolean;
+  isEditedBefore: boolean;
   depth: number;
   revalidate: () => void;
-  requestDelete: (id: string) => void;
-}> = ({
-  comment,
-  user,
-  articleId,
-  revalidate,
-  isAuthed,
-  isEdited,
-  depth,
-  requestDelete,
-}) => {
+}> = ({ comment, isEditedBefore, depth, revalidate }) => {
+  const {
+    isActivelyEditing,
+    setIsActivelyEditing,
+    currentEditingCommentId,
+    articleId,
+    isAuthed,
+    requestDelete,
+    user,
+  } = useContext(CommentContext);
+
   const [reply, setReply] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
 
   const addCommentMutation = api.comment.create.useMutation();
   const editCommentMutation = api.comment.update.useMutation();
+  const isEditing = isActivelyEditing && currentEditingCommentId === comment.id;
 
   const amITheAuthor = comment.author.id === user.id;
 
@@ -186,13 +233,20 @@ const Comment: NextPage<{
       editCommentMutation.reset();
 
       // set isEditing to false and update comment content
-      setIsEditing(false);
+      //setIsEditing(false);
+      setIsActivelyEditing({ isActive: false });
       comment.content = editValue;
 
       // revalidate the comments
       revalidate();
     }
-  }, [editCommentMutation, editValue, comment, revalidate]);
+  }, [
+    editCommentMutation,
+    editValue,
+    comment,
+    revalidate,
+    setIsActivelyEditing,
+  ]);
 
   return (
     <div className="">
@@ -226,7 +280,7 @@ const Comment: NextPage<{
             {comment.author.name}
           </Link>
           <span className="font-normal text-black/70">
-            {isEdited ? "edited" : ""}
+            {isEditedBefore ? "edited" : ""}
           </span>
 
           {!isEditing && <p className="break-all">{comment.content}</p>}
@@ -246,7 +300,10 @@ const Comment: NextPage<{
             <PencilSquareIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
-                setIsEditing(!isEditing);
+                //editCallback(comment.id, "toggle");
+                //setIsEditing(!isEditing);
+                if (isEditing) setIsActivelyEditing({ isActive: false });
+                else setIsActivelyEditing({ isActive: true, id: comment.id });
               }}
             />
           )}
@@ -318,7 +375,8 @@ const Comment: NextPage<{
             <button
               className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
               onClick={() => {
-                setIsEditing(false);
+                // setIsEditing(false);
+                setIsActivelyEditing({ isActive: false });
                 setEditValue(comment.content);
               }}
             >
@@ -368,13 +426,9 @@ const Comment: NextPage<{
             <Comment
               comment={child}
               key={child.id}
-              user={user}
-              articleId={articleId}
-              isEdited={child.isEdited}
-              isAuthed={isAuthed}
+              isEditedBefore={child.isEdited}
               revalidate={revalidate}
               depth={depth + 1}
-              requestDelete={(id: string) => requestDelete(id)}
             />
           );
         })}
