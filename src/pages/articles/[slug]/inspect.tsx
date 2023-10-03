@@ -354,6 +354,7 @@ const Inspect: NextPage = () => {
               >
                 Edit
               </Link>
+              {/* TODO: Investigate what this was suppose to do */}
               {/* <button
               onClick={() => {
                 if (typeof articleInfo.data?.isPublished !== "undefined")

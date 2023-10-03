@@ -256,7 +256,7 @@ const Articles: NextPage = () => {
         <div className="py-4">
           <p className="text-lg font-semibold">
             <span className="font-medium">
-              {/* {commentData.data?.rootCommentsCount + " "} */}
+              {commentData.data?.rootCommentsCount + " "}
             </span>
             Comments
           </p>
@@ -339,7 +339,10 @@ export async function getStaticProps(
   const slug = context.params?.slug as string;
 
   // prefetch `article.getBySlug`
-  await helpers.article.getBySlug.prefetch(slug);
+  const articleBySlug = helpers.article.getBySlug.prefetch(slug);
+  const commentBySlug = helpers.comment.getBySlug.prefetch(slug);
+
+  await Promise.all([articleBySlug, commentBySlug]);
 
   return {
     props: {
