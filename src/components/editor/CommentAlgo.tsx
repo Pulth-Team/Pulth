@@ -5,7 +5,7 @@ import {
   TrashIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
 import { signIn } from "next-auth/react";
@@ -14,166 +14,11 @@ import { twMerge } from "tailwind-merge";
 import { Dialog } from "@headlessui/react";
 import Loading from "../Loading";
 
-interface Comment {
-  id: string;
-  content: string;
-  isEdited: boolean;
-  parentIds: string[];
-  author: {
-    id: string | null;
-    name: string | null;
-    image: string | null;
-  };
-}
-
-class CommentNode {
-  id: string = "";
-  content: string = "";
-  isEdited: boolean = false;
-  parentIds: string[] = [];
-  fullfilled: boolean = false;
-  author: {
-    id: string | null;
-    name: string | null;
-    image: string | null;
-  } = {
-    id: null,
-    name: null,
-    image: null,
-  };
-  children: CommentNode[] = [];
-
-  public static fromComment(comment: Comment) {
-    const node = new CommentNode();
-    node.author = comment.author;
-    node.content = comment.content;
-    node.id = comment.id;
-    node.parentIds = comment.parentIds;
-    node.children = [];
-    node.fullfilled = true;
-    node.isEdited = comment.isEdited;
-    return node;
-  }
-
-  public static fromDummy(id: string, parentIds: string[]) {
-    const node = new CommentNode();
-    node.author = {
-      id: null,
-      name: null,
-      image: null,
-    };
-    node.content = "";
-    node.id = id;
-    node.parentIds = parentIds;
-    node.children = [];
-    node.fullfilled = false;
-    return node;
-  }
-
-  addChild(child: CommentNode) {
-    this.children.push(child);
-  }
-
-  checkAndGetChild(id: string) {
-    const child = this.children.filter((child) => child.id === id);
-    if (child.length === 0) return null;
-    else if (child.length == 1) return child[0];
-    else throw new Error("More than one child found, more than 1 id match");
-  }
-  checkAndGetPath(
-    pathArray: string[]
-  ): CommentNode | { failed: true; path: string[] } {
-    if (pathArray.length > 0 && pathArray[0]) {
-      const child = this.checkAndGetChild(pathArray[0]);
-      if (child) {
-        return child.checkAndGetPath(pathArray.slice(1));
-      } else {
-        return { failed: true, path: pathArray };
-      }
-    }
-    return this;
-  }
-}
-
-// Node based comment tree
-class CommentTree {
-  rootComments: CommentNode[];
-
-  constructor() {
-    this.rootComments = [];
-  }
-
-  getPath(pathArray: string[]) {
-    return this.rootComments.find((rootComment) => {
-      if (rootComment.id === pathArray[0]) {
-        return rootComment.checkAndGetPath(pathArray.slice(1));
-      }
-    });
-  }
-
-  addComment(comment: Comment) {
-    // check if the parentId exists
-    // if it does, add the comment to the last node
-    // if it doesn't, create the path and add the comment to the last node
-
-    // parentIds is empty, add to root
-    if (comment.parentIds.length === 0) {
-      this.rootComments.push(CommentNode.fromComment(comment));
-    }
-    // parentIds is not empty, add to parent's children
-    else {
-      // get first parent it should be in the root comments
-      const rootParent = this.rootComments.filter((rootComment) => {
-        return rootComment.id === comment.parentIds[0];
-      });
-      // if there is no root parent, return false
-      if (rootParent.length === 0) {
-        throw new Error("No root parent found");
-
-        // if there is more than one root parent, throw error
-      } else if (rootParent.length > 1) {
-        throw new Error(
-          "More than one root parent found, more than 1 id match"
-        );
-
-        // if there is one root parent, check if the path exists
-      } else if (rootParent.length == 1 && rootParent[0]) {
-        const pathExists = rootParent[0].checkAndGetPath(
-          comment.parentIds.slice(1)
-        );
-
-        if (pathExists instanceof CommentNode) {
-          // console.log(
-          //   "path exists",
-          //   { content: pathExists.content, id: pathExists.id },
-          //   {
-          //     content: comment.content,
-          //     id: comment.id,
-          //     given: comment.parentIds.slice(1),
-          //   }
-          // );
-
-          pathExists.addChild(CommentNode.fromComment(comment));
-        } else {
-          console.log("path doesn't exist", pathExists);
-        }
-      }
-    }
-  }
-}
-
-const structureComments = (comments: Comment[]) => {
-  const commentTree = new CommentTree();
-
-  comments.forEach((comment) => {
-    commentTree.addComment(comment);
-  });
-
-  return commentTree;
-};
+import { structureComments } from "~/utils/commentHelpers";
+import type { CommentData, CommentNode } from "~/utils/commentHelpers";
 
 const CommentAlgo: NextPage<{
-  comments: Comment[];
+  // comments: Comment[];
   user: {
     id: string;
     name: string;
@@ -181,9 +26,53 @@ const CommentAlgo: NextPage<{
   };
   articleId: string;
   isAuthed: boolean;
-  revalidate: () => void;
-}> = ({ comments, user, articleId, revalidate, isAuthed }) => {
-  const structuredComment = structureComments(comments);
+  slug: string;
+  // commentQuery: ReturnType<typeof api.comment.getBySlug.useQuery>;
+}> = ({ user, articleId, isAuthed, slug }) => {
+  const commentQuery = api.comment.getBySlug.useQuery(slug);
+  const [isDeleteRequested, setIsDeleteRequested] = useState(false);
+  const [isRevalidating, setIsRevalidating] = useState(false);
+
+  const [deleteCommentId, setDeleteCommentId] = useState<string>("");
+
+  const deleteCommentMutation = api.comment.delete.useMutation();
+  const structuredComment = structureComments(
+    (
+      commentQuery.data as
+        | { comments: CommentData[]; rootCommentsCount: number }
+        | undefined
+    )?.comments || []
+  );
+
+  // closes the dialog when the comment is deleted and revalidates the comments
+  useEffect(() => {
+    if (deleteCommentMutation.isSuccess) {
+      // revalidate the comments
+      commentQuery.refetch();
+      setIsRevalidating(true);
+
+      setDeleteCommentId("");
+    }
+  }, [deleteCommentMutation.isSuccess, commentQuery]);
+
+  //useEffect for commentQuery on success
+  useEffect(() => {
+    if (
+      deleteCommentMutation.isSuccess &&
+      !commentQuery.isFetching &&
+      isRevalidating
+    ) {
+      deleteCommentMutation.reset();
+      setIsRevalidating(false);
+      setIsDeleteRequested(false);
+      setDeleteCommentId("");
+    }
+  }, [
+    commentQuery.isSuccess,
+    commentQuery.isFetching,
+    deleteCommentMutation,
+    isRevalidating,
+  ]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -196,11 +85,64 @@ const CommentAlgo: NextPage<{
             articleId={articleId}
             isEdited={comment.isEdited}
             isAuthed={isAuthed}
-            revalidate={revalidate}
+            revalidate={commentQuery.refetch}
             depth={0}
+            requestDelete={(id: string) => {
+              setDeleteCommentId(id);
+              setIsDeleteRequested(true);
+            }}
           />
         );
       })}
+
+      <Dialog
+        open={isDeleteRequested}
+        onClose={() => setIsDeleteRequested(false)}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-white p-4">
+            <Dialog.Title className={"my-2 text-lg font-medium"}>
+              Delete Comment
+            </Dialog.Title>
+            <Dialog.Description>
+              Are you sure you want to delete this comment?
+            </Dialog.Description>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
+                onClick={() => {
+                  setIsDeleteRequested(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex items-center gap-2 rounded-md bg-red-500 p-2 text-white hover:bg-red-400 active:bg-red-600"
+                onClick={() => {
+                  if (deleteCommentId) {
+                    deleteCommentMutation.mutateAsync({
+                      id: deleteCommentId,
+                    });
+                  } else
+                    console.error(
+                      "Delete comment id is null, this should not happen"
+                    );
+                }}
+              >
+                {deleteCommentMutation.isLoading || commentQuery.isFetching ? (
+                  <Loading className="h-5 w-5 border-2" />
+                ) : (
+                  <TrashIcon className="h-5 w-5" />
+                )}
+                Delete
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 };
@@ -217,17 +159,41 @@ const Comment: NextPage<{
   isEdited: boolean;
   depth: number;
   revalidate: () => void;
-}> = ({ comment, user, articleId, revalidate, isAuthed, isEdited, depth }) => {
+  requestDelete: (id: string) => void;
+}> = ({
+  comment,
+  user,
+  articleId,
+  revalidate,
+  isAuthed,
+  isEdited,
+  depth,
+  requestDelete,
+}) => {
   const [reply, setReply] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(comment.content);
-  const [deleteModal, setDeleteModal] = useState(false);
 
   const addCommentMutation = api.comment.create.useMutation();
   const editCommentMutation = api.comment.update.useMutation();
-  const deleteCommentMutation = api.comment.delete.useMutation();
 
   const amITheAuthor = comment.author.id === user.id;
+
+  useEffect(() => {
+    // doesnt look smooth
+    if (editCommentMutation.isSuccess) {
+      // reset mutation state
+      editCommentMutation.reset();
+
+      // set isEditing to false and update comment content
+      setIsEditing(false);
+      comment.content = editValue;
+
+      // revalidate the comments
+      revalidate();
+    }
+  }, [editCommentMutation, editValue, comment, revalidate]);
+
   return (
     <div className="">
       <div className="flex gap-2">
@@ -289,7 +255,7 @@ const Comment: NextPage<{
             <TrashIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
-                setDeleteModal(true);
+                requestDelete(comment.id);
               }}
             />
           )}
@@ -333,22 +299,20 @@ const Comment: NextPage<{
             <button
               className="flex items-center gap-2 rounded-md bg-indigo-500 p-2 text-white hover:bg-indigo-400 active:bg-indigo-600 disabled:bg-indigo-400"
               onClick={() => {
-                editCommentMutation.mutate(
-                  {
-                    id: comment.id,
-                    content: editValue,
-                  },
-                  {
-                    onSuccess: () => {
-                      setIsEditing(false);
-                      comment.content = editValue;
-                      revalidate();
-                    },
-                  }
-                );
+                editCommentMutation.mutate({
+                  id: comment.id,
+                  content: editValue,
+                });
               }}
-              disabled={editValue === comment.content || editValue === ""}
+              disabled={
+                editValue === comment.content ||
+                editValue === "" ||
+                editCommentMutation.isLoading
+              }
             >
+              {editCommentMutation.isLoading && (
+                <Loading className="h-5 w-5 border-2" />
+              )}
               Update
             </button>
             <button
@@ -410,60 +374,11 @@ const Comment: NextPage<{
               isAuthed={isAuthed}
               revalidate={revalidate}
               depth={depth + 1}
+              requestDelete={(id: string) => requestDelete(id)}
             />
           );
         })}
       </div>
-
-      <Dialog
-        open={deleteModal}
-        onClose={() => setDeleteModal(false)}
-        className="relative z-50"
-      >
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-white p-4">
-            <Dialog.Title className={"my-2 text-lg font-medium"}>
-              Delete Comment
-            </Dialog.Title>
-            <Dialog.Description>
-              Are you sure you want to delete this comment?
-            </Dialog.Description>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                className="rounded-md bg-gray-200 p-2 hover:bg-gray-300 active:bg-gray-400"
-                onClick={() => {
-                  setDeleteModal(false);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="flex items-center gap-2 rounded-md bg-red-500 p-2 text-white hover:bg-red-400 active:bg-red-600"
-                onClick={() => {
-                  deleteCommentMutation.mutate(
-                    { id: comment.id },
-                    {
-                      onSuccess: () => {
-                        setDeleteModal(false);
-                        revalidate();
-                      },
-                    }
-                  );
-                }}
-              >
-                {deleteCommentMutation.isLoading ? (
-                  <Loading className="h-5 w-5 border-2" />
-                ) : (
-                  <TrashIcon className="h-5 w-5" />
-                )}
-                Delete
-              </button>
-            </div>
-          </Dialog.Panel>
-        </div>
-      </Dialog>
     </div>
   );
 };

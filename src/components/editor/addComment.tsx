@@ -89,7 +89,8 @@ const CommentAdd = ({
           className={twMerge(
             "justify-end gap-2",
             collapsable
-              ? (val.length > 0 ? "flex" : "hidden") + " group-focus-within:flex"
+              ? (val.length > 0 ? "flex" : "hidden") +
+                  " group-focus-within:flex"
               : "flex"
           )}
         >
