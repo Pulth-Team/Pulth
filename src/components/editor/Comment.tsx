@@ -24,8 +24,7 @@ const Comment: NextPage<{
   comment: CommentNode;
   isEditedBefore: boolean;
   depth: number;
-  revalidate: () => void;
-}> = ({ comment, isEditedBefore, depth, revalidate }) => {
+}> = ({ comment, isEditedBefore, depth }) => {
   const {
     activity,
     setActivity,
@@ -34,6 +33,8 @@ const Comment: NextPage<{
     isAuthed,
     requestDelete,
     user,
+    revalidate,
+    revalidationStatus,
   } = useContext(CommentContext);
   const [editValue, setEditValue] = useState(comment.content);
 
@@ -48,18 +49,19 @@ const Comment: NextPage<{
 
   useEffect(() => {
     // doesnt look smooth
-    if (editCommentMutation.isSuccess) {
+    if (editCommentMutation.isSuccess && isEditing) {
       // reset mutation state
       editCommentMutation.reset();
-
-      // set isEditing to false and update comment content
-      setActivity({ isActive: false });
       comment.content = editValue;
 
       // revalidate the comments
-      revalidate();
+      // revalidation will be done in CommentAlgo
+      // when revaidation is done, it will set revalidationStatus to "idle"
+      // and we will set activity to "idle" in CommentAlgo
+      // and it will set currentActiveCommentId to ""
+      revalidate("edit");
     }
-  }, [editCommentMutation, editValue, comment, revalidate, setActivity]);
+  }, [comment, editCommentMutation, editValue, isEditing, revalidate]);
 
   return (
     <div className="">
@@ -137,6 +139,7 @@ const Comment: NextPage<{
             <TrashIcon
               className="h-5 w-5 text-black/70 hover:text-black"
               onClick={() => {
+                // send delete request ro parent CommentAlgo component
                 requestDelete(comment.id);
               }}
             />
@@ -192,7 +195,8 @@ const Comment: NextPage<{
                 editCommentMutation.isLoading
               }
             >
-              {editCommentMutation.isLoading && (
+              {(editCommentMutation.isLoading ||
+                revalidationStatus === "loading") && (
                 <Loading className="h-5 w-5 border-2" />
               )}
               Update
@@ -232,9 +236,7 @@ const Comment: NextPage<{
                 },
                 {
                   onSuccess: () => {
-                    // set it to not doing anything
-                    setActivity({ isActive: false });
-                    revalidate();
+                    revalidate("reply");
                   },
                 }
               );
@@ -254,7 +256,6 @@ const Comment: NextPage<{
               comment={child}
               key={child.id}
               isEditedBefore={child.isEdited}
-              revalidate={revalidate}
               depth={depth + 1}
             />
           );

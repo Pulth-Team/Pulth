@@ -25,7 +25,9 @@ const CommentAlgo: NextPage<{
 }> = ({ user, articleId, isAuthed, slug }) => {
   const commentQuery = api.comment.getBySlug.useQuery(slug);
   const [isDeleteRequested, setIsDeleteRequested] = useState(false);
-  const [isRevalidating, setIsRevalidating] = useState(false);
+  const [revalidationState, setRevalidationState] = useState<
+    "idle" | "delete" | "edit" | "reply"
+  >("idle");
 
   const [deleteCommentId, setDeleteCommentId] = useState<string>("");
 
@@ -38,31 +40,45 @@ const CommentAlgo: NextPage<{
   useEffect(() => {
     if (deleteCommentMutation.isSuccess) {
       // revalidate the comments
+      setRevalidationState("delete");
       commentQuery.refetch();
-      setIsRevalidating(true);
 
       setDeleteCommentId("");
     }
   }, [deleteCommentMutation.isSuccess, commentQuery]);
 
-  //useEffect for commentQuery on success
+  //useEffect for deleteComment on success
   useEffect(() => {
     if (
       deleteCommentMutation.isSuccess &&
+      // for some reason, the we cannot use isFetched here
+      // TODO: find out why
       !commentQuery.isFetching &&
-      isRevalidating
+      revalidationState === "delete"
     ) {
       deleteCommentMutation.reset();
-      setIsRevalidating(false);
+      setRevalidationState("idle");
+      // close the dialog
       setIsDeleteRequested(false);
+      // resets the delete comment id to empty string
+      // so that the dialog doesnt open again when the comment is deleted
       setDeleteCommentId("");
     }
-  }, [
-    commentQuery.isSuccess,
-    commentQuery.isFetching,
-    deleteCommentMutation,
-    isRevalidating,
-  ]);
+  }, [commentQuery.isFetching, deleteCommentMutation, revalidationState]);
+
+  // useEffect for revalidation on success
+  useEffect(() => {
+    if (
+      // for some reason, the we cannot use isFetched here
+      !commentQuery.isFetching &&
+      revalidationState === "edit"
+    ) {
+      setRevalidationState("idle");
+      // reset the context state
+      setActivity("none");
+      setCurrentActiveCommentId(undefined);
+    }
+  }, [commentQuery.isFetching, revalidationState]);
 
   const [activity, setActivity] = useState<"edit" | "reply" | "none">("none");
   const [currentActiveCommentId, setCurrentActiveCommentId] = useState<
@@ -76,6 +92,16 @@ const CommentAlgo: NextPage<{
           isActive: activity !== "none",
           activity,
           currentActiveCommentId,
+
+          isAuthed,
+          user,
+          articleId,
+          revalidationStatus: (() => {
+            if (!commentQuery.isFetching) return "success";
+            if (commentQuery.isFetching) return "loading";
+            if (commentQuery.isError) return "error";
+            return "idle";
+          })(),
           setActivity: (obj: ActivitySettings) => {
             if (!obj.isActive) {
               setCurrentActiveCommentId(undefined);
@@ -88,12 +114,13 @@ const CommentAlgo: NextPage<{
             setCurrentActiveCommentId(id);
             setActivity(activity);
           },
-          isAuthed,
-          user,
-          articleId,
           requestDelete: (id: string) => {
             setDeleteCommentId(id);
             setIsDeleteRequested(true);
+          },
+          revalidate: (reason: "edit" | "reply") => {
+            setRevalidationState(reason);
+            commentQuery.refetch();
           },
         }}
       >
@@ -103,7 +130,6 @@ const CommentAlgo: NextPage<{
               comment={comment}
               key={comment.id}
               isEditedBefore={comment.isEdited}
-              revalidate={commentQuery.refetch}
               depth={0}
             />
           );
@@ -138,7 +164,7 @@ const CommentAlgo: NextPage<{
                 className="flex items-center gap-2 rounded-md bg-red-500 p-2 text-white hover:bg-red-400 active:bg-red-600"
                 onClick={() => {
                   if (deleteCommentId) {
-                    deleteCommentMutation.mutateAsync({
+                    deleteCommentMutation.mutate({
                       id: deleteCommentId,
                     });
                   } else
