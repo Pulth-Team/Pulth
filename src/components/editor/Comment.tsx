@@ -63,6 +63,13 @@ const Comment: NextPage<{
     }
   }, [comment, editCommentMutation, editValue, isEditing, revalidate]);
 
+  useEffect(() => {
+    if (addCommentMutation.isSuccess && isReplying) {
+      addCommentMutation.reset();
+      revalidate("reply");
+    }
+  }, [addCommentMutation, isReplying, revalidate]);
+
   return (
     <div className="">
       <div className="flex gap-2">
@@ -228,25 +235,20 @@ const Comment: NextPage<{
               image: user.image || "/default_profile.jpg",
             }}
             OnComment={({ content }) => {
-              addCommentMutation.mutate(
-                {
-                  content,
-                  parentId: comment.id,
-                  articleId,
-                },
-                {
-                  onSuccess: () => {
-                    revalidate("reply");
-                  },
-                }
-              );
+              addCommentMutation.mutate({
+                content,
+                parentId: comment.id,
+                articleId,
+              });
             }}
             collapsable={false}
             OnCancel={() => {
               // set it to not doing anything
               setActivity({ isActive: false });
             }}
-            isLoading={addCommentMutation.isLoading}
+            isLoading={
+              addCommentMutation.isLoading || revalidationStatus === "loading"
+            }
           />
         )}
 

@@ -49,6 +49,8 @@ const CommentAlgo: NextPage<{
 
   //useEffect for deleteComment on success
   useEffect(() => {
+    // only use this effect when you are doing something
+    // revalidationState is delete
     if (
       deleteCommentMutation.isSuccess &&
       // for some reason, the we cannot use isFetched here
@@ -68,11 +70,17 @@ const CommentAlgo: NextPage<{
 
   // useEffect for revalidation on success
   useEffect(() => {
+    // only use this effect when you are doing something
+    // revalidationState is not delete
     if (
       // for some reason, the we cannot use isFetched here
       !commentQuery.isFetching &&
-      revalidationState === "edit"
+      // we are checing revaidationState here because
+      // delete logic is handled in the above useEffect
+      ["reply", "edit"].includes(revalidationState)
     ) {
+      // reset the revalidation state
+      // so we can identify the next revalidation
       setRevalidationState("idle");
       // reset the context state
       setActivity("none");
