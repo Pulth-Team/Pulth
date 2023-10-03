@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getBaseUrl } from "~/utils/api";
 
 import { signIn, useSession } from "next-auth/react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import {
   SparklesIcon,
   ChevronUpIcon,
@@ -39,7 +39,6 @@ const Articles: NextPage = () => {
   const router = useRouter();
   const { data: userData, status: authStatus } = useSession();
   const { slug } = router.query;
-  const [myVote, setMyVote] = useState<"up" | "down" | "none">("none");
 
   // query to get the article data
   const articleData = api.article.getBySlug.useQuery((slug as string) || "");
@@ -51,45 +50,27 @@ const Articles: NextPage = () => {
     }
   );
 
-  // mutation to add a comment
-  const commentAddMutation = api.comment.create.useMutation();
   // mutation to add a vote
-  const voteAddMutation = api.vote.voteByArticleId.useMutation({
-    onSuccess: (data) => {
-      voteRankQuery.refetch();
-    },
-  });
+  const voteAddMutation = api.vote.voteByArticleId.useMutation();
 
   // query to get my vote automatically
-  api.vote.checkMyVoteByArticleId.useQuery(articleData.data?.id as string, {
-    enabled: authStatus === "authenticated" && articleData.data?.id !== null,
-    onSuccess: (data) => {
-      // check if there is a msg prop
-      if ("msg" in data) {
-        setMyVote("none");
-      } else {
-        // otherwise set the vote to the data vote
-        setMyVote(data.upVote ? "up" : "down");
-      }
-    },
-  });
+  const myVoteQuery = api.vote.checkMyVoteByArticleId.useQuery(
+    articleData.data?.id as string,
+    {
+      enabled: authStatus === "authenticated" && articleData.data?.id !== null,
+    }
+  );
+
+  // mutation to add a comment
+  const commentAddMutation = api.comment.create.useMutation();
 
   const OnCommentAdd = (comment: AddCommentData) => {
     // TODO: open a modal  for the comment
-    commentAddMutation.mutate(
-      {
-        articleId: articleData.data?.id as string,
-        content: comment.content,
-        parentId: comment.parent,
-      },
-      {
-        onSuccess: () => {
-          // refetch the article data
-          // to get the updated comments
-          articleData.refetch();
-        },
-      }
-    );
+    commentAddMutation.mutate({
+      articleId: articleData.data?.id as string,
+      content: comment.content,
+      parentId: comment.parent,
+    });
   };
 
   let userImage = userData?.user?.image;
@@ -125,17 +106,34 @@ const Articles: NextPage = () => {
 
       {/* Rank and action buttons */}
       {articleData.data?.id && (
-        <div className="mb-6 mt-8 flex flex-row justify-between">
+        <div className="mb-6 mt-8 flex flex-row  justify-between">
           <div className="flex gap-4">
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <SparklesIcon className="h-6 w-6 text-black" />
-              {/* {voteAddMutation.data
-              ? voteAddMutation.data.newRank
-              : articleData.data?.voteRank || 0} */}
-              {voteAddMutation.isLoading || voteRankQuery.isLoading ? (
-                <Loading className="h-6 w-6 border-2" />
-              ) : (
+              {/* 
+              TODO: 
+                Loading icon is glithing but good enough for now
+                to Reproduce the glitch:
+                  1. go to an article
+                  2. minimize the window / go to another app
+                  3. come back to the article
+                  4. the loading icon will glitch
+                  - loading will show up then show the vote 
+                  - then loading will show up again and then show the vote
+                  - this will happen only once
+
+
+                  !voteRankQuery.isFetching &&
+                  !voteAddMutation.isLoading &&
+                  voteRankQuery.isSuccess 
+
+                  voteRankQuery.isSuccess this condition is might be removed
+              */}
+
+              {!voteRankQuery.isFetching && !voteAddMutation.isLoading ? (
                 voteRankQuery.data
+              ) : (
+                <Loading className="h-6 w-6 border-2" />
               )}
             </div>
             <button
@@ -144,25 +142,23 @@ const Articles: NextPage = () => {
                   signIn();
                   return;
                 } else {
-                  voteAddMutation.mutate(
-                    {
+                  // FIXME: we might consider remove async mutation here
+                  voteAddMutation
+                    .mutateAsync({
                       articleId: articleData.data?.id as string,
                       vote: "up",
-                    },
-                    {
-                      onSuccess: (data) => {
-                        if (data.voteDirection == "deleted") setMyVote("none");
-                        else setMyVote("up");
-                      },
-                    }
-                  );
+                    })
+                    .then(() => {
+                      voteRankQuery.refetch();
+                      myVoteQuery.refetch();
+                    });
                 }
               }}
             >
               <ChevronUpIcon
-                className={`h-6 w-6 ${
-                  myVote !== "none" && myVote === "up"
-                    ? "text-indigo-500"
+                className={`h-8 w-8 p-1 ${
+                  myVoteQuery.data?.voteDirection === "up"
+                    ? " rounded-full bg-gray-200 text-indigo-500"
                     : " text-black"
                 }`}
               />
@@ -173,31 +169,28 @@ const Articles: NextPage = () => {
                   signIn();
                   return;
                 } else {
-                  voteAddMutation.mutate(
-                    {
+                  // FIXME: we might consider remove async mutation here
+                  voteAddMutation
+                    .mutateAsync({
                       articleId: articleData.data?.id as string,
                       vote: "down",
-                    },
-                    {
-                      onSuccess: (data) => {
-                        if (data.voteDirection == "deleted") setMyVote("none");
-                        else setMyVote("down");
-                      },
-                    }
-                  );
+                    })
+                    .then(() => {
+                      voteRankQuery.refetch();
+                      myVoteQuery.refetch();
+                    });
                 }
               }}
             >
               <ChevronDownIcon
-                className={`h-6 w-6 ${
-                  myVote !== "none" && myVote === "down"
-                    ? "text-indigo-500"
+                className={`h-8 w-8 p-1 ${
+                  myVoteQuery.data?.voteDirection === "down"
+                    ? "rounded-full bg-gray-200 text-indigo-500"
                     : " text-black"
                 }`}
               />
             </button>
           </div>
-          <div></div>
           {/* TODO: Add share and bookmark functionality */}
           {/* Will be added later */}
           {/* <div className="flex gap-4">
