@@ -24,6 +24,8 @@ const CommentContext = createContext<{
   };
   articleId: string;
   requestDelete: (id: string) => void;
+  revalidate: (reason: "edit" | "reply") => void;
+  revalidationStatus: "idle" | "loading" | "success" | "error";
 }>({
   isActive: false,
   activity: "none",
@@ -38,6 +40,8 @@ const CommentContext = createContext<{
   },
   articleId: "",
   requestDelete: () => {},
+  revalidate: () => {},
+  revalidationStatus: "idle",
 });
 CommentContext.displayName = "Comment Context";
 
