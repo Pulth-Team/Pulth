@@ -36,23 +36,6 @@ export const articleRouter = createTRPCRouter({
           },
         },
         isPublished: true,
-        // should we include the comments here?
-        // we shouldnt but we are for now
-        Comments: {
-          select: {
-            id: true,
-            author: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-            isEdited: true,
-            content: true,
-            parentIds: true,
-          },
-        },
       },
     });
     // if the article doesn't exist, return null
