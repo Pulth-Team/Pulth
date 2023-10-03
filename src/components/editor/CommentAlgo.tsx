@@ -5,7 +5,7 @@ import {
   TrashIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CommentAdd from "./addComment";
 import { api } from "~/utils/api";
 import { signIn } from "next-auth/react";
@@ -15,48 +15,8 @@ import { Dialog } from "@headlessui/react";
 import Loading from "../Loading";
 
 import { structureComments } from "~/utils/commentHelpers";
-import type { CommentData, CommentNode } from "~/utils/commentHelpers";
-
-type ActivitySettings =
-  | {
-      isActive: true;
-      id: string;
-      activity: "edit" | "reply";
-    }
-  | {
-      isActive: false;
-    };
-
-const CommentContext = createContext<{
-  isActive: boolean;
-  activity: "edit" | "reply" | "none";
-  setActivity: (obj: ActivitySettings) => void;
-  currentActiveCommentId?: string;
-
-  isAuthed: boolean;
-  user: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  articleId: string;
-  requestDelete: (id: string) => void;
-}>({
-  isActive: false,
-  activity: "none",
-  setActivity: () => {},
-  currentActiveCommentId: undefined,
-
-  isAuthed: false,
-  user: {
-    id: "",
-    name: "",
-    image: "",
-  },
-  articleId: "",
-  requestDelete: () => {},
-});
-CommentContext.displayName = "Comment Context";
+import type { CommentNode } from "~/utils/commentHelpers";
+import CommentContext, { ActivitySettings } from "../contexts/Comment";
 
 const CommentAlgo: NextPage<{
   user: {
@@ -76,11 +36,7 @@ const CommentAlgo: NextPage<{
 
   const deleteCommentMutation = api.comment.delete.useMutation();
   const structuredComment = structureComments(
-    (
-      commentQuery.data as
-        | { comments: CommentData[]; rootCommentsCount: number }
-        | undefined
-    )?.comments || []
+    commentQuery.data?.comments || []
   );
 
   // closes the dialog when the comment is deleted and revalidates the comments
@@ -210,6 +166,7 @@ const CommentAlgo: NextPage<{
     </div>
   );
 };
+
 const Comment: NextPage<{
   comment: CommentNode;
   isEditedBefore: boolean;
@@ -217,7 +174,6 @@ const Comment: NextPage<{
   revalidate: () => void;
 }> = ({ comment, isEditedBefore, depth, revalidate }) => {
   const {
-    isActive,
     activity,
     setActivity,
     currentActiveCommentId,
