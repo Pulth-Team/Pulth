@@ -91,10 +91,10 @@ const Dashboard: NextPage<{ children: React.ReactNode }> = ({ children }) => {
           onClick={() => setSearchModal(false)}
         >
           <div className="flex flex-col gap-y-2">
-            <p className="text-lg font-bold text-white line-clamp-1 md:text-xl">
+            <p className="line-clamp-1 text-lg font-bold text-white md:text-xl">
               {hit.title}
             </p>
-            <p className="text-sm font-semibold italic text-gray-400 line-clamp-2 md:line-clamp-1">
+            <p className="line-clamp-2 text-sm font-semibold italic text-gray-400 md:line-clamp-1">
               {hit.description}
             </p>
             <Link href="/profile">
