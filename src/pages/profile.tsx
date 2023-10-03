@@ -67,40 +67,35 @@ const Articles: NextPage = () => {
     [FilterObject.Draft, FilterObject.Published]
   );
 
+  // state for date range filter
+  // TODO: Add between dates
   const [dateRangeFilter, SetDateRangeFilter] = useState<
     FilterObject.lastMonth | FilterObject.lastWeek | FilterObject.AllTime
   >(FilterObject.AllTime);
 
-  const [articleData, setArticleData] = useState<
-    {
-      title: string;
-      description: string;
-      slug: string;
-      isPublished: boolean;
-      createdAt: Date;
-    }[]
-  >([]);
-
   const onSubmitDialog = () => {
-    createMutation.mutate(
-      {
-        title: dialogTitle,
-        description: dialogDescription,
-      },
-      {
-        onSuccess: () => {
-          articleDataFetch.refetch();
-          setDialogDescription("");
-          setDialogTitle("");
-          setIsOpen(false);
-        },
-      }
-    );
+    createMutation.mutate({
+      title: dialogTitle,
+      description: dialogDescription,
+    });
   };
 
+  const createMutation = api.article.create.useMutation();
+
+  const articleDataFetch = api.article.getMyArticles.useQuery({
+    limit: 9,
+    page: 0,
+    filters: {
+      isPublished: filterObjects.includes(FilterObject.Published),
+      isDraft: filterObjects.includes(FilterObject.Draft),
+      timePeriod: dateRangeFilter,
+    },
+  });
   // Ordering the articles based on the selectedOrderType
   useMemo(() => {
-    articleData.sort((a, b) => {
+    if (!articleDataFetch.data) return;
+
+    articleDataFetch.data.sort((a, b) => {
       switch (selectedOrderType) {
         case OrderType.Newest:
           return b.createdAt.getTime() - a.createdAt.getTime();
@@ -112,27 +107,26 @@ const Articles: NextPage = () => {
           return b.isPublished ? -1 : 1;
       }
     });
-  }, [selectedOrderType, articleData]);
+  }, [selectedOrderType, articleDataFetch.data]);
 
-  const createMutation = api.article.create.useMutation();
+  useEffect(() => {
+    if (createMutation.isSuccess) {
+      // reseting the mutation state
+      // so it wont cause infinite loop
+      // because if we dont isSucess will be true
+      // and it will cause the useEffect to run again
+      // so we would refetch "articleDataFetch" query again and again
+      createMutation.reset();
 
-  // TODO: remove state syncing in onsuccess of query and use the query data directly
-  const articleDataFetch = api.article.getMyArticles.useQuery(
-    {
-      limit: 9,
-      page: 0,
-      filters: {
-        isPublished: filterObjects.includes(FilterObject.Published),
-        isDraft: filterObjects.includes(FilterObject.Draft),
-        timePeriod: dateRangeFilter,
-      },
-    },
-    {
-      onSuccess(data) {
-        setArticleData(data);
-      },
+      // refetching the query to get the new articles
+      articleDataFetch.refetch();
+
+      // reseting the dialog state
+      setDialogDescription("");
+      setDialogTitle("");
+      setIsOpen(false);
     }
-  );
+  }, [createMutation, articleDataFetch]);
 
   return (
     <DashboardLayout>
@@ -338,22 +332,26 @@ const Articles: NextPage = () => {
               <Loading className="mt-4 h-12 w-12 border-4" />
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {articleData.map((article) => (
-                  <MyArticleCard
-                    key={article.slug}
-                    title={article.title}
-                    description={article.description}
-                    slug={article.slug}
-                    isPublished={article.isPublished}
-                    // TODO: Maybe add an image
-                    // image={article.image}
-                  />
-                ))}
+                {articleDataFetch.data ? (
+                  articleDataFetch.data.map((article) => (
+                    <MyArticleCard
+                      key={article.slug}
+                      title={article.title}
+                      description={article.description}
+                      slug={article.slug}
+                      isPublished={article.isPublished}
+                      // TODO: Maybe add an image
+                      // image={article.image}
+                    />
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500">No articles found</p>
+                )}
 
                 {/* Add Project div */}
                 {!articleDataFetch.isLoading &&
                   articleDataFetch.data &&
-                  articleData.length < 9 && (
+                  articleDataFetch.data.length < 9 && (
                     <button
                       className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
                       onClick={() => setIsOpen(true)}
@@ -412,7 +410,7 @@ const Articles: NextPage = () => {
                           maxLength={100}
                           minLength={12}
                           required
-                          //
+                          // aria fields for accessibility
                           aria-invalid={
                             dialogTitle.length < 12 || dialogTitle.length > 100
                           }
@@ -447,7 +445,7 @@ const Articles: NextPage = () => {
                           maxLength={320}
                           minLength={40}
                           required
-                          //
+                          // aria fields for accessibility
                           aria-invalid={
                             dialogTitle.length < 40 || dialogTitle.length > 320
                           }
