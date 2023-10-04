@@ -291,6 +291,12 @@ export const articleRouter = createTRPCRouter({
         },
       });
 
+      if (!article)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
+
       if (ctx.session.user.id != article?.authorId)
         throw new TRPCError({
           code: "UNAUTHORIZED",
