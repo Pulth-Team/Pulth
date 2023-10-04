@@ -1,4 +1,10 @@
-import { useRef, useEffect, useLayoutEffect, MutableRefObject } from "react";
+import {
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  MutableRefObject,
+  useMemo,
+} from "react";
 import type { API, EditorConfig } from "@editorjs/editorjs";
 import type EditorJS from "@editorjs/editorjs";
 import { getBaseUrl } from "~/utils/api";
@@ -13,12 +19,16 @@ interface EditorProps {
 
   OnChange?: (editorAPI: API) => void;
 }
-export default function Editor({ data, editorRef }: EditorProps): JSX.Element {
+export default function Editor({
+  data,
+  editorRef,
+  OnChange,
+  OnInit,
+  readonly,
+}: EditorProps): JSX.Element {
   const elmtRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let editorJs: EditorJS | null = null;
-
+  useMemo(() => {
     const createEditor = async () => {
       const { default: EditorJS } = await import("@editorjs/editorjs");
 
@@ -34,8 +44,10 @@ export default function Editor({ data, editorRef }: EditorProps): JSX.Element {
       editorRef.current = new EditorJS({
         tools: editorTools,
         data: data,
-        // readOnly: false,
+        readOnly: readonly,
         holder: elmtRef.current,
+        onChange: OnChange ?? (() => {}),
+        onReady: OnInit ?? (() => {}),
       });
       await editorRef.current.isReady.then(() => {
         console.log("Editor.js is ready to work!");
@@ -45,18 +57,18 @@ export default function Editor({ data, editorRef }: EditorProps): JSX.Element {
     createEditor().catch((error): void => console.error(error));
 
     return async () => {
-      // editorRef.current?.destroy();
+      //editorRef.current?.destroy();
       // editorJs?.destroy();
-      // if (editorRef.current !== null) {
-      //   await editorRef.current.isReady.then(() => {
-      //     if (editorRef.current !== null) editorRef.current.destroy();
-      //   });
-      //   editorRef.current = null;
-      // }
+      if (editorRef.current !== null) {
+        await editorRef.current.isReady.then(() => {
+          if (editorRef.current !== null) editorRef.current.destroy();
+        });
+        editorRef.current = null;
+      }
     };
-  }, [data, elmtRef, editorRef]);
+  }, [data, elmtRef, editorRef, OnChange, OnInit, readonly]);
 
-  return <div ref={elmtRef} />;
+  return <div ref={elmtRef} id="editor" />;
 }
 
 const editorTools = {
