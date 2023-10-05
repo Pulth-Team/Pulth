@@ -107,50 +107,66 @@ const Comment: NextPage<{
 
           {!isEditing && <p className="break-all">{comment.content}</p>}
         </div>
-        <div className="flex flex-shrink-0 flex-row">
+        <div className="flex flex-shrink-0 flex-grow flex-row gap-1">
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
-          {depth < 3 && (
-            <ArrowUturnLeftIcon
-              className="h-5 w-5 text-black/70 hover:text-black"
-              onClick={() => {
-                if (isAuthed)
-                  if (isReplying) setActivity({ isActive: false });
-                  else
-                    setActivity({
-                      isActive: true,
-                      id: comment.id,
-                      activity: "reply",
-                    });
-                else signIn();
-              }}
-            />
-          )}
-          {amITheAuthor && (
-            <PencilSquareIcon
-              className="h-5 w-5 text-black/70 hover:text-black"
-              onClick={() => {
-                // If its already editing, then cancel editing
-                if (isEditing) setActivity({ isActive: false });
-                // else set it to editing
+          <button
+            onClick={() => {
+              if (isAuthed)
+                if (isReplying) setActivity({ isActive: false });
                 else
                   setActivity({
                     isActive: true,
                     id: comment.id,
-                    activity: "edit",
+                    activity: "reply",
                   });
-              }}
-            />
-          )}
+              else signIn();
+            }}
+          >
+            {depth < 3 && (
+              <ArrowUturnLeftIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
+            )}
+          </button>
+          <button
+            onClick={() => {
+              // If its already editing, then cancel editing
+              if (isEditing) setActivity({ isActive: false });
+              // else set it to editing
+              else
+                setActivity({
+                  isActive: true,
+                  id: comment.id,
+                  activity: "edit",
+                });
+            }}
+          >
+            {amITheAuthor && (
+              <PencilSquareIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
+            )}
+          </button>
 
-          {amITheAuthor && (
-            <TrashIcon
-              className="h-5 w-5 text-black/70 hover:text-black"
-              onClick={() => {
-                // send delete request ro parent CommentAlgo component
-                requestDelete(comment.id);
-              }}
-            />
-          )}
+          <button
+            onClick={() => {
+              // If its already editing, then cancel editing
+              if (isEditing) setActivity({ isActive: false });
+              // else set it to editing
+              else
+                setActivity({
+                  isActive: true,
+                  id: comment.id,
+                  activity: "edit",
+                });
+            }}
+          >
+            {amITheAuthor && (
+              <TrashIcon
+                className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline"
+                onClick={() => {
+                  // send delete request ro parent CommentAlgo component
+                  requestDelete(comment.id);
+                }}
+              />
+            )}
+          </button>
         </div>
       </div>
       {isEditing && (
