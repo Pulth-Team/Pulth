@@ -143,19 +143,27 @@ export const articleRouter = createTRPCRouter({
     .input(
       z
         .object({
-          pageSize: z.number().optional(9),
-          cursor: z.number(), // cursor is the page number
+          pageSize: z.number().default(9),
+          cursor: z.number().nullish(), // cursor is the page number
           filters: z
             .object({
               isPublished: z.boolean(),
               isDraft: z.boolean(),
               timePeriod: z.enum(["all", "lastWeek", "lastMonth"]),
+              orderBy: z.enum([
+                "Newest",
+                "Oldest",
+                "Most Recent",
+                "Title (A-Z)",
+                "Title (Z-A)",
+              ]),
             })
             .optional()
             .default({
               isPublished: true,
               isDraft: true,
               timePeriod: "all",
+              orderBy: "Newest",
             }),
         })
         .default({
@@ -163,6 +171,15 @@ export const articleRouter = createTRPCRouter({
         })
     )
     .query(async ({ input, ctx }) => {
+      console.log({
+        skip: (input.cursor ?? 0) * input.pageSize,
+        take: input.pageSize + 1,
+        input: {
+          cursor: input.cursor,
+          pageSize: input.pageSize,
+        },
+      });
+
       const articles = await ctx.prisma?.article.findMany({
         where: {
           authorId: ctx.session?.user.id,
@@ -200,15 +217,41 @@ export const articleRouter = createTRPCRouter({
           isPublished: true,
           createdAt: true,
         },
-
         orderBy: {
-          createdAt: "desc",
+          createdAt: (() => {
+            if (input.filters?.orderBy === "Newest") return "desc";
+            if (input.filters?.orderBy === "Oldest") return "asc";
+            return undefined;
+          })(),
+          updatedAt: (() => {
+            if (input.filters?.orderBy === "Most Recent") return "desc";
+            return undefined;
+          })(),
+          title: (() => {
+            if (input.filters?.orderBy === "Title (A-Z)") return "asc";
+            if (input.filters?.orderBy === "Title (Z-A)") return "desc";
+            return undefined;
+          })(),
         },
-        skip: input.cursor * input.pageSize,
-        take: input.pageSize,
+        skip: (input.cursor ?? 0) * input.pageSize,
+        take: input.pageSize + 1,
       });
 
-      return articles;
+      let hasNextPage = false;
+      const hasPreviousPage = (input.cursor ?? 0) > 0;
+
+      if (articles.length > input.pageSize) {
+        articles.pop();
+        hasNextPage = true;
+      }
+      console.log("server", { hasNextPage, articleLen: articles.length });
+
+      return {
+        articles,
+        hasNextPage,
+        hasPreviousPage,
+        // pageNumber: input.cursor,
+      };
     }),
 
   create: protectedProcedure

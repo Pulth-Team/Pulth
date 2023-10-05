@@ -27,8 +27,9 @@ const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 enum OrderType {
   Newest = "Newest",
   Oldest = "Oldest",
-  PublishedFirst = "Published",
-  UnpublishedFirst = "Unpublished",
+  MostRecent = "Most Recent",
+  Title = "Title (A-Z)",
+  TitleReversed = "Title (Z-A)",
 }
 
 // objects should be given only if they are excluded from the filter
@@ -82,32 +83,43 @@ const Articles: NextPage = () => {
 
   const createMutation = api.article.create.useMutation();
 
-  const articleDataFetch = api.article.getMyArticles.useQuery({
-    limit: 9,
-    page: 0,
-    filters: {
-      isPublished: filterObjects.includes(FilterObject.Published),
-      isDraft: filterObjects.includes(FilterObject.Draft),
-      timePeriod: dateRangeFilter,
+  const [page, setPage] = useState(1);
+  const articleDataFetch = api.article.getMyArticles.useInfiniteQuery(
+    {
+      pageSize: 6,
+      filters: {
+        isPublished: filterObjects.includes(FilterObject.Published),
+        isDraft: filterObjects.includes(FilterObject.Draft),
+        timePeriod: dateRangeFilter,
+        orderBy: selectedOrderType,
+      },
     },
-  });
-  // Ordering the articles based on the selectedOrderType
-  useMemo(() => {
-    if (!articleDataFetch.data) return;
+    {
+      initialCursor: 0,
+      getNextPageParam: (lastPage, { length: pagesLength }) => {
+        if (lastPage.hasNextPage) {
+          return pagesLength;
+        } else {
+          return undefined;
+        }
+      },
+    }
+  );
+  // current Page Data
+  const CurrentPage = articleDataFetch.data?.pages[page - 1];
 
-    articleDataFetch.data.sort((a, b) => {
-      switch (selectedOrderType) {
-        case OrderType.Newest:
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        case OrderType.Oldest:
-          return a.createdAt.getTime() - b.createdAt.getTime();
-        case OrderType.PublishedFirst:
-          return b.isPublished ? 1 : -1;
-        case OrderType.UnpublishedFirst:
-          return b.isPublished ? -1 : 1;
-      }
-    });
-  }, [selectedOrderType, articleDataFetch.data]);
+  useEffect(() => {
+    if (
+      CurrentPage?.hasNextPage &&
+      // @ts-ignore
+      articleDataFetch.data?.pages.length <= page
+    ) {
+      articleDataFetch.fetchNextPage();
+    }
+  }, [CurrentPage?.hasNextPage, articleDataFetch]);
+
+  const utils = api.useContext();
+  const { getInfiniteData, setInfiniteData } = utils.article.getMyArticles;
 
   useEffect(() => {
     if (createMutation.isSuccess) {
@@ -145,7 +157,6 @@ const Articles: NextPage = () => {
                 <span className="text-2xl font-bold">My Articles</span>
               </h2>
               <div className="flex gap-2">
-                {/* TODO: Add "New" button */}
                 <button
                   onClick={() => setIsOpen(true)}
                   className="flex h-12 items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
@@ -177,7 +188,10 @@ const Articles: NextPage = () => {
                           </p>
                           <Listbox
                             value={selectedOrderType}
-                            onChange={setOrderType}
+                            onChange={(val) => {
+                              setPage(1);
+                              setOrderType(val);
+                            }}
                           >
                             <div className="relative w-36 ">
                               <Listbox.Button className={"relative"}>
@@ -191,8 +205,9 @@ const Articles: NextPage = () => {
                                 {[
                                   OrderType.Newest,
                                   OrderType.Oldest,
-                                  OrderType.PublishedFirst,
-                                  OrderType.UnpublishedFirst,
+                                  OrderType.MostRecent,
+                                  OrderType.Title,
+                                  OrderType.TitleReversed,
                                 ].map((orderType) => (
                                   <Listbox.Option
                                     key={orderType}
@@ -222,8 +237,9 @@ const Articles: NextPage = () => {
                                 if (
                                   filterObjects.length == 2 ||
                                   !filterObjects.includes(FilterObject.Draft)
-                                )
+                                ) {
                                   modifyFilter(FilterObject.Draft);
+                                }
                               }}
                               className={`inline whitespace-nowrap rounded border ${
                                 filterObjects.includes(FilterObject.Draft)
@@ -242,8 +258,9 @@ const Articles: NextPage = () => {
                                   !filterObjects.includes(
                                     FilterObject.Published
                                   )
-                                )
+                                ) {
                                   modifyFilter(FilterObject.Published);
+                                }
                               }}
                               className={`inline whitespace-nowrap rounded border ${
                                 filterObjects.includes(FilterObject.Published)
@@ -258,7 +275,31 @@ const Articles: NextPage = () => {
                           <p>Date Range</p>
                           <RadioGroup
                             value={dateRangeFilter}
-                            onChange={SetDateRangeFilter}
+                            onChange={(val) => {
+                              SetDateRangeFilter(val);
+                              setPage(1);
+                              setInfiniteData(
+                                {
+                                  cursor: null,
+                                  filters: {
+                                    isPublished: filterObjects.includes(
+                                      FilterObject.Published
+                                    ),
+                                    isDraft: filterObjects.includes(
+                                      FilterObject.Draft
+                                    ),
+                                    timePeriod: val,
+                                    orderBy: selectedOrderType,
+                                  },
+                                },
+                                (oldData) => {
+                                  return {
+                                    pages: [],
+                                    pageParams: [],
+                                  };
+                                }
+                              );
+                            }}
                             as={"div"}
                             className={"flex flex-wrap gap-2 text-sm"}
                           >
@@ -331,168 +372,209 @@ const Articles: NextPage = () => {
             {articleDataFetch.isLoading ? (
               <Loading className="mt-4 h-12 w-12 border-4" />
             ) : (
-              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {articleDataFetch.data ? (
-                  articleDataFetch.data.map((article) => (
-                    <MyArticleCard
-                      key={article.slug}
-                      title={article.title}
-                      description={article.description}
-                      slug={article.slug}
-                      isPublished={article.isPublished}
-                      // TODO: Maybe add an image
-                      // image={article.image}
-                    />
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500">No articles found</p>
-                )}
-
-                {/* Add Project div */}
-                {!articleDataFetch.isLoading &&
-                  articleDataFetch.data &&
-                  articleDataFetch.data.length < 9 && (
-                    <button
-                      className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
-                      onClick={() => setIsOpen(true)}
-                      id="create-article-button"
-                    >
-                      <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
-                      <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
-                        Create New Article
-                      </p>
-                    </button>
+              <>
+                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {CurrentPage ? (
+                    CurrentPage.articles.map((article) => (
+                      <MyArticleCard
+                        key={article.slug}
+                        title={article.title}
+                        description={article.description}
+                        slug={article.slug}
+                        isPublished={article.isPublished}
+                        // TODO: Maybe add an image
+                        // image={article.image}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500">
+                      No articles found
+                    </p>
                   )}
+                  {/* Add Project div */}
+                  {!articleDataFetch.isLoading &&
+                    articleDataFetch.data &&
+                    articleDataFetch.data.pages &&
+                    (CurrentPage?.articles?.length || 0) < 6 && (
+                      <button
+                        className="group col-span-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed bg-white py-6 hover:border-solid hover:border-indigo-500"
+                        onClick={() => setIsOpen(true)}
+                        id="create-article-button"
+                      >
+                        <PlusIcon className="h-6 w-6 group-hover:text-indigo-500"></PlusIcon>
+                        <p className="text-sm font-medium leading-6 group-hover:text-indigo-500">
+                          Create New Article
+                        </p>
+                      </button>
+                    )}
 
-                {/* TODO: Add Stepper dialog for Tag and topic selection */}
-                <Dialog
-                  open={isOpen}
-                  onClose={() => {
-                    if (!createMutation.isLoading) {
-                      setIsOpen(false);
-                      setDialogDescription("");
-                      setDialogTitle("");
-                    }
+                  {/* TODO: Add Stepper dialog for Tag and topic selection */}
+                  <Dialog
+                    open={isOpen}
+                    onClose={() => {
+                      if (!createMutation.isLoading) {
+                        setIsOpen(false);
+                        setDialogDescription("");
+                        setDialogTitle("");
+                      }
+                    }}
+                  >
+                    <div
+                      className="fixed inset-0 bg-black/30  backdrop-blur-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                    />
+                    <div className="fixed inset-0 flex items-center justify-center  ">
+                      <Dialog.Panel className="w-11/12 rounded-2xl bg-white p-4 lg:w-2/5">
+                        <Dialog.Title className="text-xl font-bold">
+                          Create new article
+                        </Dialog.Title>
+                        <Dialog.Description className={"text-sm font-light"}>
+                          Enter a name and a description for your new article.
+                        </Dialog.Description>
+                        <div>
+                          <label
+                            htmlFor="articleName"
+                            className="mt-4 block"
+                            title="Title is required"
+                          >
+                            Title{" "}
+                            <span className="italic text-red-500 underline">
+                              *
+                            </span>
+                          </label>
+                          <input
+                            name="articleName"
+                            type="text"
+                            className="peer w-full rounded-lg border border-gray-200 p-2"
+                            value={dialogTitle}
+                            onChange={(e) => setDialogTitle(e.target.value)}
+                            maxLength={100}
+                            minLength={12}
+                            required
+                            // aria fields for accessibility
+                            aria-invalid={
+                              dialogTitle.length < 12 ||
+                              dialogTitle.length > 100
+                            }
+                            aria-describedby="articleNameError"
+                            aria-errormessage="Article's name must be between 12 and 100 characters long."
+                          />
+                          <p
+                            id="articleNameError"
+                            className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-focus-visible:hidden "
+                          >
+                            Article&apos;s name must be between 12 and 100
+                            characters long.
+                          </p>
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="articleDescription"
+                            className="mt-4 block"
+                            title="Description is required"
+                          >
+                            Description{" "}
+                            <span className="italic text-red-500 underline">
+                              *
+                            </span>
+                          </label>
+                          <textarea
+                            name="articleDescription"
+                            className="peer w-full rounded-lg border border-gray-200 p-2 "
+                            value={dialogDescription}
+                            onChange={(e) =>
+                              setDialogDescription(e.target.value)
+                            }
+                            maxLength={320}
+                            minLength={40}
+                            required
+                            // aria fields for accessibility
+                            aria-invalid={
+                              dialogTitle.length < 40 ||
+                              dialogTitle.length > 320
+                            }
+                            aria-describedby="articleDescriptionError"
+                            aria-errormessage="Article's description must be between 40 and 320 characters long."
+                          ></textarea>
+                          <p
+                            id="articleDescriptionError"
+                            className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-empty:hidden peer-focus:hidden"
+                          >
+                            Article&apos;s description must be between 40 and
+                            320 characters long.
+                          </p>
+                        </div>
+
+                        <div className="mt-4 flex flex-row justify-between">
+                          <button
+                            className="mr-auto"
+                            onClick={() => {
+                              setDialogDescription("");
+                              setDialogTitle("");
+                              setIsOpen(false);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
+                            onClick={() => onSubmitDialog()}
+                            disabled={
+                              createMutation.isLoading ||
+                              dialogTitle.length < 12 ||
+                              dialogDescription.length < 40
+                            }
+                          >
+                            {createMutation.isLoading ? (
+                              <Loading className="h-6 w-6 border-4" />
+                            ) : (
+                              ""
+                            )}
+                            Continue
+                          </button>
+                        </div>
+                      </Dialog.Panel>
+                    </div>
+                  </Dialog>
+                </div>
+                <button
+                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  onClick={() => {
+                    if (page === 1) return;
+                    setPage(page - 1);
+                    // articleDataFetch.fetchPreviousPage();
                   }}
                 >
-                  <div
-                    className="fixed inset-0 bg-black/30  backdrop-blur-md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                    }}
-                  />
-                  <div className="fixed inset-0 flex items-center justify-center  ">
-                    <Dialog.Panel className="w-11/12 rounded-2xl bg-white p-4 lg:w-2/5">
-                      <Dialog.Title className="text-xl font-bold">
-                        Create new article
-                      </Dialog.Title>
-                      <Dialog.Description className={"text-sm font-light"}>
-                        Enter a name and a description for your new article.
-                      </Dialog.Description>
-                      <div>
-                        <label
-                          htmlFor="articleName"
-                          className="mt-4 block"
-                          title="Title is required"
-                        >
-                          Title{" "}
-                          <span className="italic text-red-500 underline">
-                            *
-                          </span>
-                        </label>
-                        <input
-                          name="articleName"
-                          type="text"
-                          className="peer w-full rounded-lg border border-gray-200 p-2"
-                          value={dialogTitle}
-                          onChange={(e) => setDialogTitle(e.target.value)}
-                          maxLength={100}
-                          minLength={12}
-                          required
-                          // aria fields for accessibility
-                          aria-invalid={
-                            dialogTitle.length < 12 || dialogTitle.length > 100
-                          }
-                          aria-describedby="articleNameError"
-                          aria-errormessage="Article's name must be between 12 and 100 characters long."
-                        />
-                        <p
-                          id="articleNameError"
-                          className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-focus-visible:hidden "
-                        >
-                          Article&apos;s name must be between 12 and 100
-                          characters long.
-                        </p>
-                      </div>
+                  Previous
+                </button>
 
-                      <div>
-                        <label
-                          htmlFor="articleDescription"
-                          className="mt-4 block"
-                          title="Description is required"
-                        >
-                          Description{" "}
-                          <span className="italic text-red-500 underline">
-                            *
-                          </span>
-                        </label>
-                        <textarea
-                          name="articleDescription"
-                          className="peer w-full rounded-lg border border-gray-200 p-2 "
-                          value={dialogDescription}
-                          onChange={(e) => setDialogDescription(e.target.value)}
-                          maxLength={320}
-                          minLength={40}
-                          required
-                          // aria fields for accessibility
-                          aria-invalid={
-                            dialogTitle.length < 40 || dialogTitle.length > 320
-                          }
-                          aria-describedby="articleDescriptionError"
-                          aria-errormessage="Article's description must be between 40 and 320 characters long."
-                        ></textarea>
-                        <p
-                          id="articleDescriptionError"
-                          className="text-sm font-light text-red-500 peer-valid:hidden peer-invalid:block peer-empty:hidden peer-focus:hidden"
-                        >
-                          Article&apos;s description must be between 40 and 320
-                          characters long.
-                        </p>
-                      </div>
-
-                      <div className="mt-4 flex flex-row justify-between">
-                        <button
-                          className="mr-auto"
-                          onClick={() => {
-                            setDialogDescription("");
-                            setDialogTitle("");
-                            setIsOpen(false);
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="flex flex-row items-center justify-center gap-1 rounded-md bg-indigo-500 p-2 text-sm font-medium text-white hover:bg-indigo-400 disabled:bg-indigo-300"
-                          onClick={() => onSubmitDialog()}
-                          disabled={
-                            createMutation.isLoading ||
-                            dialogTitle.length < 12 ||
-                            dialogDescription.length < 40
-                          }
-                        >
-                          {createMutation.isLoading ? (
-                            <Loading className="h-6 w-6 border-4" />
-                          ) : (
-                            ""
-                          )}
-                          Continue
-                        </button>
-                      </div>
-                    </Dialog.Panel>
-                  </div>
-                </Dialog>
-              </div>
+                <button
+                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  onClick={() => {
+                    if (!CurrentPage?.hasNextPage) return;
+                    setPage(page + 1);
+                    // articleDataFetch.fetchNextPage();
+                  }}
+                >
+                  Next
+                </button>
+                <button
+                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  onClick={() => {
+                    console.log({
+                      data: articleDataFetch.data,
+                      page,
+                      pagesLength: articleDataFetch.data?.pages.length,
+                    });
+                  }}
+                >
+                  Log
+                </button>
+              </>
             )}
           </>
         )}
