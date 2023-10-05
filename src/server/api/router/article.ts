@@ -143,8 +143,8 @@ export const articleRouter = createTRPCRouter({
     .input(
       z
         .object({
-          limit: z.number(),
-          page: z.number(),
+          pageSize: z.number().optional(9),
+          cursor: z.number(), // cursor is the page number
           filters: z
             .object({
               isPublished: z.boolean(),
@@ -159,8 +159,7 @@ export const articleRouter = createTRPCRouter({
             }),
         })
         .default({
-          limit: 9,
-          page: 0,
+          cursor: 0,
         })
     )
     .query(async ({ input, ctx }) => {
@@ -205,8 +204,8 @@ export const articleRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-        skip: input.page * input.limit,
-        take: input.limit,
+        skip: input.cursor * input.pageSize,
+        take: input.pageSize,
       });
 
       return articles;
