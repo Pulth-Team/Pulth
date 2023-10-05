@@ -59,7 +59,7 @@ export const articleRouter = createTRPCRouter({
     };
   }),
 
-  // this will be replaced with a recommended articles query
+  // WARNING: this will be replaced with a recommended articles query
   // this will be achieved by using neo4j
   getLatest: publicProcedure
     .input(
