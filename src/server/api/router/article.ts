@@ -145,6 +145,7 @@ export const articleRouter = createTRPCRouter({
         .object({
           pageSize: z.number().default(9),
           cursor: z.number().nullish(), // cursor is the page number
+          skipCountQuery: z.boolean().default(true),
           filters: z
             .object({
               isPublished: z.boolean(),
@@ -180,7 +181,7 @@ export const articleRouter = createTRPCRouter({
         },
       });
 
-      const articles = await ctx.prisma?.article.findMany({
+      const articlesPromise = ctx.prisma?.article.findMany({
         where: {
           authorId: ctx.session?.user.id,
           // if isPublished is true only return published articles
@@ -237,6 +238,46 @@ export const articleRouter = createTRPCRouter({
         take: input.pageSize + 1,
       });
 
+      let articleCountPromise: Promise<number> | undefined = undefined;
+      if (!input.skipCountQuery) {
+        articleCountPromise = ctx.prisma?.article.count({
+          where: {
+            authorId: ctx.session?.user.id,
+            // if isPublished is true only return published articles
+            // if isDraft is true only return draft articles
+            // if both are true return both
+            // if both are false return both
+            isPublished: ((): boolean | undefined => {
+              if (input.filters?.isPublished && !input.filters?.isDraft)
+                return true;
+              if (!input.filters?.isPublished && input.filters?.isDraft)
+                return false;
+
+              return undefined;
+            })(),
+            // if timePeriod is all, then return all articles
+            // if timePeriod is lastWeek, then return articles that are created in the last week
+            // if timePeriod is lastMonth, then return articles that are created in the last month
+            createdAt: (() => {
+              if (input.filters?.timePeriod === "all") return undefined;
+              if (input.filters?.timePeriod === "lastWeek")
+                return {
+                  gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                };
+              if (input.filters?.timePeriod === "lastMonth")
+                return {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                };
+            })(),
+          },
+        });
+      }
+
+      const [articles, articleCount] = await Promise.all([
+        articlesPromise,
+        articleCountPromise,
+      ]);
+
       let hasNextPage = false;
       const hasPreviousPage = (input.cursor ?? 0) > 0;
 
@@ -250,7 +291,9 @@ export const articleRouter = createTRPCRouter({
         articles,
         hasNextPage,
         hasPreviousPage,
-        // pageNumber: input.cursor,
+        // if skipCountQuery is true, then dont return articleCount
+        // if skipCountQuery is false, then return articleCount
+        articleCount: input.skipCountQuery ? undefined : articleCount,
       };
     }),
 
@@ -821,11 +864,11 @@ export const articleRouter = createTRPCRouter({
 });
 
 const makeid = (length: number) => {
-  var result = "";
-  var characters =
+  let result = "";
+  let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;

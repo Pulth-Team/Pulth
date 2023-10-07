@@ -3,7 +3,7 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect, useMemo, useReducer } from "react";
+import { useState, useEffect, useReducer } from "react";
 
 import { api } from "~/utils/api";
 
@@ -52,22 +52,6 @@ const Articles: NextPage = () => {
     OrderType.Newest
   );
 
-  // states for filters
-  const [filterObjects, modifyFilter] = useReducer(
-    (
-      state: (FilterObject.Published | FilterObject.Draft)[],
-      action: FilterObject.Published | FilterObject.Draft
-    ): (FilterObject.Published | FilterObject.Draft)[] => {
-      console.log("Modify called with", state, action);
-      const isAlreadyAdded = state.includes(action);
-      console.log("isAlreadyAdded is", isAlreadyAdded);
-
-      if (isAlreadyAdded) return state.filter((filter) => filter !== action);
-      else return [...state, action];
-    },
-    [FilterObject.Draft, FilterObject.Published]
-  );
-
   // state for date range filter
   // TODO: Add between dates
   const [dateRangeFilter, SetDateRangeFilter] = useState<
@@ -84,9 +68,26 @@ const Articles: NextPage = () => {
   const createMutation = api.article.create.useMutation();
 
   const [page, setPage] = useState(1);
+  // states for filters
+  const [filterObjects, modifyFilter] = useReducer(
+    (
+      state: (FilterObject.Published | FilterObject.Draft)[],
+      action: FilterObject.Published | FilterObject.Draft
+    ): (FilterObject.Published | FilterObject.Draft)[] => {
+      setPage(1);
+
+      const isAlreadyAdded = state.includes(action);
+      if (isAlreadyAdded) return state.filter((filter) => filter !== action);
+
+      return [...state, action];
+    },
+    [FilterObject.Draft, FilterObject.Published]
+  );
+  const [skipArticleCount, setSkipArticleCount] = useState<boolean>(false);
   const articleDataFetch = api.article.getMyArticles.useInfiniteQuery(
     {
       pageSize: 6,
+      skipCountQuery: skipArticleCount,
       filters: {
         isPublished: filterObjects.includes(FilterObject.Published),
         isDraft: filterObjects.includes(FilterObject.Draft),
@@ -109,17 +110,23 @@ const Articles: NextPage = () => {
   const CurrentPage = articleDataFetch.data?.pages[page - 1];
 
   useEffect(() => {
+    if (!skipArticleCount && articleDataFetch.data?.pages.length == 0) {
+      console.log("deactivated skipArticleCount");
+      setSkipArticleCount(true);
+    }
+  }, [skipArticleCount, articleDataFetch.data]);
+
+  useEffect(() => {
     if (
       CurrentPage?.hasNextPage &&
-      // @ts-ignore
-      articleDataFetch.data?.pages.length <= page
+      (articleDataFetch.data?.pages.length ?? 0) <= page
     ) {
       articleDataFetch.fetchNextPage();
     }
-  }, [CurrentPage?.hasNextPage, articleDataFetch]);
+  }, [CurrentPage?.hasNextPage, articleDataFetch, page]);
 
   const utils = api.useContext();
-  const { getInfiniteData, setInfiniteData } = utils.article.getMyArticles;
+  const { setInfiniteData } = utils.article.getMyArticles;
 
   useEffect(() => {
     if (createMutation.isSuccess) {
@@ -189,7 +196,9 @@ const Articles: NextPage = () => {
                           <Listbox
                             value={selectedOrderType}
                             onChange={(val) => {
+                              // set the page to 1
                               setPage(1);
+                              // change the order type
                               setOrderType(val);
                             }}
                           >
@@ -276,8 +285,11 @@ const Articles: NextPage = () => {
                           <RadioGroup
                             value={dateRangeFilter}
                             onChange={(val) => {
+                              // change the date range filter
                               SetDateRangeFilter(val);
+                              // set the page to 1
                               setPage(1);
+                              // remove old data from different filters
                               setInfiniteData(
                                 {
                                   cursor: null,
@@ -299,6 +311,8 @@ const Articles: NextPage = () => {
                                   };
                                 }
                               );
+                              // Filter changed so it might affect the article count
+                              setSkipArticleCount(false);
                             }}
                             as={"div"}
                             className={"flex flex-wrap gap-2 text-sm"}
@@ -541,24 +555,35 @@ const Articles: NextPage = () => {
                     </div>
                   </Dialog>
                 </div>
+
+                {CurrentPage?.articleCount ? (
+                  <p className="mt-4 text-sm text-gray-500">
+                    Showing {CurrentPage?.articles.length} of{" "}
+                    {CurrentPage?.articleCount} articles
+                  </p>
+                ) : (
+                  "no count"
+                )}
                 <button
-                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
                   onClick={() => {
                     if (page === 1) return;
                     setPage(page - 1);
                     // articleDataFetch.fetchPreviousPage();
                   }}
+                  disabled={page === 1}
                 >
                   Previous
                 </button>
 
                 <button
-                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
                   onClick={() => {
                     if (!CurrentPage?.hasNextPage) return;
                     setPage(page + 1);
                     // articleDataFetch.fetchNextPage();
                   }}
+                  disabled={!CurrentPage?.hasNextPage}
                 >
                   Next
                 </button>
