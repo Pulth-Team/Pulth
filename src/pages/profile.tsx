@@ -556,49 +556,37 @@ const Articles: NextPage = () => {
                   </Dialog>
                 </div>
 
-                {CurrentPage?.articleCount ? (
-                  <p className="mt-4 text-sm text-gray-500">
-                    Showing {CurrentPage?.articles.length} of{" "}
-                    {CurrentPage?.articleCount} articles
-                  </p>
-                ) : (
-                  "no count"
-                )}
-                <button
-                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
-                  onClick={() => {
-                    if (page === 1) return;
-                    setPage(page - 1);
-                    // articleDataFetch.fetchPreviousPage();
-                  }}
-                  disabled={page === 1}
-                >
-                  Previous
-                </button>
+                <div className="flex ">
+                  {CurrentPage?.articleCount ? (
+                    <p className="mr-auto mt-4 text-sm text-gray-500">
+                      Showing {CurrentPage?.articles.length} of{" "}
+                      {CurrentPage?.articleCount} articles
+                    </p>
+                  ) : (
+                    "no count"
+                  )}
+                  <button
+                    className="mr-2 mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
+                    onClick={() => {
+                      if (page === 1) return;
+                      setPage(page - 1);
+                    }}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </button>
 
-                <button
-                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
-                  onClick={() => {
-                    if (!CurrentPage?.hasNextPage) return;
-                    setPage(page + 1);
-                    // articleDataFetch.fetchNextPage();
-                  }}
-                  disabled={!CurrentPage?.hasNextPage}
-                >
-                  Next
-                </button>
-                <button
-                  className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
-                  onClick={() => {
-                    console.log({
-                      data: articleDataFetch.data,
-                      page,
-                      pagesLength: articleDataFetch.data?.pages.length,
-                    });
-                  }}
-                >
-                  Log
-                </button>
+                  <button
+                    className="mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
+                    onClick={() => {
+                      if (!CurrentPage?.hasNextPage) return;
+                      setPage(page + 1);
+                    }}
+                    disabled={!CurrentPage?.hasNextPage}
+                  >
+                    Next
+                  </button>
+                </div>
               </>
             )}
           </>
