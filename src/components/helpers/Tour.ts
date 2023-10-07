@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useRef, useState, useCallback } from "react";
 
 function isHidden(el: HTMLElement) {
-  var style = window.getComputedStyle(el);
+  let style = window.getComputedStyle(el);
   return el.offsetParent === null || style.display === "none";
 }
 
