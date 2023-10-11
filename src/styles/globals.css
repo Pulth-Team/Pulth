@@ -72,7 +72,7 @@ h6.ce-header {
   margin-bottom: 0.5rem;
 }
 
-@media screen and (max-width: 650px, min-width: 0px) {
+@media screen and (max-width: 650px)and ( min-width: 0px) {
   .ce-popover--opened {
     /* transform: translateY(-72px); */
     bottom: 77px;
