@@ -556,15 +556,17 @@ const Articles: NextPage = () => {
                   </Dialog>
                 </div>
 
-                <div className="flex ">
-                  {CurrentPage?.articleCount ? (
-                    <p className="mr-auto mt-4 text-sm text-gray-500">
-                      Showing {CurrentPage?.articles.length} of{" "}
-                      {CurrentPage?.articleCount} articles
-                    </p>
-                  ) : (
-                    "no count"
-                  )}
+                <div className="flex">
+                  <p className="mr-auto mt-4 text-sm text-gray-500">
+                    {CurrentPage?.articleCount ? (
+                      <>
+                        Showing {CurrentPage?.articles.length} of{" "}
+                        {CurrentPage?.articleCount} articles
+                      </>
+                    ) : (
+                      "No articles found 😀"
+                    )}
+                  </p>
                   <button
                     className="mr-2 mt-4 rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 disabled:bg-gray-100"
                     onClick={() => {
