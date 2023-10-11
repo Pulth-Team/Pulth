@@ -498,9 +498,10 @@ const Articles: NextPage = () => {
                               *
                             </span>
                           </label>
+                          {/* TODO: textarea should be auto resize  :( */}
                           <textarea
                             name="articleDescription"
-                            className="peer w-full rounded-lg border border-gray-200 p-2 "
+                            className="peer max-h-96 w-full resize-none rounded-lg border border-gray-200 p-2"
                             value={dialogDescription}
                             onChange={(e) =>
                               setDialogDescription(e.target.value)
