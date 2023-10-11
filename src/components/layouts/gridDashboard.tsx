@@ -38,8 +38,6 @@ const GridDashboard: NextPage<{
   const { data: userData, status: userStatus } = useSession();
   const router = useRouter();
 
-  const [searchModal, setSearchModal] = useState(false);
-
   return (
     <>
       <Div100vh className="grid h-[stretch] grid-rows-dashboard-mobile md:grid-cols-dashboard-desktop md:grid-rows-dashboard-desktop">
@@ -80,7 +78,7 @@ const GridDashboard: NextPage<{
             <div className="m-2 mt-auto hidden md:block ">
               <Link href="/api/auth/signin">
                 <button className="flex w-full rounded-md bg-gray-700 p-2 ">
-                  <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200 ">
+                  <p className="flex h-12 w-full items-center justify-center text-center font-semibold text-gray-200">
                     Login
                   </p>
                 </button>
