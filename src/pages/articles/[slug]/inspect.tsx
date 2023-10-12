@@ -48,12 +48,30 @@ const Inspect: NextPage = () => {
   const [deleteModalInput, setDeleteModalInput] = useState("");
 
   useEffect(() => {
-    if (articleInfo.isError && articleInfo.error.data?.httpStatus === 404) {
-    } else {
+    if (!articleInfo.isError || articleInfo.error.data?.httpStatus !== 404) {
       setTitle(articleInfo.data?.title);
       setDescription(articleInfo.data?.description);
     }
   }, [articleInfo.data, articleInfo.isError, router, articleInfo.error]);
+
+  useEffect(() => {
+    if (
+      articleUpdateInfoMutation.isSuccess &&
+      !articleUpdateInfoMutation.isLoading
+    ) {
+      articleUpdateInfoMutation.reset();
+      router.push(
+        "/articles/" + articleUpdateInfoMutation.data.slug + "/inspect"
+      );
+    }
+  }, [articleUpdateInfoMutation, router]);
+
+  useEffect(() => {
+    if (articleDeleteMutation.isSuccess && !articleDeleteMutation.isLoading) {
+      articleDeleteMutation.reset();
+      router.push("/articles");
+    }
+  }, [articleDeleteMutation, router]);
 
   return (
     <Dashboard>
@@ -252,14 +270,11 @@ const Inspect: NextPage = () => {
                               mutationData.description = description;
                             }
 
-                            articleUpdateInfoMutation.mutate(mutationData, {
-                              onSuccess: (data) => {
-                                router.replace(
-                                  "/articles/" + data.slug + "/inspect"
-                                );
-                                articleInfo.refetch();
-                              },
-                            });
+                            articleUpdateInfoMutation
+                              .mutateAsync(mutationData)
+                              .then((data) => {
+                                articleInfo.refetch;
+                              });
                           }}
                         >
                           {updateInfoIsLoading ? (
@@ -339,6 +354,7 @@ const Inspect: NextPage = () => {
               >
                 Edit
               </Link>
+              {/* TODO: Investigate what this was suppose to do */}
               {/* <button
               onClick={() => {
                 if (typeof articleInfo.data?.isPublished !== "undefined")
@@ -419,12 +435,7 @@ const Inspect: NextPage = () => {
                 <button
                   disabled={deleteModalInput !== articleInfo.data?.title}
                   onClick={() => {
-                    articleDeleteMutation.mutate(slug as string, {
-                      onSuccess: () => {
-                        router.push("/articles");
-                        setDeleteDialogOpen(false);
-                      },
-                    });
+                    articleDeleteMutation.mutate(slug as string);
                   }}
                   className="mt-4 flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white disabled:bg-red-400"
                 >

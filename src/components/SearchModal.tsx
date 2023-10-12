@@ -1,6 +1,6 @@
 import { Dispatch, Fragment, SetStateAction } from "react";
 import Link from "next/link";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
@@ -75,7 +75,7 @@ interface HitProps {
     author: {
       id: string;
       name: string;
-      image: string;
+      image?: string;
     };
     description: string;
     title: string;
@@ -108,7 +108,7 @@ function Hit({ hit }: HitProps) {
 
             <div className="relative h-8 w-8 ">
               <Image
-                src={hit.author.image}
+                src={hit.author.image ?? "/default_profile.jpg"}
                 alt={hit.author.name + "'s profile photo"}
                 layout="fill"
                 className="mr-2 rounded-full"
@@ -131,31 +131,3 @@ function Hit({ hit }: HitProps) {
     </Link>
   );
 }
-
-// function Hit({ hit }: { hit: any }) {
-//   return (
-//     <Link href={`/articles/${hit.slug}`}>
-//       <div
-//         className="mb-2 flex cursor-pointer flex-row items-center justify-between rounded-md bg-slate-700/30 p-1.5 hover:bg-indigo-900/70"
-//         onClick={() => setSearchModal(false)}
-//       >
-//         <div className="flex flex-col gap-y-2">
-//           <p className="text-lg font-bold text-white line-clamp-1 md:text-xl">
-//             {hit.title}
-//           </p>
-//           <p className="text-sm font-semibold italic text-gray-400 line-clamp-2 md:line-clamp-1">
-//             {hit.description}
-//           </p>
-//           <Link href="/profile">
-//             <div className="flex items-center gap-x-1">
-//               <UserCircleIcon className="h-5 w-5 stroke-white" />
-//               <p className="font-semibold text-gray-400 hover:underline">
-//                 {hit.author}
-//               </p>
-//             </div>
-//           </Link>
-//         </div>
-//         <ChevronRightIcon className="h-4 w-4 flex-shrink-0 stroke-white" />
-//       </div>
-//     </Link>
-//   );

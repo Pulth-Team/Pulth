@@ -157,7 +157,7 @@ const Tour: NextPage<
 
     console.log(backdrop);
 
-    var varyingNode = contentRef.current!;
+    let varyingNode = contentRef.current!;
     return () => {
       console.log("removed Tour");
       target.style.zIndex = ""; // Reset the z-index of the target element

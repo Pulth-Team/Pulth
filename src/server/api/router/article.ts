@@ -10,9 +10,9 @@ import {
 import { TRPCError } from "@trpc/server";
 import { OutputBlockType } from "~/components/editor/renderer/DocumentRenderer";
 import { OutputBlockData } from "@editorjs/editorjs/types/data-formats/output-data";
-import { S3 } from "aws-sdk";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 import { env } from "~/env.mjs";
-import { exclude } from "~/utils/api";
 import { Article } from "@prisma/client";
 
 export const articleRouter = createTRPCRouter({
@@ -36,28 +36,8 @@ export const articleRouter = createTRPCRouter({
           },
         },
         isPublished: true,
-        voteRank: true,
-
-        // should we include the comments here?
-        // we shouldnt but we are for now
-        Comments: {
-          select: {
-            id: true,
-            author: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-            isEdited: true,
-            content: true,
-            parentIds: true,
-          },
-        },
       },
     });
-
     // if the article doesn't exist, return null
     if (!article)
       throw new TRPCError({
@@ -79,7 +59,7 @@ export const articleRouter = createTRPCRouter({
     };
   }),
 
-  // this will be replaced with a recommended articles query
+  // WARNING: this will be replaced with a recommended articles query
   // this will be achieved by using neo4j
   getLatest: publicProcedure
     .input(
@@ -163,15 +143,73 @@ export const articleRouter = createTRPCRouter({
     .input(
       z
         .object({
-          limit: z.number().optional().default(10),
-          skip: z.number().optional().default(0),
+          pageSize: z.number().default(9),
+          cursor: z.number().nullish(), // cursor is the page number
+          skipCountQuery: z.boolean().default(true),
+          filters: z
+            .object({
+              isPublished: z.boolean(),
+              isDraft: z.boolean(),
+              timePeriod: z.enum(["all", "lastWeek", "lastMonth"]),
+              orderBy: z.enum([
+                "Newest",
+                "Oldest",
+                "Most Recent",
+                "Title (A-Z)",
+                "Title (Z-A)",
+              ]),
+            })
+            .optional()
+            .default({
+              isPublished: true,
+              isDraft: true,
+              timePeriod: "all",
+              orderBy: "Newest",
+            }),
         })
-        .optional()
+        .default({
+          cursor: 0,
+        })
     )
-    .query(async ({ ctx }) => {
-      const articles = await ctx.prisma?.article.findMany({
+    .query(async ({ input, ctx }) => {
+      console.log({
+        skip: (input.cursor ?? 0) * input.pageSize,
+        take: input.pageSize + 1,
+        input: {
+          cursor: input.cursor,
+          pageSize: input.pageSize,
+        },
+      });
+
+      const articlesPromise = ctx.prisma?.article.findMany({
         where: {
           authorId: ctx.session?.user.id,
+          // if isPublished is true only return published articles
+          // if isDraft is true only return draft articles
+          // if both are true return both
+          // if both are false return both
+          isPublished: ((): boolean | undefined => {
+            if (input.filters?.isPublished && !input.filters?.isDraft)
+              return true;
+            if (!input.filters?.isPublished && input.filters?.isDraft)
+              return false;
+
+            return undefined;
+          })(),
+          // if timePeriod is all, then return all articles
+          // if timePeriod is lastWeek, then return articles that are created in the last week
+          // if timePeriod is lastMonth, then return articles that are created in the last month
+          createdAt: (() => {
+            if (input.filters?.timePeriod === "all") return undefined;
+            if (input.filters?.timePeriod === "lastWeek")
+              return {
+                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              };
+            if (input.filters?.timePeriod === "lastMonth")
+              return {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              };
+          })(),
         },
         select: {
           title: true,
@@ -181,11 +219,82 @@ export const articleRouter = createTRPCRouter({
           createdAt: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: (() => {
+            if (input.filters?.orderBy === "Newest") return "desc";
+            if (input.filters?.orderBy === "Oldest") return "asc";
+            return undefined;
+          })(),
+          updatedAt: (() => {
+            if (input.filters?.orderBy === "Most Recent") return "desc";
+            return undefined;
+          })(),
+          title: (() => {
+            if (input.filters?.orderBy === "Title (A-Z)") return "asc";
+            if (input.filters?.orderBy === "Title (Z-A)") return "desc";
+            return undefined;
+          })(),
         },
+        skip: (input.cursor ?? 0) * input.pageSize,
+        take: input.pageSize + 1,
       });
 
-      return articles;
+      let articleCountPromise: Promise<number> | undefined = undefined;
+      if (!input.skipCountQuery) {
+        articleCountPromise = ctx.prisma?.article.count({
+          where: {
+            authorId: ctx.session?.user.id,
+            // if isPublished is true only return published articles
+            // if isDraft is true only return draft articles
+            // if both are true return both
+            // if both are false return both
+            isPublished: ((): boolean | undefined => {
+              if (input.filters?.isPublished && !input.filters?.isDraft)
+                return true;
+              if (!input.filters?.isPublished && input.filters?.isDraft)
+                return false;
+
+              return undefined;
+            })(),
+            // if timePeriod is all, then return all articles
+            // if timePeriod is lastWeek, then return articles that are created in the last week
+            // if timePeriod is lastMonth, then return articles that are created in the last month
+            createdAt: (() => {
+              if (input.filters?.timePeriod === "all") return undefined;
+              if (input.filters?.timePeriod === "lastWeek")
+                return {
+                  gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                };
+              if (input.filters?.timePeriod === "lastMonth")
+                return {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                };
+            })(),
+          },
+        });
+      }
+
+      const [articles, articleCount] = await Promise.all([
+        articlesPromise,
+        articleCountPromise,
+      ]);
+
+      let hasNextPage = false;
+      const hasPreviousPage = (input.cursor ?? 0) > 0;
+
+      if (articles.length > input.pageSize) {
+        articles.pop();
+        hasNextPage = true;
+      }
+      console.log("server", { hasNextPage, articleLen: articles.length });
+
+      return {
+        articles,
+        hasNextPage,
+        hasPreviousPage,
+        // if skipCountQuery is true, then dont return articleCount
+        // if skipCountQuery is false, then return articleCount
+        articleCount: input.skipCountQuery ? undefined : articleCount,
+      };
     }),
 
   create: protectedProcedure
@@ -230,6 +339,14 @@ export const articleRouter = createTRPCRouter({
           slug: input,
           authorId: ctx.session?.user.id,
         },
+        select: {
+          title: true,
+          description: true,
+          keywords: true,
+          isPublished: true,
+          updatedAt: true,
+          createdAt: true,
+        },
       });
 
       // if the article doesn't exist, return an error
@@ -239,11 +356,7 @@ export const articleRouter = createTRPCRouter({
           message: "Article not found in your account",
         });
 
-      const bodylessArticle = exclude(article, ["bodyData", "draftBodyData"]);
-      return {
-        ...bodylessArticle,
-        // bodyData: bodyData as unknown as OutputBlockData<string, any>[],
-      };
+      return article;
     }),
 
   // gives article's slug
@@ -262,6 +375,12 @@ export const articleRouter = createTRPCRouter({
           authorId: true,
         },
       });
+
+      if (!article)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
 
       if (ctx.session.user.id != article?.authorId)
         throw new TRPCError({
@@ -428,10 +547,9 @@ export const articleRouter = createTRPCRouter({
       // so that it doesn't show up in search results anymore
       await ctx.algolia.deleteObject(article.id);
 
-      
       // now we can revalidate the article
       ctx.res?.revalidate(`/api/articles/${updatedArticle.slug}`);
-      
+
       const { bodyData, ...rest } = updatedArticle;
       return {
         ...rest,
@@ -528,7 +646,7 @@ export const articleRouter = createTRPCRouter({
       );
 
       // create a s3 cdn connection Object
-      const s3 = new S3({
+      const s3client = new S3Client({
         region: env.AWS_REGION,
         credentials: {
           accessKeyId: env.AWS_ACCESS_KEY_CDN,
@@ -540,12 +658,12 @@ export const articleRouter = createTRPCRouter({
         deletedImageBlocks.map((block) => {
           const url = new URL(block.data.file.url);
           console.log("url Pathname", url.pathname);
-          return s3
-            .deleteObject({
+          return s3client.send(
+            new DeleteObjectCommand({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
+          );
         })
       );
 
@@ -716,7 +834,7 @@ export const articleRouter = createTRPCRouter({
       ).filter((block) => block.type === "Image") as OutputBlockData<"Image">[];
 
       // create a s3 cdn connection Object
-      const s3 = new S3({
+      const s3client = new S3Client({
         region: env.AWS_REGION,
         credentials: {
           accessKeyId: env.AWS_ACCESS_KEY_CDN,
@@ -729,12 +847,12 @@ export const articleRouter = createTRPCRouter({
         imageBlocks.map((block) => {
           const url = new URL(block.data.file.url);
           console.log("url Pathname", url.pathname);
-          return s3
-            .deleteObject({
+          return s3client.send(
+            new DeleteObjectCommand({
               Bucket: env.AWS_S3_BUCKET, // name of the bucket in S3 where the file will be stored
               Key: url.pathname.slice(1), // remove the first slash
             })
-            .promise();
+          );
         })
       );
 
@@ -746,11 +864,11 @@ export const articleRouter = createTRPCRouter({
 });
 
 const makeid = (length: number) => {
-  var result = "";
-  var characters =
+  let result = "";
+  let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;

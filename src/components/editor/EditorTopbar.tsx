@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Menu } from "@headlessui/react";
 import Loading from "~/components/Loading";
+import { twMerge } from "tailwind-merge";
 
 const EditorTopbar: NextPage<{
   title: string;
@@ -17,12 +18,12 @@ const EditorTopbar: NextPage<{
   onMenuClick: (type: "delete" | "undo-changes" | "share") => void;
   saveLoading: boolean;
 
-  // is this article published to the public
-  isPublished: boolean;
-  // is this article has unpublished changes (saved/remote changes)
+  // is Local data different from Draft data
+  isLocal: boolean;
+  // is Draft data different from published data
   isDraft: boolean;
-  // is this article has unpublished changes (local changes)
-  isChanged: boolean;
+  // is there a published version of this article
+  isPublished: boolean;
 
   publishLoading: boolean;
 }> = ({
@@ -32,12 +33,16 @@ const EditorTopbar: NextPage<{
   onUnpublish,
   onMenuClick,
   saveLoading,
-  isPublished,
+  isLocal,
   isDraft,
-  isChanged,
+  isPublished,
   publishLoading,
 }) => {
-  type SaveText = "Save Draft" | "Saved" | "Saved / Published" | "Unknown";
+  type SaveText =
+    | "Save Draft"
+    | "Draft Saved"
+    | "Saved / Published"
+    | "Unknown";
   type PublishText =
     | "Publish"
     | "Publish Draft"
@@ -50,52 +55,77 @@ const EditorTopbar: NextPage<{
   let publishText: PublishText = "Unknown";
 
   let isUnpublishAct = false;
+  let enableHintAction = false;
+  let enablePublishAction = true;
 
-  // if the article is published and has no changes (local or remote)
-  if (isPublished && !isDraft && !isChanged) {
-    saveText = "Saved / Published";
-    publishText = "Unpublish";
-    isUnpublishAct = true;
+  // TODO: Refactor this logic
+  if (isPublished) {
+    if (isDraft) {
+      if (isLocal) {
+        // There is a published version
+        // There is Draft which is different from published
+        // There is a local changes on Draft
+        saveText = "Save Draft";
+        publishText = "Save & Publish";
+        enableHintAction = true;
+      } else {
+        // There is a published version
+        // There is Draft which is different from published
+        // There is no local changes on Draft
+        saveText = "Draft Saved";
+        publishText = "Publish Draft";
+      }
+    } else {
+      if (isLocal) {
+        // There is a published version
+        // There is no Draft
+        // There is a local changes on Draft
+        saveText = "Save Draft";
+        publishText = "Save & Publish";
+        enableHintAction = true;
+      } else {
+        // There is a published version
+        // There is no Draft
+        // There is no local changes on Draft
+        saveText = "Saved / Published";
+        publishText = "Unpublish";
+        isUnpublishAct = true;
+      }
+    }
+  } else {
+    if (isDraft) {
+      if (isLocal) {
+        // There is no published version
+        // There is Draft which is different from published
+        // There is a local changes on Draft
+        saveText = "Save Draft";
+        publishText = "Save & Publish";
+        enableHintAction = true;
+      } else {
+        // There is no published version
+        // There is Draft which is different from published
+        // There is no local changes on Draft
+        saveText = "Draft Saved";
+        publishText = "Publish Draft";
+      }
+    } else {
+      if (isLocal) {
+        // There is no published version
+        // There is no Draft
+        // There is a local changes on Draft
+        saveText = "Save Draft";
+        publishText = "Save & Publish";
+        enableHintAction = true;
+      } else {
+        // There is no published version
+        // There is no Draft
+        // There is no local changes on Draft
+        saveText = "Saved / Published";
+        publishText = "Publish";
+        enablePublishAction = false;
+      }
+    }
   }
-
-  // if the article is published and has local changes (not remote)
-  if (isPublished && !isDraft && isChanged) {
-    saveText = "Save Draft";
-    publishText = "Save & Publish";
-    isUnpublishAct = false;
-  }
-
-  // if the article is published and has remote changes (not local)
-  if (isPublished && isDraft && !isChanged) {
-    saveText = "Saved";
-    publishText = "Publish Draft";
-    isUnpublishAct = false;
-  }
-
-  // if the article is published and has local and remote changes
-  if (isPublished && isDraft && isChanged) {
-    saveText = "Save Draft";
-    publishText = "Save & Publish";
-    isUnpublishAct = false;
-  }
-
-
-  // if the article is not published and has no changes (local or remote)
-  if (!isPublished  && !isChanged) {
-    saveText = "Saved";
-    publishText = "Publish Draft";
-    isUnpublishAct = false;
-  }
-
-  // if the article is not published and has local changes (not remote)
-  if (!isPublished  && isChanged) {
-    saveText = "Save Draft";
-    publishText = "Save & Publish";
-    isUnpublishAct = false;
-  }
-
-
-
 
   return (
     <div className="sticky top-0 z-10 mb-4 flex items-center gap-x-2 bg-white px-4 py-2 shadow-md">
@@ -106,19 +136,21 @@ const EditorTopbar: NextPage<{
       <button
         className="flex items-center gap-2 rounded-md px-2 py-1 text-black/70"
         onClick={() => onSave()}
+        disabled={!enableHintAction}
       >
         {saveLoading && <Loading className="w-4 border-2" />}
         {saveText}
       </button>
       <button
-        className="flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white"
+        className={twMerge(
+          "flex items-center gap-2 rounded-md bg-indigo-600 p-2 px-4 font-medium text-white",
+          !enablePublishAction && "bg-indigo-400"
+        )}
         onClick={() => {
-          if (isUnpublishAct) 
-          onUnpublish();
-          else
-
-          onPublish()
+          if (isUnpublishAct) onUnpublish();
+          else onPublish();
         }}
+        disabled={!enablePublishAction}
       >
         {publishLoading && <Loading className="w-4 border-2" />}
         {publishText}

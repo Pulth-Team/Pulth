@@ -47,8 +47,6 @@ model User {
     accounts      Account[]
     sessions      Session[]
 
-    metaData MetaData?
-
     Articles Article[] @relation("ArticleAuthor")
     // votedArticles Article[] @relation("ArticleVoters", fields: [voterIds], references: [id])
     Comments Comment[] @relation("AuthorUser")
@@ -57,16 +55,7 @@ model User {
     // im not hundred percent sure this is the right way to do this
     ratedComments   Comment[] @relation("RatedUser", fields: [ratedCommentsId], references: [id])
     images          Image[]
-    articleId       String?   @db.ObjectId
     votedTo         VotedBy[] @relation("ArticleVotes")
-}
-
-model MetaData {
-    id        String @id @default(auto()) @map("_id") @db.ObjectId
-    user      User   @relation(fields: [userId], references: [id])
-    follows   Int    @default(0)
-    followers Int    @default(0)
-    userId    String @unique @db.ObjectId
 }
 
 model VerificationToken {
@@ -90,7 +79,7 @@ model Article {
     description   String
     slug          String   @unique
     bodyData      Json
-    draftBodyData Json?     
+    draftBodyData Json?
     isPublished   Boolean  @default(false)
     keywords      String[] @default([])
 
@@ -98,8 +87,10 @@ model Article {
     updatedAt     DateTime @updatedAt
     editorVersion String?
 
-    voteRank Int       @default(0)
-    votes    VotedBy[] @relation("ArticleVotes")
+    // artifical field for the frontend
+    // this is the number of votes the article has received so far (upvotes - downvotes)
+    // voteRank Int       @default(0)
+    votes VotedBy[] @relation("ArticleVotes")
 
     Comments Comment[]
 }

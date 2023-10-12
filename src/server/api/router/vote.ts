@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { ObjectId } from "bson";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const voteRouter = createTRPCRouter({
   voteByArticleId: protectedProcedure
@@ -22,7 +26,6 @@ export const voteRouter = createTRPCRouter({
           userId: z.string(),
           upVote: z.boolean(),
         }),
-        newRank: z.number(),
         voteDirection: z.enum(["up", "down", "deleted"]),
       })
     )
@@ -55,37 +58,20 @@ export const voteRouter = createTRPCRouter({
           // compare vote type
           if (isVotedBefore.isUpvote === isUpVote) {
             // if same vote type, delete vote
-            const voteDeleteResult = prisma.votedBy.delete({
+            const voteDeleteResult = await prisma.votedBy.delete({
               where: {
                 id: isVotedBefore.id,
               },
             });
 
-            // update voteRank in article
-            const voteRankUpdateResult = prisma.article.update({
-              where: {
-                id: articleId,
-              },
-              data: {
-                voteRank: {
-                  increment: -1 * (isUpVote ? 1 : -1),
-                },
-              },
-            });
-
-            return Promise.all([voteDeleteResult, voteRankUpdateResult]).then(
-              ([voteDeleteResult, voteRankUpdateResult]) => {
-                return {
-                  msg: "vote deleted",
-                  vote: voteDeleteResult,
-                  newRank: voteRankUpdateResult.voteRank,
-                  voteDirection: "deleted",
-                };
-              }
-            );
+            return {
+              msg: "vote deleted",
+              vote: voteDeleteResult,
+              voteDirection: "deleted",
+            };
           } else {
             // if different vote type, update vote
-            const voteUpdateResult = prisma.votedBy.update({
+            const voteUpdateResult = await prisma.votedBy.update({
               where: {
                 id: isVotedBefore.id,
               },
@@ -94,28 +80,11 @@ export const voteRouter = createTRPCRouter({
               },
             });
 
-            // update voteRank in article
-            const voteRankUpdateResult = prisma.article.update({
-              where: {
-                id: articleId,
-              },
-              data: {
-                voteRank: {
-                  increment: 2 * (isUpVote ? 1 : -1),
-                },
-              },
-            });
-
-            return Promise.all([voteUpdateResult, voteRankUpdateResult]).then(
-              ([voteUpdateResult, voteRankUpdateResult]) => {
-                return {
-                  msg: "vote converted to opposite type",
-                  vote: voteUpdateResult,
-                  newRank: voteRankUpdateResult.voteRank,
-                  voteDirection: isUpVote ? "up" : "down",
-                };
-              }
-            );
+            return {
+              msg: "vote converted to opposite type",
+              vote: voteUpdateResult,
+              voteDirection: isUpVote ? "up" : "down",
+            };
           }
         }
 
@@ -128,30 +97,14 @@ export const voteRouter = createTRPCRouter({
           },
         });
 
-        // update voteRank in article
-        const voteRankUpdateResult = await prisma.article.update({
-          where: {
-            id: articleId,
-          },
-          data: {
-            voteRank: {
-              increment: 1 * (isUpVote ? 1 : -1),
-            },
-          },
+        return Promise.all([voteCreateResult]).then(([voteCreateResult]) => {
+          return {
+            msg: "vote created",
+            vote: voteCreateResult,
+            // newRank: voteRankUpdateResult.voteRank,
+            voteDirection: isUpVote ? "up" : "down",
+          };
         });
-
-        console.log("voteRankUpdateResult", voteRankUpdateResult);
-
-        return Promise.all([voteCreateResult, voteRankUpdateResult]).then(
-          ([voteCreateResult, voteRankUpdateResult]) => {
-            return {
-              msg: "vote created",
-              vote: voteCreateResult,
-              newRank: voteRankUpdateResult.voteRank,
-              voteDirection: isUpVote ? "up" : "down",
-            };
-          }
-        );
       }
     ),
 
@@ -172,7 +125,32 @@ export const voteRouter = createTRPCRouter({
           userId,
         },
       });
+      let voteEnum: "up" | "down" | "none" = "none";
 
-      return vote || { msg: "no vote found" };
+      if (!vote) voteEnum = "none";
+      else voteEnum = vote?.upVote ? "up" : "down";
+
+      return {
+        voteDirection: voteEnum,
+        details: vote
+          ? {
+              id: vote.id,
+              articleId: vote.articleId,
+              userId: vote.userId,
+            }
+          : undefined,
+      };
+    }),
+  getVoteRankByArticleId: publicProcedure
+    .input(z.string().refine((id) => ObjectId.isValid(id), {}))
+    .query(async ({ input: articleId, ctx: { prisma } }) => {
+      const article = await prisma.article.findUnique({
+        where: {
+          id: articleId,
+        },
+      });
+      if (!article) return 0;
+
+      return await article.voteRank;
     }),
 });

@@ -183,4 +183,84 @@ export const commentRouter = createTRPCRouter({
         },
       });
     }),
+
+  getBySlug: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    // Get the article
+    const article = await ctx.prisma?.article.findUnique({
+      where: {
+        slug: input,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    // If the article doesn't exist, return an error
+    if (!article)
+      throw new TRPCError({
+        message: "Article not found",
+        code: "NOT_FOUND",
+      });
+
+    // Get the comments
+    const allComments = await ctx.prisma?.comment.findMany({
+      where: {
+        articleId: article.id,
+      },
+      select: {
+        id: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        isEdited: true,
+        content: true,
+        parentIds: true,
+      },
+    });
+
+    const RootCommentsCount = allComments?.filter(
+      (comment) => comment.parentIds.length === 0
+    ).length;
+
+    return {
+      comments: allComments,
+      rootCommentsCount: RootCommentsCount,
+    };
+  }),
+  getByArticleId: publicProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      // Get the comments
+      const allComments = await ctx.prisma?.comment.findMany({
+        where: {
+          articleId: input,
+        },
+        select: {
+          id: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          isEdited: true,
+          content: true,
+          parentIds: true,
+        },
+      });
+
+      const RootCommentsCount = allComments?.filter(
+        (comment) => comment.parentIds.length === 0
+      ).length;
+
+      return {
+        comments: allComments,
+        rootCommentsCount: RootCommentsCount,
+      };
+    }),
 });

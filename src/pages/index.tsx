@@ -184,16 +184,16 @@ const Home: NextPage = () => {
               </Tab>
             </Tab.List>
             <Tab.Panels className="mt-2 text-white">
-              <Tab.Panel className="" static>
+              <Tab.Panel className="" unmount={false}>
                 <Transition
                   show={selectedIndex === 0}
                   unmount={false}
+                  appear={true}
                   enter="transition duration-700"
                   enterFrom="opacity-0 "
                   enterTo="opacity-100 "
                   leave="hidden"
                 >
-                  {/* FIXME: Change inner html with something informative */}
                   <p>
                     Quizzes are a great way to test your knowledge and learn in
                     a fun way. You can find quizzes about any topic you want to
@@ -209,10 +209,11 @@ const Home: NextPage = () => {
                   </ul>
                 </Transition>
               </Tab.Panel>
-              <Tab.Panel className="" static>
+              <Tab.Panel className="" unmount={false}>
                 <Transition
                   show={selectedIndex === 1}
                   unmount={false}
+                  appear={true}
                   enter="transition duration-700"
                   enterFrom="opacity-0 "
                   enterTo="opacity-100 "
@@ -231,10 +232,11 @@ const Home: NextPage = () => {
                   </ul>
                 </Transition>
               </Tab.Panel>
-              <Tab.Panel className="" static>
+              <Tab.Panel className="" unmount={false}>
                 <Transition
                   show={selectedIndex === 2}
                   unmount={false}
+                  appear={true}
                   enter="transition duration-700 order-first"
                   enterFrom="opacity-0 "
                   enterTo="opacity-100 "
@@ -294,7 +296,7 @@ const Home: NextPage = () => {
             enterTo="opacity-100 "
             leave="hidden"
           >
-            <div className="h-96 w-full rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
+            <div className="h-[480px] w-full rounded-lg bg-gradient-to-r from-gray-700 to-indigo-600 shadow-lg shadow-gray-700"></div>
           </Transition>
           <Transition
             show={selectedIndex === 1}

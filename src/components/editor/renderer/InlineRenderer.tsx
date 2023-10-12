@@ -19,39 +19,36 @@ const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
 
     function InlineRendererAST({ ast }: { ast: PureNodeAST[] }) {
       const elementArray = ast.map((node, index) => {
-        switch (node.type) {
-          case "text":
-            return <span key={index}>{node.value}</span>;
-          case "element":
-            switch (node.tagName) {
-              case "b":
-                return (
-                  <span key={index} className="font-bold">
-                    <InlineRendererAST ast={node.children} />
-                  </span>
-                );
-              case "i":
-                return (
-                  <span key={index} className="italic">
-                    <InlineRendererAST ast={node.children} />
-                  </span>
-                );
-              case "a":
-                return (
-                  <Link href={node.properties.href as string}>
-                    <span className="underline cursor-pointer">
-                      <InlineRendererAST ast={node.children} />
-                    </span>
-                  </Link>
-                );
-              default:
-                console.log(node);
-                return (
-                  <span className="p-1 bg-gray-700 text-white ">
-                    Unsupported element type {node.tagName}
-                  </span>
-                );
-            }
+        if (node.type == "text") return <span key={index}>{node.value}</span>;
+
+        switch (node.tagName) {
+          case "b":
+            return (
+              <span key={index} className="font-bold">
+                <InlineRendererAST ast={node.children} />
+              </span>
+            );
+          case "i":
+            return (
+              <span key={index} className="italic">
+                <InlineRendererAST ast={node.children} />
+              </span>
+            );
+          case "a":
+            return (
+              <Link key={index} href={node.properties.href as string}>
+                <span className="cursor-pointer underline">
+                  <InlineRendererAST ast={node.children} />
+                </span>
+              </Link>
+            );
+          default:
+            console.log(node);
+            return (
+              <span key={index} className="bg-gray-700 p-1 text-white ">
+                Unsupported element type {node.tagName}
+              </span>
+            );
         }
       });
 
