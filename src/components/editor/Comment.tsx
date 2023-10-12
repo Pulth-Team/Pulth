@@ -107,7 +107,7 @@ const Comment: NextPage<{
 
           {!isEditing && <p className="break-all">{comment.content}</p>}
         </div>
-        <div className="flex flex-shrink-0 flex-grow flex-row gap-1">
+        <div className="flex  flex-row gap-1">
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
           <button
             onClick={() => {
@@ -126,6 +126,7 @@ const Comment: NextPage<{
               <ArrowUturnLeftIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
             )}
           </button>
+
           <button
             onClick={() => {
               // If its already editing, then cancel editing
