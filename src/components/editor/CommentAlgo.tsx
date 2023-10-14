@@ -100,7 +100,6 @@ const CommentAlgo: NextPage<{
           isActive: activity !== "none",
           activity,
           currentActiveCommentId,
-
           isAuthed,
           user,
           articleId,

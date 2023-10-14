@@ -42,6 +42,9 @@ const Articles: NextPage = () => {
 
   // query to get the article data
   const articleData = api.article.getBySlug.useQuery((slug as string) || "");
+
+  const isArticleExists = articleData.data?.id !== undefined;
+
   //query to get the comment data
   const commentData = api.comment.getBySlug.useQuery((slug as string) || "");
 
@@ -49,7 +52,7 @@ const Articles: NextPage = () => {
   const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
     articleData.data?.id as string,
     {
-      enabled: articleData.data?.id !== null,
+      enabled: isArticleExists,
     }
   );
 
@@ -60,7 +63,7 @@ const Articles: NextPage = () => {
   const myVoteQuery = api.vote.checkMyVoteByArticleId.useQuery(
     articleData.data?.id as string,
     {
-      enabled: authStatus === "authenticated" && articleData.data?.id !== null,
+      enabled: authStatus === "authenticated" && isArticleExists,
     }
   );
 
@@ -93,7 +96,7 @@ const Articles: NextPage = () => {
 
   let body = (
     <>
-      {!articleData.data?.id && (
+      {!isArticleExists && (
         <div>
           <p className="mb-4">
             Article not found. Maybe it&apos;s been deleted by the author.
@@ -111,31 +114,11 @@ const Articles: NextPage = () => {
       {RenderedDocument}
 
       {/* Rank and action buttons */}
-      {articleData.data?.id && (
+      {isArticleExists && (
         <div className="mb-6 mt-8 flex flex-row  justify-between">
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <SparklesIcon className="h-6 w-6 text-black" />
-              {/* 
-              TODO: 
-                Loading icon is glithing but good enough for now
-                to Reproduce the glitch:
-                  1. go to an article
-                  2. minimize the window / go to another app
-                  3. come back to the article
-                  4. the loading icon will glitch
-                  - loading will show up then show the vote 
-                  - then loading will show up again and then show the vote
-                  - this will happen only once
-
-
-                  !voteRankQuery.isFetching &&
-                  !voteAddMutation.isLoading &&
-                  voteRankQuery.isSuccess 
-
-                  voteRankQuery.isSuccess this condition is might be removed
-              */}
-
               {!voteRankQuery.isFetching && !voteAddMutation.isLoading ? (
                 voteRankQuery.data
               ) : (
@@ -207,7 +190,7 @@ const Articles: NextPage = () => {
       )}
 
       {/* About the author */}
-      {articleData.data?.author && (
+      {isArticleExists && articleData.data?.author && (
         <div className="mt-4 flex items-center justify-between md:px-4">
           <div className="flex items-center gap-x-3">
             <div className="relative h-12 w-12 ">
@@ -252,7 +235,7 @@ const Articles: NextPage = () => {
       )}
 
       {/* Comments should have a separate api */}
-      {commentData.data?.rootCommentsCount !== 0 && (
+      {isArticleExists && (
         <div className="py-4">
           <p className="text-lg font-semibold">
             <span className="font-medium">
