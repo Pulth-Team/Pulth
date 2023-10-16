@@ -354,32 +354,6 @@ const Inspect: NextPage = () => {
               >
                 Edit
               </Link>
-              {/* TODO: Investigate what this was suppose to do */}
-              {/* <button
-              onClick={() => {
-                if (typeof articleInfo.data?.isPublished !== "undefined")
-                  articlePublishMutation.mutate(
-                    {
-                      slug: slug as string,
-
-                    },
-                    {
-                      onSuccess: (data) => {
-                        articleInfo.refetch();
-                      },
-                    }
-                  );
-              }}
-              className="flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-white md:mt-6 "
-            >
-              {publishMutationIsLoading ? (
-                <Loading className="mr-2 h-6 w-6 border-2" />
-              ) : (
-                ""
-              )}
-              {articleInfo.data?.isPublished ? "Unpublish" : "Publish"}
-            </button> */}
-
               {/* This Should open a model for confirmation */}
               <button
                 className="flex items-center justify-center rounded-lg bg-red-500 px-4 py-2 text-white md:mb-2 md:mt-6 md:hidden"
