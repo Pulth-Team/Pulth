@@ -7,6 +7,10 @@ function isHidden(el: HTMLElement) {
   return el.offsetParent === null || style.display === "none";
 }
 
+function checkMediaQuery(query: string) {
+  return window.matchMedia(`(min-width: ${query})`).matches;
+}
+
 function calculatePositionLeft(
   targetPosition: DOMRect,
   direction: "top" | "bottom" | "left" | "right",
@@ -56,5 +60,13 @@ function calculatePositionTop(
       return targetPosition.top + targetPosition.height;
   }
 }
+//TODO: Get from tailwind config
+const tailwindSizeOrder = ["sm", "md", "lg", "xl", "2xl"];
 
-export { isHidden, calculatePositionLeft, calculatePositionTop };
+function sortTailwindSizes(sizeArray:(any & {tailwindQuery:string})[]) {
+  return sizeArray.sort((a, b) => {
+    return tailwindSizeOrder.indexOf(a) - tailwindSizeOrder.indexOf(b);
+  });
+}
+
+export { isHidden, calculatePositionLeft, calculatePositionTop, checkMediaQuery, sortTailwindSizes };

@@ -48,16 +48,30 @@ const Dashboard: NextPage = () => {
             },
             {
               targetQuery: "#dashboard-menu-item",
-              direction: "right",
+              direction: "top",
               align: "start",
               message: "This is the dashboard. You can see your overall stats",
               skip: true,
+              conditions: [
+                {
+                  taildwindQuery: "md",
+                  direction: "right",
+                  align: "center",
+                },
+              ],
             },
             {
               targetQuery: "#explore-menu-item",
-              direction: "right",
-              align: "start",
+              direction: "top",
+              align: "center",
               message: "This is the explore page. Let's go there !",
+              conditions: [
+                {
+                  taildwindQuery: "md",
+                  direction: "right",
+                  align: "center",
+                },
+              ],
               redirect: "/explore",
             },
           ]}
