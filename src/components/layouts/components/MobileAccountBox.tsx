@@ -13,7 +13,7 @@ import { signOut } from "next-auth/react";
 const MobileAccountBox = ({ image }: { image: string }) => {
   return (
     <Menu as="div" className={`self-stretch md:hidden`}>
-      <Menu.Button className={`relative h-10 w-10 focus:outline-none `}>
+      <Menu.Button className={`relative h-10 w-10 focus:outline-none`}>
         <Image
           src={image || "/default_profile.jpg"}
           alt="profile"
@@ -22,7 +22,7 @@ const MobileAccountBox = ({ image }: { image: string }) => {
           className="aspect-square rounded-full"
         ></Image>
       </Menu.Button>
-      <Menu.Items className="absolute right-1 translate-y-3 rounded-md bg-gray-700 p-1 focus:outline-none active:outline-none">
+      <Menu.Items className="absolute right-1 z-10 translate-y-3 rounded-md bg-gray-700 p-1 focus:outline-none active:outline-none">
         <Link href={"/profile"}>
           <Menu.Item>
             <div className="flex cursor-pointer items-center gap-x-1 rounded p-1 align-middle text-white hover:bg-gray-800 active:bg-gray-800">
