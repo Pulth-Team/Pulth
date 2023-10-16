@@ -5,7 +5,14 @@ import { useRouter } from "next/router";
 import React, { useRef, useState, useLayoutEffect } from "react";
 
 import { twMerge } from "tailwind-merge";
-import { calculatePositionLeft, calculatePositionTop } from "./helpers/Tour";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "~/../tailwind.config.js";
+import {
+  calculatePositionLeft,
+  calculatePositionTop,
+  checkMediaQuery,
+  sortTailwindSizes,
+} from "./helpers/Tour";
 
 ///
 /// Tour Component
@@ -30,6 +37,9 @@ type StartProps =
       onClosed?: () => void;
     };
 
+const config = resolveConfig(tailwindConfig);
+const tailwindScreens = config.theme?.screens;
+
 // creates a NextFunctionComponent
 const Tour: NextPage<
   {
@@ -47,6 +57,12 @@ const Tour: NextPage<
       // default is center
       align?: "start" | "center" | "end";
       className?: string;
+      conditions?: {
+        taildwindQuery: "sm" | "md" | "lg" | "xl" | "2xl";
+        align: "start" | "center" | "end";
+        direction: "top" | "bottom" | "left" | "right";
+        className?: string;
+      }[];
     }[];
     onFinished?: (
       e: "success" | "backdrop" | "skipped" | "error" | "redirect",
@@ -138,19 +154,80 @@ const Tour: NextPage<
     contentRef.current!.style.zIndex = "10001";
 
     const { width, height } = contentRef.current!.getBoundingClientRect();
+    let left = 0;
+    let top = 0;
 
-    const left = calculatePositionLeft(
-      target.getBoundingClientRect(),
-      currentTour.direction || "bottom",
-      currentTour.align || "center",
-      width
-    );
-    const top = calculatePositionTop(
-      target.getBoundingClientRect(),
-      currentTour.direction || "bottom",
-      currentTour.align || "center",
-      height
-    );
+    if (currentTour.conditions) {
+      let mostSpecificCondition = "default";
+      let sortedConditions = sortTailwindSizes(currentTour.conditions) as {
+        taildwindQuery: "sm" | "md" | "lg" | "xl" | "2xl";
+        align: "start" | "center" | "end";
+        direction: "top" | "bottom" | "left" | "right";
+        className?: string;
+      }[];
+      console.log(sortedConditions);
+      for (const condition of sortedConditions) {
+        console.log(condition.taildwindQuery);
+        if (!tailwindScreens) break;
+        if (!condition.taildwindQuery) break;
+        if (!(condition.taildwindQuery in tailwindScreens)) break;
+        if (
+          checkMediaQuery(
+            tailwindScreens[
+              condition.taildwindQuery as keyof typeof tailwindScreens
+            ].toString()
+          )
+        ) {
+          mostSpecificCondition = condition.taildwindQuery;
+        } else {
+          break;
+        }
+      }
+      console.log(mostSpecificCondition);
+      if (mostSpecificCondition === "default") {
+        left = calculatePositionLeft(
+          target.getBoundingClientRect(),
+          currentTour.direction || "bottom",
+          currentTour.align || "center",
+          width
+        );
+        top = calculatePositionTop(
+          target.getBoundingClientRect(),
+          currentTour.direction || "bottom",
+          currentTour.align || "center",
+          height
+        );
+      } else {
+        let condition = currentTour.conditions.find(
+          (e) => e.taildwindQuery === mostSpecificCondition
+        );
+        left = calculatePositionLeft(
+          target.getBoundingClientRect(),
+          condition?.direction || "bottom",
+          condition?.align || "center",
+          width
+        );
+        top = calculatePositionTop(
+          target.getBoundingClientRect(),
+          condition?.direction || "bottom",
+          condition?.align || "center",
+          height
+        );
+      }
+    } else {
+      left = calculatePositionLeft(
+        target.getBoundingClientRect(),
+        currentTour.direction || "bottom",
+        currentTour.align || "center",
+        width
+      );
+      top = calculatePositionTop(
+        target.getBoundingClientRect(),
+        currentTour.direction || "bottom",
+        currentTour.align || "center",
+        height
+      );
+    }
 
     contentRef.current!.style.left = left + "px";
     contentRef.current!.style.top = top + "px";
