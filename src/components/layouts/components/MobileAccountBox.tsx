@@ -12,7 +12,7 @@ import { signOut } from "next-auth/react";
 
 const MobileAccountBox = ({ image }: { image: string }) => {
   return (
-    <Menu as="div" className={`self-stretch md:hidden`}>
+    <Menu as="div" className={`self-stretch md:hidden`} id="mobile-account-box">
       <Menu.Button className={`relative h-10 w-10 focus:outline-none`}>
         <Image
           src={image || "/default_profile.jpg"}
