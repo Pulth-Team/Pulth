@@ -9,10 +9,13 @@ import DragScrollContainer from "~/components/DragScrollContainer";
 import ArticleCard from "~/components/ArticleCard";
 import DashboardLayout from "~/components/layouts/gridDashboard";
 import Tour from "../components/Tour";
+import { useState } from "react";
 
 const Explore: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
+
+  const [tour, setTour] = useState(true);
 
   const { data: articles, isLoading } = api.article.getLatest.useQuery({
     limit: 10,
@@ -103,31 +106,53 @@ const Explore: NextPage = () => {
           <Tour
             className="w-96"
             start={"redirect"}
+            redirect="/profile"
             onFinished={(e, message) => {
-              if (e === "error") console.error(message);
+              setTour(false);
             }}
             tours={[
               {
-                targetQuery: "#recom-scroll",
                 message:
                   'This is a article recommendation for you. You can click "Go to Article" button to read the article.',
-                className: "my-2",
-                direction: "bottom",
+                default: {
+                  direction: "bottom",
+                  align: "center",
+                  targetQuery: "#recom-scroll",
+                  className: "my-2",
+                },
               },
               {
-                targetQuery: "#current-account-box",
-                message: "This is your current account's informations.",
-                direction: "top",
-                align: "center",
-                className: "-translate-y-2 w-64",
+                message:
+                  "This is your current account. you can click to it. It will open a menu. You can view your profile, settings and logout from there.",
+
+                default: {
+                  // targetQuery: "#current-account-box",
+                  targetQuery: "#mobile-account-box",
+                  direction: "bottom",
+                  align: "end",
+                  className: "w-64 mt-2",
+                },
+
+                mediaQueries: [
+                  {
+                    targetQuery: "#current-account-box",
+                    taildwindQuery: "md",
+                    direction: "right",
+                    align: "end",
+                    className: "ml-2 -translate-y-2",
+                  },
+                ],
               },
               {
-                targetQuery: "#view-profile-btn",
                 message: "You can view your profile by clicking this button.",
-                direction: "right",
-                align: "end",
-                className: "translate-y-2 w-64",
-                redirect: `/user/${user?.id}`,
+
+                showOn: ["md"],
+                default: {
+                  targetQuery: "#view-profile-btn",
+                  direction: "right",
+                  align: "end",
+                  className: "translate-y-2 w-64",
+                },
               },
             ]}
           />
