@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 
 import Head from "next/head";
-import Link from "next/link";
 
 import dynamic from "next/dynamic";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
@@ -36,43 +35,39 @@ const Dashboard: NextPage = () => {
         <br />
         <Tour
           start={tour}
-          onClosed={() => {
-            setTour(false);
-          }}
-          className="mx-4 my-2 w-64"
+          className="w-64"
+          redirect="/explore"
           tours={[
             {
-              targetQuery: "#search-button",
               message: "This is the dashboard. You can see your overall stats",
-              align: "end",
-            },
-            {
-              targetQuery: "#dashboard-menu-item",
-              direction: "top",
-              align: "start",
-              message: "This is the dashboard. You can see your overall stats",
-              skip: true,
-              conditions: [
+              default: {
+                direction: "top",
+                align: "start",
+                targetQuery: "#dashboard-menu-item",
+              },
+              mediaQueries: [
                 {
                   taildwindQuery: "md",
                   direction: "right",
-                  align: "center",
+                  align: "start",
+                  className: "ml-4",
                 },
               ],
             },
             {
-              targetQuery: "#explore-menu-item",
-              direction: "top",
-              align: "center",
               message: "This is the explore page. Let's go there !",
-              conditions: [
+              default: {
+                direction: "top",
+                align: "center",
+                targetQuery: "#explore-menu-item",
+              },
+              mediaQueries: [
                 {
                   taildwindQuery: "md",
                   direction: "right",
                   align: "center",
                 },
               ],
-              redirect: "/explore",
             },
           ]}
           onFinished={(e, message) => {
