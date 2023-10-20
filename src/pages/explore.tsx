@@ -146,7 +146,7 @@ const Explore: NextPage = () => {
               {
                 message: "You can view your profile by clicking this button.",
 
-                showOn: ["md"],
+                showOn: ["md", "lg", "xl", "2xl"],
                 default: {
                   targetQuery: "#view-profile-btn",
                   direction: "right",
