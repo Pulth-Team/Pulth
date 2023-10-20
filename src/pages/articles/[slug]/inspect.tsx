@@ -9,7 +9,8 @@ import { useRouter } from "next/router";
 import Loading from "~/components/Loading";
 import Dashboard from "~/components/layouts/gridDashboard";
 import { api } from "~/utils/api";
-import { Tab, Dialog } from "@headlessui/react";
+import { Tab, Dialog, Disclosure } from "@headlessui/react";
+import { ChevronUpIcon } from "@heroicons/react/20/solid";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -65,13 +66,91 @@ const Inspect: NextPage = () => {
       );
     }
   }, [articleUpdateInfoMutation, router]);
-
   useEffect(() => {
     if (articleDeleteMutation.isSuccess && !articleDeleteMutation.isLoading) {
       articleDeleteMutation.reset();
       router.push("/articles");
     }
   }, [articleDeleteMutation, router]);
+
+  type ScoreCheckingKey =
+    | "title_less_than_10"
+    | "title_longer_30"
+    | "description_less_than_80"
+    | "description_longer_160";
+  const ScoreCheckings: {
+    [key in ScoreCheckingKey]: {
+      msg: string;
+      value: boolean;
+      importance: "critical" | "warning";
+      type: "title" | "description";
+    };
+  } = {
+    title_less_than_10: {
+      msg: "Title is too short. It should be at least 10",
+      value: (articleInfo.data?.title?.length || 0) > 10,
+      importance: "critical",
+      type: "title",
+    },
+    title_longer_30: {
+      msg: "Title is too long. It shouldn’t be longer than 30",
+      value: (articleInfo.data?.title?.length || 0) < 30,
+      importance: "warning",
+      type: "title",
+    },
+    description_less_than_80: {
+      msg: "Description is too short. It should be at least 80",
+      value: (articleInfo.data?.description?.length || 0) > 80,
+      importance: "critical",
+      type: "description",
+    },
+    description_longer_160: {
+      msg: "Description is too long. It shouldn’t be longer than 160",
+      value: (articleInfo.data?.description?.length || 0) < 160,
+      importance: "warning",
+      type: "description",
+    },
+  };
+
+  const titleGreenCount = Object.values(ScoreCheckings).filter((score) => {
+    return score.type === "title" && score.value;
+  }).length;
+
+  const descriptionGreenCount = Object.values(ScoreCheckings).filter(
+    (score) => {
+      return score.type === "description" && score.value;
+    }
+  ).length;
+
+  const titleYellowCount = Object.values(ScoreCheckings).filter((score) => {
+    return (
+      score.type === "title" && !score.value && score.importance === "warning"
+    );
+  }).length;
+
+  const descriptionYellowCount = Object.values(ScoreCheckings).filter(
+    (score) => {
+      return (
+        score.type === "description" &&
+        !score.value &&
+        score.importance === "warning"
+      );
+    }
+  ).length;
+
+  const titleRedCount = Object.values(ScoreCheckings).filter((score) => {
+    return (
+      score.type === "title" && !score.value && score.importance === "critical"
+    );
+  }).length;
+
+  const descriptionRedCount = Object.values(ScoreCheckings).filter((score) => {
+    return (
+      score.type === "description" &&
+      !score.value &&
+      score.importance === "critical"
+    );
+  }).length;
 
   return (
     <Dashboard>
@@ -176,7 +255,6 @@ const Inspect: NextPage = () => {
                     <Tab.Panel>
                       <div className="mt-4 flex flex-col">
                         <span className="text-black/70">Title:</span>
-
                         <input
                           className="border-2 p-3 outline-indigo-500"
                           value={title || ""}
@@ -184,7 +262,11 @@ const Inspect: NextPage = () => {
                             setTitle(e.target.value);
                           }}
                         />
+                        <p className="ml-1 text-xs italic text-gray-500">
+                          {title?.length}/40
+                        </p>
                       </div>
+
                       <div className="mt-4 flex flex-col">
                         <span className="text-black/70">Description:</span>
 
@@ -296,6 +378,216 @@ const Inspect: NextPage = () => {
                         >
                           Clear
                         </button>
+                      </div>
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <div className="grid grid-cols-3 gap-4 pt-4">
+                        <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
+                          <p className="text-xl">Overall Score</p>
+                          <p className="text-2xl font-semibold">
+                            43
+                            <span className="text-base text-black/50">
+                              /100
+                            </span>
+                          </p>
+                        </div>
+                        <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
+                          <p className="text-xl">Meta Score</p>
+                          <p className="text-2xl font-semibold">
+                            31
+                            <span className="text-base text-black/50">
+                              /100
+                            </span>
+                          </p>
+                        </div>
+                        <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
+                          <p className="text-xl">Article Score</p>
+                          <p className="text-2xl font-semibold">
+                            62
+                            <span className="text-base text-black/50">
+                              /100
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="w-full pt-4">
+                        <div className="mx-auto w-full rounded-2xl bg-white p-2">
+                          <Disclosure>
+                            {({ open }) => (
+                              <>
+                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
+                                  <span className="">Title</span>
+                                  <div className=" flex items-center gap-4">
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        titleGreenCount == 0 ? "hidden" : ""
+                                      }`}
+                                    >
+                                      <p>{titleGreenCount}</p>
+                                      <div className="h-3 w-3 rounded-full bg-green-700"></div>
+                                    </div>
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        titleYellowCount == 0 ? "hidden" : ""
+                                      }`}
+                                    >
+                                      <p>{titleYellowCount}</p>
+                                      <div className=" h-3 w-3 rounded-full bg-yellow-500"></div>
+                                    </div>
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        titleRedCount == 0 ? "hidden" : ""
+                                      }`}
+                                    >
+                                      <p>{titleRedCount}</p>
+                                      <div className=" h-3 w-3 rounded-full bg-red-500"></div>
+                                    </div>
+
+                                    <ChevronUpIcon
+                                      className={`${
+                                        open ? "" : "rotate-180 transform"
+                                      } h-5 w-5 text-black`}
+                                    />
+                                  </div>
+                                </Disclosure.Button>
+                                <Disclosure.Panel className="px-4 pt-2 text-sm">
+                                  {Object.values(ScoreCheckings).map(
+                                    (score) => {
+                                      if (
+                                        !score.value &&
+                                        score.importance === "critical" &&
+                                        score.type === "title"
+                                      ) {
+                                        return (
+                                          <p className={`text-red-700`}>
+                                            {score.msg}
+                                          </p>
+                                        );
+                                      }
+                                    }
+                                  )}
+                                  {Object.values(ScoreCheckings).map(
+                                    (score) => {
+                                      if (
+                                        !score.value &&
+                                        score.importance === "warning" &&
+                                        score.type === "title"
+                                      ) {
+                                        return (
+                                          <p className={`text-yellow-600`}>
+                                            {score.msg}
+                                          </p>
+                                        );
+                                      }
+                                    }
+                                  )}
+                                  {Object.values(ScoreCheckings).map(
+                                    (Score) => {
+                                      if (Score.value && Score.type === "title")
+                                        return (
+                                          <p className={`text-green-700`}>
+                                            {Score.msg}
+                                          </p>
+                                        );
+                                    }
+                                  )}
+                                </Disclosure.Panel>
+                              </>
+                            )}
+                          </Disclosure>
+                          <br />
+                          <Disclosure>
+                            {({ open }) => (
+                              <>
+                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
+                                  <span className="text-siz">Description</span>
+                                  <div className=" flex items-center gap-4">
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        descriptionGreenCount == 0
+                                          ? "hidden"
+                                          : ""
+                                      }`}
+                                    >
+                                      <p>{descriptionGreenCount}</p>
+                                      <div className="h-3 w-3 rounded-full bg-green-700"></div>
+                                    </div>
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        descriptionYellowCount == 0
+                                          ? "hidden"
+                                          : ""
+                                      }`}
+                                    >
+                                      <p>{descriptionYellowCount}</p>
+                                      <div className=" h-3 w-3 rounded-full bg-yellow-500"></div>
+                                    </div>
+                                    <div
+                                      className={`flex items-center gap-1 ${
+                                        descriptionRedCount == 0
+                                          ? " hidden"
+                                          : ""
+                                      }`}
+                                    >
+                                      <p>{descriptionRedCount}</p>
+                                      <div className=" h-3 w-3 rounded-full bg-red-500"></div>
+                                    </div>
+                                    <ChevronUpIcon
+                                      className={`${
+                                        open ? "" : "rotate-180 transform"
+                                      } h-5 w-5 text-black`}
+                                    />
+                                  </div>
+                                </Disclosure.Button>
+                                <Disclosure.Panel className="px-4 pb-2 pt-2 text-sm">
+                                  {Object.values(ScoreCheckings).map(
+                                    (score) => {
+                                      if (
+                                        !score.value &&
+                                        score.importance === "critical" &&
+                                        score.type === "description"
+                                      ) {
+                                        return (
+                                          <p className={`text-red-700`}>
+                                            {score.msg}
+                                          </p>
+                                        );
+                                      }
+                                    }
+                                  )}
+                                  {Object.values(ScoreCheckings).map(
+                                    (score) => {
+                                      if (
+                                        !score.value &&
+                                        score.importance === "warning" &&
+                                        score.type === "description"
+                                      ) {
+                                        return (
+                                          <p className={`text-yellow-600`}>
+                                            {score.msg}
+                                          </p>
+                                        );
+                                      }
+                                    }
+                                  )}
+                                  {Object.values(ScoreCheckings).map(
+                                    (Score) => {
+                                      if (
+                                        Score.value &&
+                                        Score.type === "description"
+                                      )
+                                        return (
+                                          <p className={`text-green-700`}>
+                                            {Score.msg}
+                                          </p>
+                                        );
+                                    }
+                                  )}
+                                </Disclosure.Panel>
+                              </>
+                            )}
+                          </Disclosure>
+                        </div>
                       </div>
                     </Tab.Panel>
                   </Tab.Panels>
