@@ -44,6 +44,7 @@ const Dashboard: NextPage = () => {
                 direction: "top",
                 align: "start",
                 targetQuery: "#dashboard-menu-item",
+                className: "-translate-y-2",
               },
               mediaQueries: [
                 {

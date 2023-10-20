@@ -26,8 +26,9 @@ type TourProps = {
   default: {
     direction: "top" | "bottom" | "left" | "right";
     align: "start" | "center" | "end";
-    className?: string;
     targetQuery: string;
+
+    className?: string;
   };
   mediaQueries?: TourCondition[];
   message: string;
@@ -101,6 +102,7 @@ function getMostSpecificCondition(
   // sort the conditions by tailwind size
   // smallest => largest
   const sortedConditions = sortTailwindSizes(conditions);
+  //console.log("Sorted Conditions", sortedConditions);
 
   // get the most specific condition
   let mostSpecificCondition: undefined | TourCondition = undefined;
@@ -114,13 +116,25 @@ function getMostSpecificCondition(
   for (const condition of sortedConditions) {
     // check if current media query is a subset of the condition
     if (
-      !isTailwindQueryBiggerOrEqual(currentMediaQuery, condition.taildwindQuery)
-    )
-      // if it is not then break
+      isTailwindQueryLessOrEqual(condition.taildwindQuery, currentMediaQuery)
+    ) {
+      console.log(
+        condition.taildwindQuery,
+        " is  less or equal to",
+        currentMediaQuery
+      );
+      // if it is then use this condition
+      mostSpecificCondition = condition;
+    }
+    // if it is not then break
+    else {
+      console.log(
+        condition.taildwindQuery,
+        " is bigger then",
+        currentMediaQuery
+      );
       break;
-
-    // if it is then use this condition
-    mostSpecificCondition = condition;
+    }
   }
   return mostSpecificCondition;
 }
@@ -156,7 +170,7 @@ function sortTailwindSizes(sizeArray: TourCondition[]) {
   });
 }
 
-function isTailwindQueryBiggerOrEqual(
+function isTailwindQueryLessOrEqual(
   superSet: TailwindQuery | "default",
   subSet: TailwindQuery | "default"
 ) {
@@ -171,7 +185,7 @@ function isTailwindQueryBiggerOrEqual(
 
   // if both are not default then compare the indexes
   return (
-    tailwindSizeOrder.indexOf(superSet) >= tailwindSizeOrder.indexOf(subSet)
+    tailwindSizeOrder.indexOf(superSet) <= tailwindSizeOrder.indexOf(subSet)
   );
 }
 
