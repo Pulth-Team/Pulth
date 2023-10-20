@@ -421,7 +421,7 @@ const Inspect: NextPage = () => {
               </Dialog.Description>
 
               <input
-                className="my-2 w-full p-2"
+                className="my-2 w-full rounded-lg border-2 p-2"
                 onChange={(e) => {
                   setDeleteModalInput(e.target.value);
                 }}
