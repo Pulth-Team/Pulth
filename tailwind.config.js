@@ -9,7 +9,7 @@ module.exports = {
       },
 
       gridTemplateColumns: {
-        "dashboard-desktop": "288px 1fr",
+        "dashboard-desktop": "clamp(256px,20vw,288px) 1fr",
         "dashboard-mobile": "56px 1fr",
       },
       gridTemplateRows: {
