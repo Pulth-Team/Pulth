@@ -86,21 +86,21 @@ const Inspect: NextPage = () => {
       isValid: (title?.length || 0) > 20,
       failMessage:
         "Title is too short. It should be at least 20 charecters long.",
-      successMessage: "Title is longer then 20 character.",
+      successMessage: "Title is longer than 20 character.",
       importance: "critical",
     },
     isLongerThan30: {
       isValid: (title?.length || 0) > 30,
       failMessage:
         "Title is too short. It should be at least 30 charecters long.",
-      successMessage: "Title is longer then 30 character.",
+      successMessage: "Title is longer than 30 character.",
       importance: "critical",
     },
     isLessThan50: {
       isValid: (title?.length || 0) < 50,
       failMessage:
         "Title is too long. It should be at most 50 charecters long.",
-      successMessage: "Title is shorter then 50 character.",
+      successMessage: "Title is shorter than 50 character.",
       importance: "warning",
     },
   };
@@ -118,21 +118,21 @@ const Inspect: NextPage = () => {
       isValid: (description?.length || 0) > 80,
       failMessage:
         "Description is too short. It should be at least 80 charecters long.",
-      successMessage: "Description is longer then 80 character.",
+      successMessage: "Description is longer than 80 character.",
       importance: "critical",
     },
     isLessThan220: {
       isValid: (description?.length || 0) < 220,
       failMessage:
-        "Description is too long. It should be at most 320 charecters long.",
-      successMessage: "Description is shorter then 80 character.",
+        "Description is too long. It should be at most 220 charecters long.",
+      successMessage: "Description is shorter than 220 character.",
       importance: "warning",
     },
     isLessThan280: {
       isValid: (description?.length || 0) < 280,
       failMessage:
         "Description is too long. It should be at most 280 charecters long.",
-      successMessage: "Description is shorter then 280 character.",
+      successMessage: "Description is shorter than 280 character.",
       importance: "critical",
     },
   };
@@ -397,7 +397,7 @@ const Inspect: NextPage = () => {
                       </div>
                     </Tab.Panel>
                     <Tab.Panel>
-                      <div className="grid grid-cols-3 gap-4 pt-4">
+                      <div className="grid grid-cols-3 gap-4 py-4">
                         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
                           <p className="text-xl">Overall Score</p>
                           <p className="text-2xl font-semibold">
@@ -426,12 +426,13 @@ const Inspect: NextPage = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="w-full pt-4">
-                        <div className="mx-auto w-full rounded-2xl bg-white p-2">
-                          <Disclosure>
+                      <hr className="border" />
+                      <div className="w-full py-4">
+                        <div className="mx-auto flex w-full flex-col gap-4 rounded-2xl bg-white">
+                          <Disclosure as={"div"}>
                             {({ open }) => (
                               <>
-                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
+                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
                                   <span className="">Title</span>
                                   <div className=" flex items-center gap-4">
                                     <div
@@ -466,49 +467,71 @@ const Inspect: NextPage = () => {
                                     />
                                   </div>
                                 </Disclosure.Button>
-                                <Disclosure.Panel className="px-4 pt-2 text-sm">
-                                  {Object.values(TitleScores).map((score) => {
-                                    if (
-                                      !score.isValid &&
-                                      score.importance === "critical"
-                                    ) {
-                                      return (
-                                        <p className={`text-red-700`}>
-                                          {score.failMessage}
-                                        </p>
-                                      );
+                                <Disclosure.Panel className="px-4 pt-2">
+                                  {Object.values(TitleScores).map(
+                                    (score, index) => {
+                                      if (
+                                        !score.isValid &&
+                                        score.importance === "critical"
+                                      ) {
+                                        return (
+                                          <p
+                                            className={`text-red-700`}
+                                            key={
+                                              "fail-message-title-critical-" +
+                                              index
+                                            }
+                                          >
+                                            {score.failMessage}
+                                          </p>
+                                        );
+                                      }
                                     }
-                                  })}
-                                  {Object.values(TitleScores).map((score) => {
-                                    if (
-                                      !score.isValid &&
-                                      score.importance === "warning"
-                                    ) {
-                                      return (
-                                        <p className={`text-yellow-600`}>
-                                          {score.failMessage}
-                                        </p>
-                                      );
+                                  )}
+                                  {Object.values(TitleScores).map(
+                                    (score, index) => {
+                                      if (
+                                        !score.isValid &&
+                                        score.importance === "warning"
+                                      ) {
+                                        return (
+                                          <p
+                                            className={`text-yellow-600`}
+                                            key={
+                                              "fail-message-title-warning-" +
+                                              index
+                                            }
+                                          >
+                                            {score.failMessage}
+                                          </p>
+                                        );
+                                      }
                                     }
-                                  })}
-                                  {Object.values(TitleScores).map((Score) => {
-                                    if (Score.isValid)
-                                      return (
-                                        <p className={`text-green-700`}>
-                                          {Score.successMessage}
-                                        </p>
-                                      );
-                                  })}
+                                  )}
+                                  {Object.values(TitleScores).map(
+                                    (Score, index) => {
+                                      if (Score.isValid)
+                                        return (
+                                          <p
+                                            className={`text-green-700`}
+                                            key={
+                                              "succes-message-title-" + index
+                                            }
+                                          >
+                                            {Score.successMessage}
+                                          </p>
+                                        );
+                                    }
+                                  )}
                                 </Disclosure.Panel>
                               </>
                             )}
                           </Disclosure>
-                          <br />
-                          <Disclosure>
+                          <Disclosure as={"div"}>
                             {({ open }) => (
                               <>
-                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
-                                  <span className="text-siz">Description</span>
+                                <Disclosure.Button className="flex w-full justify-between rounded-lg border bg-white px-4 py-2 text-left font-medium text-black focus:outline-none focus-visible:ring focus-visible:ring-opacity-75">
+                                  <span className="">Description</span>
                                   <div className=" flex items-center gap-4">
                                     <div
                                       className={`flex items-center gap-1 ${
@@ -547,15 +570,21 @@ const Inspect: NextPage = () => {
                                     />
                                   </div>
                                 </Disclosure.Button>
-                                <Disclosure.Panel className="px-4 pb-2 pt-2 text-sm">
+                                <Disclosure.Panel className="px-4 pb-2 pt-2">
                                   {Object.values(DescriptionScores).map(
-                                    (score) => {
+                                    (score, index) => {
                                       if (
                                         !score.isValid &&
                                         score.importance === "critical"
                                       ) {
                                         return (
-                                          <p className={`text-red-700`}>
+                                          <p
+                                            className={`text-red-700`}
+                                            key={
+                                              "fail-message-description-critical-" +
+                                              index
+                                            }
+                                          >
                                             {score.failMessage}
                                           </p>
                                         );
@@ -563,13 +592,19 @@ const Inspect: NextPage = () => {
                                     }
                                   )}
                                   {Object.values(DescriptionScores).map(
-                                    (score) => {
+                                    (score, index) => {
                                       if (
                                         !score.isValid &&
                                         score.importance === "warning"
                                       ) {
                                         return (
-                                          <p className={`text-yellow-600`}>
+                                          <p
+                                            className={`text-yellow-600`}
+                                            key={
+                                              "fail-message-description-warning-" +
+                                              index
+                                            }
+                                          >
                                             {score.failMessage}
                                           </p>
                                         );
@@ -577,10 +612,16 @@ const Inspect: NextPage = () => {
                                     }
                                   )}
                                   {Object.values(DescriptionScores).map(
-                                    (Score) => {
+                                    (Score, index) => {
                                       if (Score.isValid)
                                         return (
-                                          <p className={`text-green-700`}>
+                                          <p
+                                            className={`text-green-700`}
+                                            key={
+                                              "success-message-description-" +
+                                              index
+                                            }
+                                          >
                                             {Score.successMessage}
                                           </p>
                                         );
