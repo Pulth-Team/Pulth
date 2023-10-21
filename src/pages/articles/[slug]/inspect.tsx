@@ -37,11 +37,9 @@ const Inspect: NextPage = () => {
   });
 
   const articleUpdateInfoMutation = api.article.updateInfo.useMutation();
-  const articlePublishMutation = api.article.publish.useMutation();
   const articleDeleteMutation = api.article.delete.useMutation();
 
   const updateInfoIsLoading = articleUpdateInfoMutation.isLoading;
-  const publishMutationIsLoading = articlePublishMutation.isLoading;
 
   const [title, setTitle] = useState(articleInfo.data?.title);
   const [description, setDescription] = useState(articleInfo.data?.description);
