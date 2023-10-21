@@ -73,84 +73,100 @@ const Inspect: NextPage = () => {
     }
   }, [articleDeleteMutation, router]);
 
-  type ScoreCheckingKey =
-    | "title_less_than_10"
-    | "title_longer_30"
-    | "description_less_than_80"
-    | "description_longer_160";
-  const ScoreCheckings: {
-    [key in ScoreCheckingKey]: {
-      msg: string;
-      value: boolean;
+  type TitleChecks = "isLongerThan20" | "isLongerThan30" | "isLessThan50";
+  const TitleScores: {
+    [key in TitleChecks]: {
+      isValid: boolean;
+      failMessage: string;
+      successMessage: string;
       importance: "critical" | "warning";
-      type: "title" | "description";
     };
   } = {
-    title_less_than_10: {
-      msg: "Title is too short. It should be at least 10",
-      value: (articleInfo.data?.title?.length || 0) > 10,
+    isLongerThan20: {
+      isValid: (title?.length || 0) > 20,
+      failMessage:
+        "Title is too short. It should be at least 20 charecters long.",
+      successMessage: "Title is longer then 20 character.",
       importance: "critical",
-      type: "title",
     },
-    title_longer_30: {
-      msg: "Title is too long. It shouldn’t be longer than 30",
-      value: (articleInfo.data?.title?.length || 0) < 30,
-      importance: "warning",
-      type: "title",
-    },
-    description_less_than_80: {
-      msg: "Description is too short. It should be at least 80",
-      value: (articleInfo.data?.description?.length || 0) > 80,
+    isLongerThan30: {
+      isValid: (title?.length || 0) > 30,
+      failMessage:
+        "Title is too short. It should be at least 30 charecters long.",
+      successMessage: "Title is longer then 30 character.",
       importance: "critical",
-      type: "description",
     },
-    description_longer_160: {
-      msg: "Description is too long. It shouldn’t be longer than 160",
-      value: (articleInfo.data?.description?.length || 0) < 160,
+    isLessThan50: {
+      isValid: (title?.length || 0) < 50,
+      failMessage:
+        "Title is too long. It should be at most 50 charecters long.",
+      successMessage: "Title is shorter then 50 character.",
       importance: "warning",
-      type: "description",
     },
   };
 
-  const titleGreenCount = Object.values(ScoreCheckings).filter((score) => {
-    return score.type === "title" && score.value;
-  }).length;
+  type DescriptionChecks = "isLongerThan80" | "isLessThan220" | "isLessThan280";
+  const DescriptionScores: {
+    [key in DescriptionChecks]: {
+      isValid: boolean;
+      failMessage: string;
+      successMessage: string;
+      importance: "critical" | "warning";
+    };
+  } = {
+    isLongerThan80: {
+      isValid: (description?.length || 0) > 80,
+      failMessage:
+        "Description is too short. It should be at least 80 charecters long.",
+      successMessage: "Description is longer then 80 character.",
+      importance: "critical",
+    },
+    isLessThan220: {
+      isValid: (description?.length || 0) < 220,
+      failMessage:
+        "Description is too long. It should be at most 320 charecters long.",
+      successMessage: "Description is shorter then 80 character.",
+      importance: "warning",
+    },
+    isLessThan280: {
+      isValid: (description?.length || 0) < 280,
+      failMessage:
+        "Description is too long. It should be at most 280 charecters long.",
+      successMessage: "Description is shorter then 280 character.",
+      importance: "critical",
+    },
+  };
 
-  const descriptionGreenCount = Object.values(ScoreCheckings).filter(
-    (score) => {
-      return score.type === "description" && score.value;
-    }
+  const TitleGreenCount = Object.values(TitleScores).filter(
+    (score) => score.isValid
+  ).length;
+  const TitleYellowCount = Object.values(TitleScores).filter(
+    (score) => !score.isValid && score.importance === "warning"
+  ).length;
+  const TitleRedCount = Object.values(TitleScores).filter(
+    (score) => !score.isValid && score.importance === "critical"
   ).length;
 
-  const titleYellowCount = Object.values(ScoreCheckings).filter((score) => {
-    return (
-      score.type === "title" && !score.value && score.importance === "warning"
-    );
-  }).length;
-
-  const descriptionYellowCount = Object.values(ScoreCheckings).filter(
-    (score) => {
-      return (
-        score.type === "description" &&
-        !score.value &&
-        score.importance === "warning"
-      );
-    }
+  const DescriptionGreenCount = Object.values(DescriptionScores).filter(
+    (score) => score.isValid
+  ).length;
+  const DescriptionYellowCount = Object.values(DescriptionScores).filter(
+    (score) => !score.isValid && score.importance === "warning"
+  ).length;
+  const DescriptionRedCount = Object.values(DescriptionScores).filter(
+    (score) => !score.isValid && score.importance === "critical"
   ).length;
 
-  const titleRedCount = Object.values(ScoreCheckings).filter((score) => {
-    return (
-      score.type === "title" && !score.value && score.importance === "critical"
-    );
-  }).length;
+  const MetaScore = Math.round(
+    ((TitleGreenCount + DescriptionGreenCount) /
+      (Object.values(TitleScores).length +
+        Object.values(DescriptionScores).length)) *
+      100
+  );
 
-  const descriptionRedCount = Object.values(ScoreCheckings).filter((score) => {
-    return (
-      score.type === "description" &&
-      !score.value &&
-      score.importance === "critical"
-    );
-  }).length;
+  const ArticleScore = 50;
+
+  const OverallScore = Math.round((MetaScore + ArticleScore) / 2).toString();
 
   return (
     <Dashboard>
@@ -385,7 +401,7 @@ const Inspect: NextPage = () => {
                         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
                           <p className="text-xl">Overall Score</p>
                           <p className="text-2xl font-semibold">
-                            43
+                            {OverallScore}
                             <span className="text-base text-black/50">
                               /100
                             </span>
@@ -394,7 +410,7 @@ const Inspect: NextPage = () => {
                         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
                           <p className="text-xl">Meta Score</p>
                           <p className="text-2xl font-semibold">
-                            31
+                            {MetaScore}
                             <span className="text-base text-black/50">
                               /100
                             </span>
@@ -403,7 +419,7 @@ const Inspect: NextPage = () => {
                         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
                           <p className="text-xl">Article Score</p>
                           <p className="text-2xl font-semibold">
-                            62
+                            {ArticleScore}
                             <span className="text-base text-black/50">
                               /100
                             </span>
@@ -420,26 +436,26 @@ const Inspect: NextPage = () => {
                                   <div className=" flex items-center gap-4">
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        titleGreenCount == 0 ? "hidden" : ""
+                                        TitleGreenCount == 0 ? "hidden" : ""
                                       }`}
                                     >
-                                      <p>{titleGreenCount}</p>
+                                      <p>{TitleGreenCount}</p>
                                       <div className="h-3 w-3 rounded-full bg-green-700"></div>
                                     </div>
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        titleYellowCount == 0 ? "hidden" : ""
+                                        TitleYellowCount == 0 ? "hidden" : ""
                                       }`}
                                     >
-                                      <p>{titleYellowCount}</p>
+                                      <p>{TitleYellowCount}</p>
                                       <div className=" h-3 w-3 rounded-full bg-yellow-500"></div>
                                     </div>
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        titleRedCount == 0 ? "hidden" : ""
+                                        TitleRedCount == 0 ? "hidden" : ""
                                       }`}
                                     >
-                                      <p>{titleRedCount}</p>
+                                      <p>{TitleRedCount}</p>
                                       <div className=" h-3 w-3 rounded-full bg-red-500"></div>
                                     </div>
 
@@ -451,46 +467,38 @@ const Inspect: NextPage = () => {
                                   </div>
                                 </Disclosure.Button>
                                 <Disclosure.Panel className="px-4 pt-2 text-sm">
-                                  {Object.values(ScoreCheckings).map(
-                                    (score) => {
-                                      if (
-                                        !score.value &&
-                                        score.importance === "critical" &&
-                                        score.type === "title"
-                                      ) {
-                                        return (
-                                          <p className={`text-red-700`}>
-                                            {score.msg}
-                                          </p>
-                                        );
-                                      }
+                                  {Object.values(TitleScores).map((score) => {
+                                    if (
+                                      !score.isValid &&
+                                      score.importance === "critical"
+                                    ) {
+                                      return (
+                                        <p className={`text-red-700`}>
+                                          {score.failMessage}
+                                        </p>
+                                      );
                                     }
-                                  )}
-                                  {Object.values(ScoreCheckings).map(
-                                    (score) => {
-                                      if (
-                                        !score.value &&
-                                        score.importance === "warning" &&
-                                        score.type === "title"
-                                      ) {
-                                        return (
-                                          <p className={`text-yellow-600`}>
-                                            {score.msg}
-                                          </p>
-                                        );
-                                      }
+                                  })}
+                                  {Object.values(TitleScores).map((score) => {
+                                    if (
+                                      !score.isValid &&
+                                      score.importance === "warning"
+                                    ) {
+                                      return (
+                                        <p className={`text-yellow-600`}>
+                                          {score.failMessage}
+                                        </p>
+                                      );
                                     }
-                                  )}
-                                  {Object.values(ScoreCheckings).map(
-                                    (Score) => {
-                                      if (Score.value && Score.type === "title")
-                                        return (
-                                          <p className={`text-green-700`}>
-                                            {Score.msg}
-                                          </p>
-                                        );
-                                    }
-                                  )}
+                                  })}
+                                  {Object.values(TitleScores).map((Score) => {
+                                    if (Score.isValid)
+                                      return (
+                                        <p className={`text-green-700`}>
+                                          {Score.successMessage}
+                                        </p>
+                                      );
+                                  })}
                                 </Disclosure.Panel>
                               </>
                             )}
@@ -504,32 +512,32 @@ const Inspect: NextPage = () => {
                                   <div className=" flex items-center gap-4">
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        descriptionGreenCount == 0
+                                        DescriptionGreenCount == 0
                                           ? "hidden"
                                           : ""
                                       }`}
                                     >
-                                      <p>{descriptionGreenCount}</p>
+                                      <p>{DescriptionGreenCount}</p>
                                       <div className="h-3 w-3 rounded-full bg-green-700"></div>
                                     </div>
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        descriptionYellowCount == 0
+                                        DescriptionYellowCount == 0
                                           ? "hidden"
                                           : ""
                                       }`}
                                     >
-                                      <p>{descriptionYellowCount}</p>
+                                      <p>{DescriptionYellowCount}</p>
                                       <div className=" h-3 w-3 rounded-full bg-yellow-500"></div>
                                     </div>
                                     <div
                                       className={`flex items-center gap-1 ${
-                                        descriptionRedCount == 0
+                                        DescriptionRedCount == 0
                                           ? " hidden"
                                           : ""
                                       }`}
                                     >
-                                      <p>{descriptionRedCount}</p>
+                                      <p>{DescriptionRedCount}</p>
                                       <div className=" h-3 w-3 rounded-full bg-red-500"></div>
                                     </div>
                                     <ChevronUpIcon
@@ -540,45 +548,40 @@ const Inspect: NextPage = () => {
                                   </div>
                                 </Disclosure.Button>
                                 <Disclosure.Panel className="px-4 pb-2 pt-2 text-sm">
-                                  {Object.values(ScoreCheckings).map(
+                                  {Object.values(DescriptionScores).map(
                                     (score) => {
                                       if (
-                                        !score.value &&
-                                        score.importance === "critical" &&
-                                        score.type === "description"
+                                        !score.isValid &&
+                                        score.importance === "critical"
                                       ) {
                                         return (
                                           <p className={`text-red-700`}>
-                                            {score.msg}
+                                            {score.failMessage}
                                           </p>
                                         );
                                       }
                                     }
                                   )}
-                                  {Object.values(ScoreCheckings).map(
+                                  {Object.values(DescriptionScores).map(
                                     (score) => {
                                       if (
-                                        !score.value &&
-                                        score.importance === "warning" &&
-                                        score.type === "description"
+                                        !score.isValid &&
+                                        score.importance === "warning"
                                       ) {
                                         return (
                                           <p className={`text-yellow-600`}>
-                                            {score.msg}
+                                            {score.failMessage}
                                           </p>
                                         );
                                       }
                                     }
                                   )}
-                                  {Object.values(ScoreCheckings).map(
+                                  {Object.values(DescriptionScores).map(
                                     (Score) => {
-                                      if (
-                                        Score.value &&
-                                        Score.type === "description"
-                                      )
+                                      if (Score.isValid)
                                         return (
                                           <p className={`text-green-700`}>
-                                            {Score.msg}
+                                            {Score.successMessage}
                                           </p>
                                         );
                                     }
