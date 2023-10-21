@@ -197,8 +197,9 @@ const Inspect: NextPage = () => {
                   pathname: `/articles/[slug]/edit`,
                   query: { slug: slug },
                 }}
+                className="mt-4"
               >
-                <button className=" mt-4  flex items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white">
+                <button className="flex h-full items-center justify-center rounded-lg bg-gray-500 px-4 py-2 text-white">
                   Edit
                 </button>
               </Link>
@@ -213,8 +214,8 @@ const Inspect: NextPage = () => {
             </div>
           </div>
           <hr className="mt-1 border-black" />
-          <div className="flex flex-col gap-x-2 md:flex-row">
-            <div className="flex-grow">
+          <div className="flex flex-col justify-center gap-x-2 md:flex-row">
+            <div className="max-w-screen-lg flex-grow">
               <div className="mt-4">
                 <span className="text-black/70">Description:</span>
 
@@ -637,7 +638,7 @@ const Inspect: NextPage = () => {
               </div>
             </div>
 
-            <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 self-start p-2 shadow-md md:order-last md:w-auto md:min-w-fit md:flex-shrink md:flex-grow-0">
+            <div className="order-first mt-4 grid w-full gap-x-2 self-start rounded-xl border p-2 shadow-md md:order-last md:col-span-2 md:w-auto md:min-w-max md:max-w-md md:flex-shrink md:flex-grow-0 md:grid-cols-[min,min] lg:col-span-1 lg:flex-grow">
               <span className="text-black/70">status:</span>
 
               <p>
@@ -651,7 +652,7 @@ const Inspect: NextPage = () => {
 
               for subscribers only, for everyone, for subscribers and people with link */}
 
-              <span className="text-black/70">published at:</span>
+              <span className="text-black/70 ">updated at:</span>
 
               <p>{dayjs(articleInfo.data?.updatedAt).fromNow()}</p>
 
