@@ -73,14 +73,15 @@ const Tour: NextPage<{
 
   if (!tailwindScreens) throw new Error("Tailwind screens are not defined");
 
-  const currentMediaQuery = getCurrentTailwindQuery(tailwindScreens || {});
-
   useLayoutEffect(() => {
+    //if window isnt defined return
+    if (typeof window === "undefined") return;
     // if (start === false || start !== "redirect" || router.query.tour !== "true") return;
     if (start === false) return;
     if (start === "redirect" && router.query.tour !== "true") return;
 
     if (!currentTour) return;
+    const currentMediaQuery = getCurrentTailwindQuery(tailwindScreens || {});
 
     const currentOptions = currentTour.default;
     // check if there are any conditions for the current tour
@@ -237,7 +238,9 @@ const Tour: NextPage<{
     tourIndex,
     router.query,
     isRunning,
-    currentMediaQuery,
+    redirect,
+    router,
+    tours.length,
   ]);
   if (!currentTour) return null;
 
