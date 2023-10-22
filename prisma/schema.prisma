@@ -154,4 +154,8 @@ model Follow {
     follower    User   @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
     followingId String @db.ObjectId
     following   User   @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([followerId, followingId])
 }

@@ -5,7 +5,7 @@ import Image from "next/legacy/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import React from "react";
+import React, { use, useEffect } from "react";
 
 import Loading from "~/components/Loading";
 import ArticleCard from "~/components/ArticleCard";
@@ -18,11 +18,67 @@ const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
 
-  const { data: profileData, status } = api.user.getUserById.useQuery({
-    id: userId?.toString() || "",
-  },{
-    enabled: !!userId,// if there is no userId, don't fetch
-  });
+  const { data: profileData, status } = api.user.getUserById.useQuery(
+    {
+      id: userId?.toString() || "",
+    },
+    {
+      enabled: !!userId, // if there is no userId, don't fetch
+    }
+  );
+
+  const { data: followerCount, refetch: followerCountRefetch } =
+    api.followSystem.getFollowerCount.useQuery(
+      {
+        accountId: userId?.toString() || "",
+      },
+      {
+        enabled: !!userId, // if there is no userId, don't fetch
+      }
+    );
+
+  const { data: followingCount, refetch: followingCountRefetch } =
+    api.followSystem.getFollowingCount.useQuery(
+      {
+        accountId: userId?.toString() || "",
+      },
+      {
+        enabled: !!userId, // if there is no userId, don't fetch
+      }
+    );
+
+  const { data: isFollowing, refetch: isFollowingRefetch } =
+    api.followSystem.isFollowing.useQuery(
+      {
+        accountId: userId?.toString() || "",
+      },
+      {
+        enabled: !!userId, // if there is no userId, don't fetch
+      }
+    );
+
+  const followMutation = api.followSystem.followUser.useMutation();
+  const unfollowMutation = api.followSystem.unfollowUser.useMutation();
+
+  useEffect(() => {
+    if (followMutation.isSuccess || unfollowMutation.isSuccess) {
+      followerCountRefetch();
+      followingCountRefetch();
+      isFollowingRefetch();
+    }
+  }, [
+    followerCountRefetch,
+    followingCountRefetch,
+    isFollowingRefetch,
+    unfollowMutation.isSuccess,
+    followMutation.isSuccess,
+  ]);
+
+  useEffect(() => {
+    if (profileData) {
+      document.title = `${profileData.name} | Pulth`;
+    }
+  }, [profileData]);
 
   if (status === "loading")
     return (
@@ -60,17 +116,28 @@ const ProfileIndex: NextPage = () => {
           </div>
           <div className="flex w-5/12 items-center justify-end gap-x-16">
             <div className="flex flex-col items-center">
-              <p className="text-2xl font-semibold">1.56k</p>
+              <p className="text-2xl font-semibold">{followerCount}</p>
               <p>followers</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-2xl font-semibold">1.56k</p>
+              <p className="text-2xl font-semibold">{followingCount}</p>
               <p>follows</p>
             </div>
             <div>
-              <button className="flex items-center gap-x-2 rounded-lg bg-black px-5 py-1.5 text-lg font-semibold text-white">
+              <button
+                className="flex items-center gap-x-2 rounded-lg bg-black px-5 py-1.5 text-lg font-semibold text-white"
+                onClick={() => {
+                  if (!userId) return;
+
+                  if (isFollowing) {
+                    unfollowMutation.mutate({ accountId: userId as string });
+                  } else {
+                    followMutation.mutate({ accountId: userId as string });
+                  }
+                }}
+              >
                 <UserPlusIcon className="h-6 w-6 stroke-white" />
-                Follow
+                {isFollowing ? "Unfollow" : "Follow"}
               </button>
             </div>
           </div>
@@ -101,32 +168,6 @@ const ProfileIndex: NextPage = () => {
           </DragScrollContainer>
         </div>
       </div>
-      <Tour
-        className="w-96"
-        start={"redirect"}
-        onFinished={(e, message) => {
-          if (e === "error") console.error(message);
-        }}
-        tours={[
-          {
-            targetQuery: "#info-box",
-            message:
-              "This is your info box. You can see your profile picture, name.",
-            direction: "bottom",
-            align: "start",
-            className: "my-6",
-          },
-          {
-            targetQuery: "#my-articles",
-            message:
-              "This is your articles. You can see your articles and you can click to read them.",
-            direction: "bottom",
-            align: "start",
-            className: "my-6",
-            redirect: "/profile",
-          },
-        ]}
-      />
     </DashboardLayout>
   );
 };
