@@ -83,7 +83,7 @@ const ProfileIndex: NextPage = () => {
   if (status === "loading")
     return (
       <DashboardLayout>
-        <Loading className="m-16 h-16 w-16 border-2" />;
+        <Loading className="m-16 h-16 w-16 border-2" />
       </DashboardLayout>
     );
   if (status === "error" || !profileData || profileData instanceof Error)
