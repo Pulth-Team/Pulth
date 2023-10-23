@@ -17,10 +17,14 @@ const Explore: NextPage = () => {
 
   const [tour, setTour] = useState(true);
 
-  const { data: articles, isLoading } = api.article.getLatest.useQuery({
-    limit: 10,
-    skip: 0,
-  });
+  const { data: latestArticles, isLoading: isLatestLoading } =
+    api.article.getLatest.useQuery({
+      limit: 10,
+      skip: 0,
+    });
+
+  const { data: followedArticles } =
+    api.followSystem.getRecentActivity.useQuery();
 
   return (
     <DashboardLayout>
@@ -40,10 +44,10 @@ const Explore: NextPage = () => {
         </h1>
         <div className="flex flex-col gap-y-5">
           <p className="px-5 text-2xl font-semibold md:px-0">
-            {user ? "Selected for you..." : "Recent articles"}
+            Populer in Pulth
           </p>
           <DragScrollContainer id="recom-scroll">
-            {isLoading
+            {isLatestLoading
               ? [0, 1, 2, 3].map((val, index) => (
                   <div
                     className={`flex min-w-[256px] max-w-xs flex-shrink-0 animate-pulse flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
@@ -73,7 +77,7 @@ const Explore: NextPage = () => {
                     </div>
                   </div>
                 ))
-              : articles?.map((article) => (
+              : latestArticles?.map((article) => (
                   <ArticleCard
                     Title={article.title}
                     // Topics={article.topics}
@@ -91,16 +95,30 @@ const Explore: NextPage = () => {
                     {article.description}
                   </ArticleCard>
                 ))}
+          </DragScrollContainer>
 
-            {/* <ArticleCard
-              Title="Next.js Auth Errors"
-              Topics={["Javascript", "Web", "React"]}
-              Author={{ Title: "Web Architect", Name: "Bekir Gulestan" }}
-              isRecommended={true}
-            >
-              Some article made for explaining Next Auth Errors deeply. That
-              cover nearly 4 (Four) error which is nearly all(102) of them.
-            </ArticleCard> */}
+          <p className="px-5 text-2xl font-semibold md:px-0">
+            Recent articles from your follows
+          </p>
+
+          <DragScrollContainer>
+            {followedArticles?.map((article) => (
+              <ArticleCard
+                Title={article.title}
+                createdAt={article.createdAt}
+                isRecommended={false}
+                slug={article.slug}
+                Author={{
+                  Name: article.author.name!,
+                  Image: article.author.image!,
+                  UserId: article.author.id,
+                }}
+                //
+                key={article.slug}
+              >
+                {article.description}
+              </ArticleCard>
+            ))}
           </DragScrollContainer>
 
           <Tour
