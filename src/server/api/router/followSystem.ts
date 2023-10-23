@@ -185,6 +185,8 @@ export const followSystemRouter = createTRPCRouter({
 
     const followingIds = follows.map((follow) => follow.following.id);
 
+    if (followingIds.length === 0) return [];
+
     const posts = await ctx.prisma.article.findMany({
       where: {
         authorId: {

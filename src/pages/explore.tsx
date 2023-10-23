@@ -97,30 +97,34 @@ const Explore: NextPage = () => {
                 ))}
           </DragScrollContainer>
 
-          <p className="px-5 text-2xl font-semibold md:px-0">
-            Recent articles from your follows
-          </p>
-
-          <DragScrollContainer>
-            {followedArticles?.map((article) => (
-              <ArticleCard
-                Title={article.title}
-                createdAt={article.createdAt}
-                isRecommended={false}
-                slug={article.slug}
-                Author={{
-                  Name: article.author.name!,
-                  Image: article.author.image!,
-                  UserId: article.author.id,
-                }}
-                //
-                key={article.slug}
-              >
-                {article.description}
-              </ArticleCard>
-            ))}
-          </DragScrollContainer>
-
+          {followedArticles?.length === 0 ? (
+            ""
+          ) : (
+            <>
+              <p className="px-5 text-2xl font-semibold md:px-0">
+                Recent articles from your follows
+              </p>
+              <DragScrollContainer>
+                {followedArticles?.map((article) => (
+                  <ArticleCard
+                    Title={article.title}
+                    createdAt={article.createdAt}
+                    isRecommended={false}
+                    slug={article.slug}
+                    Author={{
+                      Name: article.author.name!,
+                      Image: article.author.image!,
+                      UserId: article.author.id,
+                    }}
+                    //
+                    key={article.slug}
+                  >
+                    {article.description}
+                  </ArticleCard>
+                ))}
+              </DragScrollContainer>
+            </>
+          )}
           <Tour
             className="w-96"
             start={"redirect"}
