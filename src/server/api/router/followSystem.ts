@@ -167,4 +167,50 @@ export const followSystemRouter = createTRPCRouter({
 
       return followers;
     }),
+  getRecentActivity: protectedProcedure.query(async ({ ctx }) => {
+    const follows = await ctx.prisma.follow.findMany({
+      where: {
+        followerId: ctx.session.user.id,
+      },
+      select: {
+        following: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    const followingIds = follows.map((follow) => follow.following.id);
+
+    const posts = await ctx.prisma.article.findMany({
+      where: {
+        authorId: {
+          in: followingIds,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        slug: true,
+        createdAt: true,
+
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return posts;
+  }),
 });
