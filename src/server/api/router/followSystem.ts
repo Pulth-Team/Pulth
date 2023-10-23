@@ -200,6 +200,7 @@ export const followSystemRouter = createTRPCRouter({
         description: true,
         slug: true,
         createdAt: true,
+        isPublished: true,
 
         author: {
           select: {
