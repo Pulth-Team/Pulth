@@ -15,8 +15,6 @@ const Explore: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
 
-  const [tour, setTour] = useState(true);
-
   const { data: latestArticles, isLoading: isLatestLoading } =
     api.article.getLatest.useQuery({
       limit: 10,
@@ -97,7 +95,7 @@ const Explore: NextPage = () => {
                 ))}
           </DragScrollContainer>
 
-          {followedArticles?.length === 0 ? (
+          {followedArticles?.length === 0 || typeof user === "undefined" ? (
             ""
           ) : (
             <>
@@ -129,9 +127,6 @@ const Explore: NextPage = () => {
             className="w-96"
             start={"redirect"}
             redirect="/profile"
-            onFinished={(e, message) => {
-              setTour(false);
-            }}
             tours={[
               {
                 message:

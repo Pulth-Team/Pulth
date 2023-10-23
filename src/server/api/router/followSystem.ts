@@ -192,6 +192,7 @@ export const followSystemRouter = createTRPCRouter({
         authorId: {
           in: followingIds,
         },
+        isPublished: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -202,7 +203,6 @@ export const followSystemRouter = createTRPCRouter({
         description: true,
         slug: true,
         createdAt: true,
-        isPublished: true,
 
         author: {
           select: {
