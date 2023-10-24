@@ -21,9 +21,12 @@ export const followSystemRouter = createTRPCRouter({
       const currentUser = ctx.session.user;
 
       //checks if user is already following
-      const isFollowing = await ctx.prisma.follow.findFirst({
+      const isFollowing = await ctx.prisma.follow.findUnique({
         where: {
-          followingId: currentUser.id,
+          followerId_followingId: {
+            followerId: currentUser.id,
+            followingId: input.accountId,
+          },
         },
       });
 
