@@ -12,7 +12,7 @@ import ArticleCard from "~/components/ArticleCard";
 import DragScrollContainer from "~/components/DragScrollContainer";
 import Tour from "~/components/Tour";
 
-import { UserPlusIcon } from "@heroicons/react/24/outline";
+import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
@@ -125,7 +125,11 @@ const ProfileIndex: NextPage = () => {
             </div>
             <div>
               <button
-                className="flex items-center gap-x-2 rounded-lg bg-black px-5 py-1.5 text-lg font-semibold text-white"
+                className={`font-semibol flex items-center gap-x-2 rounded-lg px-5 py-1.5 text-lg ${
+                  isFollowing
+                    ? "border-2 border-indigo-500 bg-white text-indigo-500"
+                    : "bg-indigo-500 text-white"
+                }`}
                 onClick={() => {
                   if (!userId) return;
 
@@ -136,7 +140,11 @@ const ProfileIndex: NextPage = () => {
                   }
                 }}
               >
-                <UserPlusIcon className="h-6 w-6 stroke-white" />
+                {isFollowing ? (
+                  <UserMinusIcon className="h-6 w-6 stroke-indigo-500" />
+                ) : (
+                  <UserPlusIcon className="h-6 w-6 stroke-white" />
+                )}
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
             </div>
