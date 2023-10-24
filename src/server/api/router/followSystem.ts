@@ -23,7 +23,7 @@ export const followSystemRouter = createTRPCRouter({
       //checks if user is already following
       const isFollowing = await ctx.prisma.follow.findFirst({
         where: {
-          followerId: currentUser.id,
+          followingId: currentUser.id,
         },
       });
 
