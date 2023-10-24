@@ -20,6 +20,12 @@ export const followSystemRouter = createTRPCRouter({
 
       const currentUser = ctx.session.user;
 
+      if (currentUser.id === input.accountId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot follow yourself",
+        });
+      }
       //checks if user is already following
       const isFollowing = await ctx.prisma.follow.findUnique({
         where: {
