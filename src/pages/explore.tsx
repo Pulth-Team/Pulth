@@ -23,6 +23,14 @@ const Explore: NextPage = () => {
 
   const { data: followedArticles } =
     api.followSystem.getRecentActivity.useQuery();
+  const { data: latestArticles, isLoading: isLatestLoading } =
+    api.article.getLatest.useQuery({
+      limit: 10,
+      skip: 0,
+    });
+
+  const { data: followedArticles } =
+    api.followSystem.getRecentActivity.useQuery();
 
   return (
     <DashboardLayout>
@@ -93,6 +101,16 @@ const Explore: NextPage = () => {
                     {article.description}
                   </ArticleCard>
                 ))}
+
+            {/* <ArticleCard
+              Title="Next.js Auth Errors"
+              Topics={["Javascript", "Web", "React"]}
+              Author={{ Title: "Web Architect", Name: "Bekir Gulestan" }}
+              isRecommended={true}
+            >
+              Some article made for explaining Next Auth Errors deeply. That
+              cover nearly 4 (Four) error which is nearly all(102) of them.
+            </ArticleCard> */}
           </DragScrollContainer>
 
           {followedArticles?.length === 0 || typeof user === "undefined" ? (
