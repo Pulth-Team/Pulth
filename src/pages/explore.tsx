@@ -23,14 +23,6 @@ const Explore: NextPage = () => {
 
   const { data: followedArticles } =
     api.followSystem.getRecentActivity.useQuery();
-  const { data: latestArticles, isLoading: isLatestLoading } =
-    api.article.getLatest.useQuery({
-      limit: 10,
-      skip: 0,
-    });
-
-  const { data: followedArticles } =
-    api.followSystem.getRecentActivity.useQuery();
 
   return (
     <DashboardLayout>
