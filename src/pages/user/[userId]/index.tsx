@@ -13,10 +13,12 @@ import DragScrollContainer from "~/components/DragScrollContainer";
 import Tour from "~/components/Tour";
 
 import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
+import { useSession } from "next-auth/react";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
+  const { data: userData } = useSession();
 
   const { data: profileData, status } = api.user.getUserById.useQuery(
     {
@@ -95,13 +97,13 @@ const ProfileIndex: NextPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-y-8 p-8 px-16">
+      <div className="flex flex-col gap-y-3 px-4 py-8 lg:p-16">
         <div className="flex justify-between">
           <div
-            className="flex items-center gap-x-5 rounded-lg bg-white p-3"
+            className="flex items-center gap-x-5 rounded-lg bg-white"
             id="info-box"
           >
-            <div className="relative h-36 w-36">
+            <div className="relative h-16 w-16 lg:h-24 lg:w-24">
               <Image
                 src={profileData.image || "/default_profile.jpg"}
                 layout="fill"
@@ -109,23 +111,20 @@ const ProfileIndex: NextPage = () => {
                 alt="Profile Picture"
               />
             </div>
-            <div className="flex flex-col">
-              <p className="text-2xl font-semibold">{profileData.name}</p>
-              <p className="text-gray-600">{profileData.email}</p>
-            </div>
+            <p className="text-xl font-medium">{profileData?.name}</p>
           </div>
-          <div className="flex w-5/12 items-center justify-end gap-x-16">
-            <div className="flex flex-col items-center">
-              <p className="text-2xl font-semibold">{followerCount}</p>
-              <p>followers</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p className="text-2xl font-semibold">{followingCount}</p>
-              <p>follows</p>
+          <div className="hidden items-center gap-8 lg:flex">
+            <div>
+              <p className="text-center text-lg font-bold">{followerCount}</p>
+              <p className="text-sm text-black/60">Followers</p>
             </div>
             <div>
+              <p className="text-center text-lg font-bold">{followingCount}</p>
+              <p className="text-sm text-black/60">Follows</p>
+            </div>
+            {userData?.user.id !== userId && (
               <button
-                className={`font-semibol flex items-center gap-x-2 rounded-lg px-5 py-1.5 text-lg ${
+                className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg px-4 py-2 font-semibold ${
                   isFollowing
                     ? "border-2 border-indigo-500 bg-white text-indigo-500"
                     : "bg-indigo-500 text-white"
@@ -147,15 +146,77 @@ const ProfileIndex: NextPage = () => {
                 )}
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
-            </div>
+            )}
           </div>
         </div>
-        <div className="flex flex-col gap-y-3">
-          <h3 className="text-3xl font-bold">About Me</h3>
+        <div className="flex flex-col gap-y-3 text-left">
           <p className="text-lg text-black/80">{profileData.description}</p>
         </div>
-        <div className="flex flex-col rounded-lg bg-white p-3" id="my-articles">
-          <h3 className="mb-5 text-3xl font-bold">My Articles</h3>
+        <div className="flex w-full gap-2 lg:hidden">
+          <div>
+            <p className="text-center text-lg font-bold">{followerCount}</p>
+            <p className="text-sm text-black/60">Followers</p>
+          </div>
+          <div>
+            <p className="text-center text-lg font-bold">{followingCount}</p>
+            <p className="text-sm text-black/60">Follows</p>
+          </div>
+          {userData?.user.id !== userId && (
+            <button
+              className={`ml-auto flex flex-none items-center gap-x-2 rounded-lg px-4 py-1 font-semibold ${
+                isFollowing
+                  ? "border-2 border-indigo-500 bg-white text-indigo-500"
+                  : "bg-indigo-500 text-white"
+              }`}
+              onClick={() => {
+                if (!userId) return;
+
+                if (isFollowing) {
+                  unfollowMutation.mutate({ accountId: userId as string });
+                } else {
+                  followMutation.mutate({ accountId: userId as string });
+                }
+              }}
+            >
+              {isFollowing ? (
+                <UserMinusIcon className="h-6 w-6 stroke-indigo-500" />
+              ) : (
+                <UserPlusIcon className="h-6 w-6 stroke-white" />
+              )}
+              {isFollowing ? "Unfollow" : "Follow"}
+            </button>
+          )}
+        </div>
+
+        <div
+          className="flex flex-col rounded-lg bg-white pt-3"
+          id="my-articles"
+        >
+          <h3 className="mb-5 text-xl font-semibold">Recent Articles</h3>
+          <DragScrollContainer>
+            {profileData.Articles.map((article) => (
+              <ArticleCard
+                Title={article.title}
+                Author={{
+                  Name: article.author.name!,
+                  Image: article.author.image!,
+                  UserId: article.author.id,
+                }}
+                createdAt={article.createdAt}
+                isRecommended={false}
+                key={article.slug}
+                slug={article.slug}
+              >
+                {article.description}
+              </ArticleCard>
+            ))}
+          </DragScrollContainer>
+        </div>
+        <div
+          className="flex flex-col rounded-lg bg-white pb-3 pr-3 pt-3"
+          id="my-articles"
+        >
+          <h3 className="mb-3 text-xl font-semibold">Most popular courses</h3>
           <DragScrollContainer>
             {profileData.Articles.map((article) => (
               <ArticleCard
