@@ -5,7 +5,8 @@ import Image from "next/legacy/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import { useEffect } from "react";
+import React, { use, useEffect, useState } from "react";
+import { Dialog, Tab } from "@headlessui/react";
 
 import Loading from "~/components/Loading";
 import ArticleCard from "~/components/ArticleCard";
@@ -13,11 +14,15 @@ import DragScrollContainer from "~/components/DragScrollContainer";
 
 import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { set } from "zod";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
   const { userId } = router.query;
   const { data: userData } = useSession();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [tabIndex, setTabIndex] = useState<0 | 1>(0);
 
   const { data: profileData, status } = api.user.getUserById.useQuery(
     {
@@ -113,11 +118,23 @@ const ProfileIndex: NextPage = () => {
             <p className="text-xl font-medium">{profileData?.name}</p>
           </div>
           <div className="hidden items-center gap-8 lg:flex">
-            <div>
+            <div
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setIsOpen(true);
+                setTabIndex(0);
+              }}
+            >
               <p className="text-center text-lg font-bold">{followerCount}</p>
               <p className="text-sm text-black/60">Followers</p>
             </div>
-            <div>
+            <div
+              className="hover:cursor-pointer"
+              onClick={() => {
+                setIsOpen(true);
+                setTabIndex(1);
+              }}
+            >
               <p className="text-center text-lg font-bold">{followingCount}</p>
               <p className="text-sm text-black/60">Follows</p>
             </div>
@@ -236,6 +253,44 @@ const ProfileIndex: NextPage = () => {
           </DragScrollContainer>
         </div>
       </div>
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        className={
+          "absolute inset-0 flex items-center justify-center bg-black/70 py-8"
+        }
+      >
+        <Dialog.Panel className={"h-full w-full max-w-md bg-white"}>
+          <Tab.Group
+            selectedIndex={tabIndex}
+            onChange={(index) => {
+              setTabIndex(index as 0 | 1);
+            }}
+          >
+            <Tab.List className={"order-2 flex justify-evenly border-b p-3"}>
+              <Tab>Followers</Tab>
+              <Tab>Follows</Tab>
+            </Tab.List>
+            <Tab.Panels>
+              <Tab.Panel>
+                <div className="m-4 flex justify-evenly">
+                  <div>
+                    <div className="h-8 w-8 bg-cyan-500"></div>
+                  </div>
+                  <p className="flex items-center justify-center">
+                    Emir Taştan
+                  </p>
+                  <div className="flex items-center justify-normal">
+                    <button className="mr-2">Takip</button>
+                    <button>Engel</button>
+                  </div>
+                </div>
+              </Tab.Panel>
+              <Tab.Panel>Content 2</Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
+        </Dialog.Panel>
+      </Dialog>
     </DashboardLayout>
   );
 };
