@@ -27,27 +27,29 @@ const tailwindScreens = config.theme?.screens;
 ///  - This component is used in the dashboard.tsx page
 ///
 ///  [ ] - add event based next action
-///  [ ]   - for example if user clicks to highlighted target then go to next step
+///        - for example if user clicks to highlighted target then go to next step
 ///  [ ] - add indicator for the current step
 ///  [ ] - add indicator for the total steps
 ///  [ ] - give handler to the parent component to handle the tour
-///  [ ]   - for example parent may want to skip some steps according to the user's knowledge
+///        - for example parent may want to skip some steps according to the user's knowledge
+///  [ ] - add conditions support (Media Query based)
 ///  [X] - add MultiPage support
-
-// TODO: Dictionary for the conditions
-// for example:
-// {
-//   sm: {
-//     align: "start",
-//     direction: "top",
-//     targetQuery: "#search-button.mobile",
-//   },
-//   md: {
-//     align: "center",
-//     direction: "right",
-//     targetQuery: "#search-button.desktop",
-//   },
-// }
+///  [X] - add Media Query support (TailwindCSS)
+///  [X] - add conditions support (Boolean based)
+//   [ ] - Dictionary for the conditions
+//        -  for example:
+//           {
+//              sm: {
+//                align: "start",
+//                direction: "top",
+//                targetQuery: "#search-button.mobile",
+//              },
+//              md: {
+//                align: "center",
+//                direction: "right",
+//                targetQuery: "#search-button.desktop",
+//              },
+//           }
 
 // creates a NextFunctionComponent
 const Tour: NextPage<{
