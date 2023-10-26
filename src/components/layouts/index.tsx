@@ -96,10 +96,10 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
       </header>
 
       <div className="flex min-h-[calc(100dvh-72px)] flex-col md:min-h-[calc(100dvh)]">
-        <main className="max-w-screen overflow-x-a flex-grow self-stretch bg-white pb-[72px] pt-14 md:pb-0 md:pl-[clamp(256px,20vw,288px)] ">
+        <main className="max-w-screen mb-[72px] mt-14 min-h-[calc(100dvh-128px)] flex-grow self-stretch overflow-x-auto bg-white md:mb-0 md:ml-[clamp(256px,20vw,288px)] md:min-h-[calc(100dvh-56px)] ">
           {children}
         </main>
-        <div className="fixed inset-x-0 bottom-0 md:right-[calc(100vw-clamp(256px,20vw,288px))] md:top-14">
+        <div className="fixed inset-x-0 bottom-0 md:right-[calc(100vw-clamp(256px,20vw,288px))] md:top-14 md:max-w-[clamp(256px,20vw,288px)]">
           <nav className="flex justify-evenly bg-gray-800 px-2 py-1.5 md:h-full md:flex-col md:justify-start md:p-2">
             {menuItems.map((item) => {
               const Icon = item.icon.outline;
