@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 
 import Image from "next/legacy/image";
 

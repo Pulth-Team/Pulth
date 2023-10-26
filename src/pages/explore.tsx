@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 
 import DragScrollContainer from "~/components/DragScrollContainer";
 import ArticleCard from "~/components/ArticleCard";
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import Tour from "../components/Tour";
 import { useState } from "react";
 

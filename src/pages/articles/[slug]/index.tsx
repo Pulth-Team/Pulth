@@ -19,7 +19,8 @@ import {
 
 import { api } from "~/utils/api";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
+
 import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
 import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
@@ -77,9 +78,6 @@ const Articles: NextPage = () => {
       content: comment.content,
       parentId: comment.parent,
     });
-    // .then(() => {
-    //   commentData.refetch();
-    // });
   };
 
   let userImage = userData?.user?.image;

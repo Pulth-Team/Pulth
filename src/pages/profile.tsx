@@ -20,7 +20,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import Loading from "~/components/Loading";
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import MyArticleCard from "~/components/editor/MyArticleCard";
 import Trpc from "./api/trpc/[trpc]";
 import { Protocol } from "@aws-sdk/client-s3";

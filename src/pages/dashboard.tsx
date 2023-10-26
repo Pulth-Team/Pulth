@@ -5,7 +5,7 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import { useState } from "react";
 
 const Dashboard: NextPage = () => {

@@ -16,10 +16,10 @@ import { useSession } from "next-auth/react";
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import MobileAccountBox from "../components/MobileAccountBox";
-import Search from "../components/Search";
+import MobileAccountBox from "./components/MobileAccountBox";
+import Search from "./components/Search";
 import { useRouter } from "next/router";
-import AccountBox from "../components/AccountBox";
+import AccountBox from "./components/AccountBox";
 
 type DashboardProps = {
   children: ReactNode;
@@ -95,8 +95,8 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
         </div>
       </header>
 
-      <div className="flex h-[100dvh] min-h-[calc(100dvh-72px)] flex-col">
-        <main className="max-w-screen flex-grow self-stretch overflow-x-auto bg-white pb-[72px] pt-14 md:pb-0 md:pl-[clamp(256px,20vw,288px)] ">
+      <div className="flex min-h-[calc(100dvh-72px)] flex-col md:min-h-[calc(100dvh)]">
+        <main className="max-w-screen overflow-x-a flex-grow self-stretch bg-white pb-[72px] pt-14 md:pb-0 md:pl-[clamp(256px,20vw,288px)] ">
           {children}
         </main>
         <div className="fixed inset-x-0 bottom-0 md:right-[calc(100vw-clamp(256px,20vw,288px))] md:top-14">

@@ -1,11 +1,11 @@
 import type { NextPage } from "next";
+import DashboardLayout from "~/components/layouts";
 
 import Head from "next/head";
 import Link from "next/link";
 
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
 
 // load editor only on client side
 import dynamic from "next/dynamic";
