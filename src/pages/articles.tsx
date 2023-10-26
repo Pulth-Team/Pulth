@@ -32,7 +32,7 @@ const Articles: NextPage = () => {
       <div className="flex gap-2 ">
         {art.map((a, index) => (
           <div
-            className="w-32 h-32 flex-shrink-0 bg-gray-100"
+            className="h-32 w-32 flex-shrink-0 bg-gray-100"
             key={index}
           ></div>
         ))}
