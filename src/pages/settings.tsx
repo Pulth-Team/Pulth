@@ -7,7 +7,7 @@ import { useEffect, useReducer, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import Image from "next/legacy/image";
 
 import { Tab } from "@headlessui/react";

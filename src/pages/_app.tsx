@@ -27,14 +27,9 @@ const MyApp: AppType<{ session: Session }> = ({
 
   // show analytics only in production and development (not in preview mode)
   const showAnalytics = (isProduction || isDevelopment) && GOOGLE_ANALYTICS_ID;
-  // console.log("showAnalytics", showAnalytics, {
-  //   isProduction,
-  //   isDevelopment,
-  //   GOOGLE_ANALYTICS_ID,
-  // });
 
   return (
-    <div className="h-screen bg-white">
+    <div className="bg-white">
       <Head>
         {/* used for safari tab color */}
         <meta name="theme-color" content="#1F2937" />

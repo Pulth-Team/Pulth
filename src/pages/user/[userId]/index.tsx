@@ -1,16 +1,15 @@
 import type { NextPage } from "next";
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 
 import Image from "next/legacy/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import React, { use, useEffect } from "react";
+import { useEffect } from "react";
 
 import Loading from "~/components/Loading";
 import ArticleCard from "~/components/ArticleCard";
 import DragScrollContainer from "~/components/DragScrollContainer";
-import Tour from "~/components/Tour";
 
 import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 
