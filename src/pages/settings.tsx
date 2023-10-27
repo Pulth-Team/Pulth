@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 
 import Head from "next/head";
-import Link from "next/link";
 
 import { useEffect, useReducer, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -10,11 +9,20 @@ import { useRouter } from "next/router";
 import DashboardLayout from "~/components/layouts";
 import Image from "next/legacy/image";
 
-import { Tab } from "@headlessui/react";
-import { Switch } from "@headlessui/react";
 import ChevronLeftIcon from "@heroicons/react/24/solid/ChevronLeftIcon";
 import { api } from "~/utils/api";
 import Loading from "~/components/Loading";
+
+interface userState {
+  name: string;
+  email: string;
+  image: string;
+  description: string;
+}
+
+interface userAction {
+  payload: Partial<userState>;
+}
 
 const Settings: NextPage = () => {
   const router = useRouter();
@@ -25,17 +33,6 @@ const Settings: NextPage = () => {
   });
 
   const [textareaCount, setTextareaCount] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  interface userState {
-    name: string;
-    email: string;
-    image: string;
-    description: string;
-  }
-
-  interface userAction {
-    payload: Partial<userState>;
-  }
 
   const userReducer = (state: userState, action: userAction): userState => {
     const { payload } = action;
@@ -67,6 +64,8 @@ const Settings: NextPage = () => {
         image: image || undefined,
         description: currentDesc || undefined,
       };
+
+      setTextareaCount(currentDesc?.length!);
       dispatch({
         payload: payload,
       });
@@ -99,10 +98,6 @@ const Settings: NextPage = () => {
           <div className="box-border translate-y-[1.5px] cursor-pointer border-b-2 border-indigo-600 px-2 pb-2 text-indigo-700">
             General
           </div>
-          {/* <div className="pb-2 px-2 translate-y-px cursor-pointer">
-            Security
-          </div>
-          <div className="pb-2 px-2 translate-y-px cursor-pointer">Billing</div> */}
         </div>
         <div className="flex flex-col">
           <div>
@@ -172,11 +167,6 @@ const Settings: NextPage = () => {
                 {textareaCount} / 350
               </p>
             </div>
-            {/* <div>
-              <p>Title</p>
-              <input className="border-2 rounded-lg p-2" />
-              <p className="text-gray-500 text-xs italic ml-1">Teachers Only</p>
-            </div> */}
           </div>
           <div className="mt-5 flex gap-x-2">
             <button
@@ -222,40 +212,6 @@ const Settings: NextPage = () => {
               Reset Changes
             </button>
           </div>
-          {/* <div>
-            <h3 className="font-semibold text-xl mt-10">Management</h3>
-            <p className=" text-gray-500">
-              You can manage your account with this section. Nothing here will
-              be displayed.
-            </p>
-            <div className="flex flex-col mt-5 gap-y-5">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="text-lg font-medium">Recom Engine</h4>
-                  <p className="text-gray-500">
-                    Allow Recom Engine to collect my data for personal
-                    recomendations
-                  </p>
-                </div>
-                <Switch
-                  checked={recomEnabled}
-                  onChange={() => setRecomEnabled(!recomEnabled)}
-                  className={`${recomEnabled ? "bg-indigo-600" : "bg-slate-400"}
-                    relative flex h-7 w-14 cursor-pointer rounded-full border-2 transition-colors duration-200 box-content ease-in-out 
-                  `}
-                >
-                  <span className="sr-only">Toggle Recom Engine</span>
-                  <span
-                    aria-hidden="true"
-                    className={`${
-                      recomEnabled ? "translate-x-full" : "translate-x-0"
-                    }
-                      pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-sm border-2 ring-0 transition duration-200 ease-in-out`}
-                  />
-                </Switch>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     </DashboardLayout>
