@@ -71,7 +71,7 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
 
   return (
     <div className=" bg-gray-800">
-      <header className="fixed inset-x-0 flex justify-between bg-gray-800 p-2">
+      <header className="fixed inset-x-0 z-10 flex justify-between bg-gray-800 p-2">
         <Link href="/" className="px-2 py-1">
           <span className="text-xl font-bold text-indigo-500">PulthApp</span>
         </Link>
