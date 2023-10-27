@@ -110,12 +110,14 @@ export const followSystemRouter = createTRPCRouter({
       return !!follow;
     }),
 
-  getMyFollows: protectedProcedure.query(async ({ ctx }) => {
-    const currentUser = ctx.session.user;
+  getFollows: protectedProcedure.input(z.object({
+    accountId: z.string(),
+
+  })).query(async ({ ctx, input }) => {
 
     const follows = await ctx.prisma.follow.findMany({
       where: {
-        followerId: currentUser.id,
+        followerId: input.accountId,
       },
       select: {
         following: {
@@ -134,12 +136,13 @@ export const followSystemRouter = createTRPCRouter({
     return followList;
   }),
 
-  getMyFollowers: protectedProcedure.query(async ({ ctx }) => {
-    const currentUser = ctx.session.user;
+  getFollowers: protectedProcedure.input(z.object({
+    accountId: z.string(),
+  })).query(async ({ ctx , input}) => {
 
     const followers = await ctx.prisma.follow.findMany({
       where: {
-        followingId: currentUser.id,
+        followingId: input.accountId,
       },
       select: {
         follower: {
@@ -153,10 +156,26 @@ export const followSystemRouter = createTRPCRouter({
       },
     });
 
+    console.log(followers);
+
     const followersList = followers.map((follow) => follow.follower);
 
     return followersList;
   }),
+
+  removeFollower: protectedProcedure.input(z.object({accountId: z.string()})).mutation(async ({ ctx, input }) => {
+    const follower = await ctx.prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followingId: ctx.session.user.id,
+          followerId: input.accountId,
+        },
+      },
+    });
+
+    return follower;
+  }),
+
   getFollowerCount: publicProcedure
     .input(z.object({ accountId: z.string() }))
     .query(async ({ input, ctx }) => {

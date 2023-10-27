@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import DashboardLayout from "~/components/layouts";
 
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
@@ -18,64 +18,90 @@ import { set } from "zod";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
-  const { userId } = router.query;
-  const { data: userData } = useSession();
+  const { userId: profileUserId } = router.query;
+  const { data: currentUserData } = useSession();
 
   const [isOpen, setIsOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState<0 | 1>(0);
 
   const { data: profileData, status } = api.user.getUserById.useQuery(
     {
-      id: userId?.toString() || "",
+      id: profileUserId?.toString() || "",
     },
     {
-      enabled: !!userId, // if there is no userId, don't fetch
+      enabled: !!profileUserId, // if there is no profileUserId, don't fetch
     }
   );
 
   const { data: followerCount, refetch: followerCountRefetch } =
     api.followSystem.getFollowerCount.useQuery(
       {
-        accountId: userId?.toString() || "",
+        accountId: profileUserId?.toString() || "",
       },
       {
-        enabled: !!userId, // if there is no userId, don't fetch
+        enabled: !!profileUserId, // if there is no profileUserId, don't fetch
       }
     );
 
   const { data: followingCount, refetch: followingCountRefetch } =
     api.followSystem.getFollowingCount.useQuery(
       {
-        accountId: userId?.toString() || "",
+        accountId: profileUserId?.toString() || "",
       },
       {
-        enabled: !!userId, // if there is no userId, don't fetch
+        enabled: !!profileUserId, // if there is no profileUserId, don't fetch
       }
     );
 
   const { data: isFollowing, refetch: isFollowingRefetch } =
     api.followSystem.isFollowing.useQuery(
       {
-        accountId: userId?.toString() || "",
+        accountId: profileUserId?.toString() || "",
       },
       {
-        enabled: !!userId, // if there is no userId, don't fetch
+        enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+      }
+    );
+
+  const { data: Followers, refetch: followersRefetch } =
+    api.followSystem.getFollowers.useQuery(
+      { accountId: profileUserId?.toString() || "" },
+      {
+        enabled: tabIndex === 0,
+      }
+    );
+
+  const { data: Follows, refetch: followsRefetch } =
+    api.followSystem.getFollows.useQuery(
+      { accountId: profileUserId?.toString() || "" },
+      {
+        enabled: tabIndex === 1,
       }
     );
 
   const followMutation = api.followSystem.followUser.useMutation();
   const unfollowMutation = api.followSystem.unfollowUser.useMutation();
+  const removeFollowerMutation = api.followSystem.removeFollower.useMutation();
 
   useEffect(() => {
-    if (followMutation.isSuccess || unfollowMutation.isSuccess) {
+    if (
+      followMutation.isSuccess ||
+      unfollowMutation.isSuccess ||
+      removeFollowerMutation.isSuccess
+    ) {
       followerCountRefetch();
       followingCountRefetch();
       isFollowingRefetch();
+      followsRefetch();
+      followersRefetch();
     }
   }, [
     followerCountRefetch,
     followingCountRefetch,
     isFollowingRefetch,
+    followsRefetch,
+    followersRefetch,
+    removeFollowerMutation.isSuccess,
     unfollowMutation.isSuccess,
     followMutation.isSuccess,
   ]);
@@ -138,7 +164,7 @@ const ProfileIndex: NextPage = () => {
               <p className="text-center text-lg font-bold">{followingCount}</p>
               <p className="text-sm text-black/60">Follows</p>
             </div>
-            {userData?.user.id !== userId && (
+            {currentUserData?.user.id !== profileUserId && (
               <button
                 className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg px-4 py-2 font-semibold ${
                   isFollowing
@@ -146,12 +172,16 @@ const ProfileIndex: NextPage = () => {
                     : "bg-indigo-500 text-white"
                 }`}
                 onClick={() => {
-                  if (!userId) return;
+                  if (!profileUserId) return;
 
                   if (isFollowing) {
-                    unfollowMutation.mutate({ accountId: userId as string });
+                    unfollowMutation.mutate({
+                      accountId: profileUserId as string,
+                    });
                   } else {
-                    followMutation.mutate({ accountId: userId as string });
+                    followMutation.mutate({
+                      accountId: profileUserId as string,
+                    });
                   }
                 }}
               >
@@ -169,15 +199,27 @@ const ProfileIndex: NextPage = () => {
           <p className="text-lg text-black/80">{profileData.description}</p>
         </div>
         <div className="flex w-full gap-2 lg:hidden">
-          <div>
+          <div
+            className="hover:cursor-pointer"
+            onClick={() => {
+              setIsOpen(true);
+              setTabIndex(0);
+            }}
+          >
             <p className="text-center text-lg font-bold">{followerCount}</p>
             <p className="text-sm text-black/60">Followers</p>
           </div>
-          <div>
+          <div
+            className="hover:cursor-pointer"
+            onClick={() => {
+              setIsOpen(true);
+              setTabIndex(1);
+            }}
+          >
             <p className="text-center text-lg font-bold">{followingCount}</p>
             <p className="text-sm text-black/60">Follows</p>
           </div>
-          {userData?.user.id !== userId && (
+          {currentUserData?.user.id !== profileUserId && (
             <button
               className={`ml-auto flex flex-none items-center gap-x-2 rounded-lg px-4 py-1 font-semibold ${
                 isFollowing
@@ -185,12 +227,14 @@ const ProfileIndex: NextPage = () => {
                   : "bg-indigo-500 text-white"
               }`}
               onClick={() => {
-                if (!userId) return;
+                if (!profileUserId) return;
 
                 if (isFollowing) {
-                  unfollowMutation.mutate({ accountId: userId as string });
+                  unfollowMutation.mutate({
+                    accountId: profileUserId as string,
+                  });
                 } else {
-                  followMutation.mutate({ accountId: userId as string });
+                  followMutation.mutate({ accountId: profileUserId as string });
                 }
               }}
             >
@@ -268,25 +312,82 @@ const ProfileIndex: NextPage = () => {
             }}
           >
             <Tab.List className={"order-2 flex justify-evenly border-b p-3"}>
-              <Tab>Followers</Tab>
-              <Tab>Follows</Tab>
+              <Tab
+                className={`${tabIndex == 0 ? "border-b-2 border-black" : ""}`}
+              >
+                Followers
+              </Tab>
+              <Tab
+                className={`${tabIndex == 1 ? "border-b-2 border-black" : ""}`}
+              >
+                Follows
+              </Tab>
             </Tab.List>
             <Tab.Panels>
               <Tab.Panel>
-                <div className="m-4 flex justify-evenly">
-                  <div>
-                    <div className="h-8 w-8 bg-cyan-500"></div>
+                {Followers?.map((follower) => (
+                  <div className="m-4 flex justify-between" key={follower.id}>
+                    <div className="flex items-center justify-center gap-2">
+                      <Image
+                        className="rounded-full"
+                        src={follower.image ?? "/default_profile.jpg"}
+                        alt="profile"
+                        height={32}
+                        width={32}
+                      ></Image>
+                      <p>{follower.name}</p>
+                    </div>
+                    <div className="flex items-center justify-normal">
+                      <button
+                        className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg bg-indigo-500 px-4 py-2 text-white ${
+                          currentUserData?.user.id != profileUserId
+                            ? "hidden"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          removeFollowerMutation.mutate({
+                            accountId: follower.id as string,
+                          });
+                        }}
+                      >
+                        Remove
+                        {removeFollowerMutation.isLoading ? (
+                          <Loading className="h-5 w-5 border-2" />
+                        ) : (
+                          ""
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <p className="flex items-center justify-center">
-                    Emir Taştan
-                  </p>
-                  <div className="flex items-center justify-normal">
-                    <button className="mr-2">Takip</button>
-                    <button>Engel</button>
-                  </div>
-                </div>
+                ))}
               </Tab.Panel>
-              <Tab.Panel>Content 2</Tab.Panel>
+              <Tab.Panel>
+                {Follows?.map((follower) => (
+                  <div className="m-4 flex justify-between" key={follower.id}>
+                    <div className="flex items-center justify-center gap-2">
+                      <Image
+                        className="rounded-full"
+                        src={follower.image ?? "/default_profile.jpg"}
+                        alt="profile"
+                        height={32}
+                        width={32}
+                      ></Image>
+                      <p>{follower.name}</p>
+                    </div>
+                    <div className="flex items-center justify-normal">
+                      <button
+                        className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg bg-indigo-500 px-4 py-2 text-white ${
+                          currentUserData?.user.id != profileUserId
+                            ? "hidden"
+                            : ""
+                        }`}
+                      >
+                        Following
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
         </Dialog.Panel>
