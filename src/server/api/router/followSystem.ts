@@ -129,7 +129,9 @@ export const followSystemRouter = createTRPCRouter({
       },
     });
 
-    return follows;
+    const followers = follows.map((follow) => follow.following);
+
+    return followers;
   }),
 
   getMyFollowers: protectedProcedure.query(async ({ ctx }) => {
