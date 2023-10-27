@@ -7,7 +7,7 @@ import type {
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Loading from "~/components/Loading";
-import Dashboard from "~/components/layouts/gridDashboard";
+import Dashboard from "~/components/layouts";
 import { api } from "~/utils/api";
 import { Tab, Dialog, Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";

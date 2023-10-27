@@ -5,14 +5,10 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
-import { useSession } from "next-auth/react";
-
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import { useState } from "react";
 
 const Dashboard: NextPage = () => {
-  const { data } = useSession();
-
   const [tour, setTour] = useState(false);
 
   const showTour = () => {
@@ -30,7 +26,7 @@ const Dashboard: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="p-4">
+      <div className="px-4">
         <button onClick={showTour}>start Tour</button>
         <br />
         <Tour

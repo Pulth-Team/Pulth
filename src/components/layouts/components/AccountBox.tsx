@@ -27,7 +27,7 @@ const AccountBox = ({
   return (
     <div
       className={twMerge(
-        "flex",
+        "relative flex",
         className,
         "mt-auto rounded-md bg-gray-700 p-2 "
       )}
@@ -86,14 +86,12 @@ const AccountBox = ({
       </Menu>
       <div className="ml-2 flex flex-col">
         <p className="font-semibold text-gray-200">{name}</p>
-        <Link
-          href={`/profile`}
-        >
+        <Link href={{ pathname: `/user/[userId]`, query: { userId: id } }}>
           <button
             className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"
           >
-            View Profile
+            Inspect Profile
           </button>
         </Link>
       </div>
