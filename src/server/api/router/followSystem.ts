@@ -129,9 +129,9 @@ export const followSystemRouter = createTRPCRouter({
       },
     });
 
-    const followers = follows.map((follow) => follow.following);
+    const followList = follows.map((follow) => follow.following);
 
-    return followers;
+    return followList;
   }),
 
   getMyFollowers: protectedProcedure.query(async ({ ctx }) => {
@@ -153,7 +153,9 @@ export const followSystemRouter = createTRPCRouter({
       },
     });
 
-    return followers;
+    const followersList = followers.map((follow) => follow.follower);
+
+    return followersList;
   }),
   getFollowerCount: publicProcedure
     .input(z.object({ accountId: z.string() }))
