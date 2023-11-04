@@ -31,7 +31,7 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
                        } h-full`}
       >
         <p
-          className={`text-lg font-medium  ${
+          className={`inline-block w-full truncate break-all text-lg font-medium  ${
             !isPublished
               ? "group-hover:text-indigo-500"
               : "group-hover:text-white"
@@ -40,7 +40,7 @@ const MyArticleCard: NextPage<MyArticleProps> = ({
           {title}
         </p>
         <p
-          className={`line-clamp-3  ${
+          className={`line-clamp-3 w-full break-all   ${
             !isPublished
               ? "group-hover:text-indigo-500"
               : "group-hover:text-white"

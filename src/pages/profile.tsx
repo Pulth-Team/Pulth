@@ -21,7 +21,7 @@ import {
 
 import Loading from "~/components/Loading";
 import DashboardLayout from "~/components/layouts";
-import MyArticleCard from "~/components/editor/MyArticleCard";
+import MyArticleCard from "~/components/MyArticleCard";
 import Trpc from "./api/trpc/[trpc]";
 import { Protocol } from "@aws-sdk/client-s3";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
