@@ -471,6 +471,7 @@ const Articles: NextPage = () => {
                             maxLength={100}
                             minLength={12}
                             required
+                            autoComplete="off"
                             // aria fields for accessibility
                             aria-invalid={
                               dialogTitle.length < 12 ||
