@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
-import { Hits, InstantSearch } from "react-instantsearch";
+import { Hits, InstantSearch, Configure } from "react-instantsearch";
 
 import CustomSearchBox from "./CustomSearchBox";
 import { env } from "~/env.mjs";
@@ -57,6 +57,7 @@ const SearchModal = ({ isOpen, setOpen }: searchModalProps) => {
                 >
                   <CustomSearchBox />
                   <Hits hitComponent={Hit} />
+                  <Configure hitsPerPage={5} />
                 </InstantSearch>
               </Dialog.Panel>
             </Transition.Child>
