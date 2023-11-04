@@ -183,10 +183,10 @@ const Inspect: NextPage = () => {
         </div>
       ) : (
         <div className="px-4 py-8">
-          <div className="flex flex-row">
-            <div className="flex-grow">
+          <div className="flex max-w-full">
+            <div className="inline-block w-full flex-grow">
               <p className="text-xs text-black/70">Inspect Article</p>
-              <h1 className="mt-1 text-2xl font-bold">
+              <h1 className="mt-1 inline-block w-full max-w-full truncate text-2xl font-bold md:max-w-xs lg:max-w-lg xl:max-w-2xl 2xl:max-w-full">
                 {articleInfo.data?.title}
               </h1>
             </div>
@@ -216,7 +216,7 @@ const Inspect: NextPage = () => {
           <hr className="mt-1 border-black" />
           <div className="flex flex-col justify-center gap-x-2 md:flex-row">
             <div className="max-w-screen-lg flex-grow">
-              <div className="mt-4">
+              <div className="mt-4 w-full break-all">
                 <span className="text-black/70">Description:</span>
 
                 <p>{articleInfo.data?.description}</p>
