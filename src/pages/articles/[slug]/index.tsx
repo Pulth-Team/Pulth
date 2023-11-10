@@ -42,18 +42,38 @@ const Articles: NextPage = () => {
   const { slug } = router.query;
 
   // query to get the article data
-  const articleData = api.article.getBySlug.useQuery((slug as string) || "");
+  const articleData = api.article.getBySlug.useQuery((slug as string) || "", {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+  });
 
   const isArticleExists = articleData.data?.id !== undefined;
 
   //query to get the comment data
-  const commentData = api.comment.getBySlug.useQuery((slug as string) || "");
+  const commentData = api.comment.getCountBySlug.useQuery(
+    (slug as string) || "",
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
+    }
+  );
 
   // query to get the vote rank
   const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
     articleData.data?.id as string,
     {
       enabled: isArticleExists,
+      refetchIntervalInBackground: false,
+      refetchInterval: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -65,20 +85,13 @@ const Articles: NextPage = () => {
     articleData.data?.id as string,
     {
       enabled: authStatus === "authenticated" && isArticleExists,
+      refetchIntervalInBackground: false,
+      refetchInterval: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     }
   );
-
-  // mutation to add a comment
-  const commentAddMutation = api.comment.create.useMutation();
-
-  const OnCommentAdd = (comment: AddCommentData) => {
-    // TODO: open a modal  for the comment
-    commentAddMutation.mutateAsync({
-      articleId: articleData.data?.id as string,
-      content: comment.content,
-      parentId: comment.parent,
-    });
-  };
 
   let userImage = userData?.user?.image;
   if (userImage === null) userImage = "/default_profile.jpg";

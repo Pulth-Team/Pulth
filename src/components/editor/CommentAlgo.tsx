@@ -22,7 +22,13 @@ const CommentAlgo: NextPage<{
 }> = ({ articleId, slug }) => {
   const { data: userSession, status: authStatus } = useSession();
 
-  const commentQuery = api.comment.getBySlug.useQuery(slug);
+  const commentQuery = api.comment.getBySlug.useQuery(slug, {
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchIntervalInBackground: false,
+  });
   const [isDeleteRequested, setIsDeleteRequested] = useState(false);
   const [revalidationState, setRevalidationState] = useState<
     "idle" | "delete" | "edit" | "reply"
@@ -76,7 +82,7 @@ const CommentAlgo: NextPage<{
       !commentQuery.isFetching &&
       // we are checing revaidationState here because
       // delete logic is handled in the above useEffect
-      ["reply", "edit"].includes(revalidationState)
+      revalidationState !== "delete"
     ) {
       // reset the revalidation state
       // so we can identify the next revalidation

@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import Image from "next/legacy/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
@@ -36,7 +35,7 @@ const CommentAdd = ({
 
   // const { status, data: userSession } = useSession();
 
-  const { isAuthed, user, revalidationStatus, articleId, setActivity } =
+  const { isAuthed, user, revalidationStatus, articleId, revalidate } =
     useContext(CommentContext);
 
   const AddCommentMutation = api.comment.create.useMutation();
@@ -59,7 +58,20 @@ const CommentAdd = ({
     setVal(e.target.value);
   };
 
-  if (!isAuthed || !user)
+  useEffect(() => {
+    if (AddCommentMutation.isSuccess) {
+      AddCommentMutation.reset();
+
+      revalidate("reply");
+    }
+  }, [AddCommentMutation, revalidate]);
+
+  if (
+    !isAuthed ||
+    !user ||
+    revalidationStatus === "loading" ||
+    AddCommentMutation.isLoading
+  )
     return (
       <div className="flex items-center justify-center rounded-lg border py-4 shadow-sm">
         <Loading className="h-6 w-6 border-2" />;
