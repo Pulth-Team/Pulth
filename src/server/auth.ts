@@ -96,8 +96,8 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser({ user }) {
-      // check if user.name is undefined if not
-      if (user.name)
+      // check if user.name is undefined
+      if (!user.name) {
         await prisma.user.update({
           where: {
             id: user.id,
@@ -112,6 +112,7 @@ export const authOptions: NextAuthOptions = {
             description: "I'm new here",
           },
         });
+      }
     },
     session(message) {},
   },
