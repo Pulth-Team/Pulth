@@ -242,39 +242,11 @@ const Articles: NextPage = () => {
             Comments
           </p>
           <hr className="mb-2" />
-          <div className="flex flex-col ">
-            {authStatus == "authenticated" ? (
-              <CommentAdd
-                user={{
-                  name: userData?.user?.name as string,
-                  image: userImage || "default_profile.jpg",
-                }}
-                OnComment={OnCommentAdd}
-                isLoading={commentAddMutation.isLoading}
-                collapsable={true}
-              />
-            ) : (
-              <button
-                className="flex items-center justify-center rounded-lg bg-gray-600 py-4 text-white"
-                onClick={() => signIn()}
-              >
-                Login to comment
-              </button>
-            )}
 
-            <hr className="my-2" />
-
-            <CommentAlgo
-              user={{
-                id: userData?.user?.id as string,
-                name: userData?.user?.name as string,
-                image: userImage || "/default_profile.jpg",
-              }}
-              isAuthed={authStatus == "authenticated"}
-              articleId={articleData.data?.id as string}
-              slug={slug as string}
-            />
-          </div>
+          <CommentAlgo
+            articleId={articleData.data?.id as string}
+            slug={slug as string}
+          />
         </div>
       )}
     </>

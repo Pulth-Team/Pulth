@@ -17,7 +17,7 @@ const CommentContext = createContext<{
   currentActiveCommentId?: string;
 
   isAuthed: boolean;
-  user: {
+  user?: {
     id: string;
     name: string;
     image: string;

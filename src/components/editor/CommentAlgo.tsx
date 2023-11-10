@@ -12,17 +12,16 @@ import CommentContext, { ActivitySettings } from "../contexts/Comment";
 
 import Loading from "../Loading";
 import Comment from "./Comment";
+import AddComment from "./addComment";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const CommentAlgo: NextPage<{
-  user: {
-    id: string;
-    name: string;
-    image: string;
-  };
   articleId: string;
-  isAuthed: boolean;
   slug: string;
-}> = ({ user, articleId, isAuthed, slug }) => {
+}> = ({ articleId, slug }) => {
+  const { data: userSession, status: authStatus } = useSession();
+
   const commentQuery = api.comment.getBySlug.useQuery(slug);
   const [isDeleteRequested, setIsDeleteRequested] = useState(false);
   const [revalidationState, setRevalidationState] = useState<
@@ -93,6 +92,13 @@ const CommentAlgo: NextPage<{
     string | undefined
   >(undefined);
 
+  const pureUser = {
+    name: userSession?.user?.name || "",
+    image: userSession?.user?.image || "/default_profile.jpg",
+    // TODO: fix this type error
+    id: userSession?.user?.id as string,
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <CommentContext.Provider
@@ -100,8 +106,8 @@ const CommentAlgo: NextPage<{
           isActive: activity !== "none",
           activity,
           currentActiveCommentId,
-          isAuthed,
-          user,
+          isAuthed: authStatus === "authenticated",
+          user: authStatus === "authenticated" ? pureUser : undefined,
           articleId,
           revalidationStatus: (() => {
             if (!commentQuery.isFetching) return "success";
@@ -131,6 +137,7 @@ const CommentAlgo: NextPage<{
           },
         }}
       >
+        <AddComment collapsable className="mb-2" />
         {structuredComment.rootComments.map((comment) => {
           return (
             <Comment
