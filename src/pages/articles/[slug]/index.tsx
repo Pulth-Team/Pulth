@@ -22,7 +22,6 @@ import { api } from "~/utils/api";
 import DashboardLayout from "~/components/layouts";
 
 import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
-import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
 import Loading from "~/components/Loading";
 
@@ -77,9 +76,6 @@ const Articles: NextPage = () => {
     }
   );
 
-  // mutation to add a vote
-  const voteAddMutation = api.vote.voteByArticleId.useMutation();
-
   // query to get my vote automatically
   const myVoteQuery = api.vote.checkMyVoteByArticleId.useQuery(
     articleData.data?.id as string,
@@ -92,6 +88,9 @@ const Articles: NextPage = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  // mutation to add a vote
+  const voteAddMutation = api.vote.voteByArticleId.useMutation();
 
   let userImage = userData?.user?.image;
   if (userImage === null) userImage = "/default_profile.jpg";
@@ -137,11 +136,14 @@ const Articles: NextPage = () => {
               )}
             </div>
             <button
+              disabled={voteAddMutation.isLoading}
               onClick={() => {
                 if (authStatus !== "authenticated") {
                   signIn();
                   return;
                 } else {
+                  // return if the mutation is already loading
+                  if (voteAddMutation.isLoading) return;
                   // FIXME: we might consider remove async mutation here
                   voteAddMutation
                     .mutateAsync({
@@ -154,21 +156,25 @@ const Articles: NextPage = () => {
                     });
                 }
               }}
+              className="group"
             >
               <ChevronUpIcon
-                className={`h-8 w-8 p-1 ${
+                className={`h-8 w-8 rounded-full p-1  ${
                   myVoteQuery.data?.voteDirection === "up"
-                    ? " rounded-full bg-gray-200 text-indigo-500"
-                    : " text-black"
+                    ? " bg-gray-200 text-indigo-500"
+                    : " text-black hover:bg-gray-100 group-disabled:bg-white"
                 }`}
               />
             </button>
             <button
+              disabled={voteAddMutation.isLoading}
               onClick={() => {
                 if (authStatus !== "authenticated") {
                   signIn();
                   return;
                 } else {
+                  // return if the mutation is already loading
+                  if (voteAddMutation.isLoading) return;
                   // FIXME: we might consider remove async mutation here
                   voteAddMutation
                     .mutateAsync({
@@ -181,12 +187,13 @@ const Articles: NextPage = () => {
                     });
                 }
               }}
+              className="group"
             >
               <ChevronDownIcon
-                className={`h-8 w-8 p-1 ${
+                className={`h-8 w-8 rounded-full p-1 ${
                   myVoteQuery.data?.voteDirection === "down"
-                    ? "rounded-full bg-gray-200 text-indigo-500"
-                    : " text-black"
+                    ? "bg-gray-200 text-indigo-500 "
+                    : " text-black hover:bg-gray-100 group-disabled:bg-white"
                 }`}
               />
             </button>
