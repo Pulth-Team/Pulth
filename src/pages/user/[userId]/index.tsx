@@ -196,7 +196,9 @@ const ProfileIndex: NextPage = () => {
           </div>
         </div>
         <div className="flex flex-col gap-y-3 text-left">
-          <p className="text-lg text-black/80">{profileData.description}</p>
+          <p className="break-all text-lg text-black/80">
+            {profileData.description}
+          </p>
         </div>
         <div className="flex w-full gap-2 lg:hidden">
           <div
