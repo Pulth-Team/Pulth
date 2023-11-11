@@ -179,6 +179,11 @@ export const followSystemRouter = createTRPCRouter({
   getFollowerCount: publicProcedure
     .input(z.object({ accountId: z.string() }))
     .query(async ({ input, ctx }) => {
+      if (!ObjectId.isValid(input.accountId))
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User id is not valid",
+      });
       const followers = await ctx.prisma.follow.count({
         where: {
           followingId: input.accountId,
@@ -191,6 +196,11 @@ export const followSystemRouter = createTRPCRouter({
   getFollowingCount: publicProcedure
     .input(z.object({ accountId: z.string() }))
     .query(async ({ input, ctx }) => {
+      if (!ObjectId.isValid(input.accountId))
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User id is not valid",
+      });
       const followers = await ctx.prisma.follow.count({
         where: {
           followerId: input.accountId,

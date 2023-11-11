@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import DashboardLayout from "~/components/layouts";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
@@ -24,14 +25,16 @@ const ProfileIndex: NextPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState<0 | 1>(0);
 
-  const { data: profileData, status } = api.user.getUserById.useQuery(
-    {
-      id: profileUserId?.toString() || "",
-    },
-    {
-      enabled: !!profileUserId, // if there is no profileUserId, don't fetch
-    }
-  );
+  const { data: profileData, status: profileDataStatus } =
+    api.user.getUserById.useQuery(
+      {
+        id: profileUserId?.toString() || "",
+      },
+      {
+        enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+        retry: false,
+      }
+    );
 
   const { data: followerCount, refetch: followerCountRefetch } =
     api.followSystem.getFollowerCount.useQuery(
@@ -40,6 +43,7 @@ const ProfileIndex: NextPage = () => {
       },
       {
         enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+        retry: false,
       }
     );
 
@@ -50,6 +54,7 @@ const ProfileIndex: NextPage = () => {
       },
       {
         enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+        retry: false,
       }
     );
 
@@ -60,6 +65,7 @@ const ProfileIndex: NextPage = () => {
       },
       {
         enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+        retry: false,
       }
     );
 
@@ -112,16 +118,45 @@ const ProfileIndex: NextPage = () => {
     }
   }, [profileData]);
 
-  if (status === "loading")
+  if (profileDataStatus === "loading")
     return (
       <DashboardLayout>
-        <Loading className="m-16 h-16 w-16 border-2" />
+        <div className="flex min-h-content-area items-center justify-center">
+          <Loading className="m-16 h-16 w-16 border-2" />
+        </div>
       </DashboardLayout>
     );
-  if (status === "error" || !profileData || profileData instanceof Error)
+  if (
+    profileDataStatus === "error" ||
+    !profileData ||
+    profileData instanceof Error
+  )
     return (
       <DashboardLayout>
-        <div className="p-4">User Not Found</div>
+        <div className="flex h-full min-h-content-area items-center justify-center">
+          <div className="text-center">
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              User not found
+            </h1>
+            <p className="mt-3 text-base leading-7 text-gray-600">
+              The user does not exist or has been deleted.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Link
+                href="/explore"
+                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Go back explore
+              </Link>
+              <a
+                href="mailto:gulestanbekir@gmail.com"
+                className="text-sm font-semibold text-gray-900"
+              >
+                Contact support <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </DashboardLayout>
     );
 
