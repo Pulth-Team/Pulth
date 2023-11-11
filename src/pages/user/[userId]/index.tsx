@@ -5,8 +5,7 @@ import Image from "next/image";
 
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import React, { use, useEffect, useState } from "react";
-import { Dialog, Tab } from "@headlessui/react";
+import React, { useEffect, useState } from "react";
 
 import Loading from "~/components/Loading";
 import ArticleCard from "~/components/ArticleCard";
@@ -14,7 +13,7 @@ import DragScrollContainer from "~/components/DragScrollContainer";
 
 import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
-import { set } from "zod";
+import FollowDialog from "~/components/Dialogs/FollowSystemDialog";
 
 const ProfileIndex: NextPage = () => {
   const router = useRouter();
@@ -22,7 +21,9 @@ const ProfileIndex: NextPage = () => {
   const { data: currentUserData } = useSession();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [tabIndex, setTabIndex] = useState<0 | 1>(0);
+  const [currentTab, setCurrentTab] = useState<"follows" | "followers">(
+    "followers"
+  );
 
   const { data: profileData, status } = api.user.getUserById.useQuery(
     {
@@ -63,48 +64,8 @@ const ProfileIndex: NextPage = () => {
       }
     );
 
-  const { data: Followers, refetch: followersRefetch } =
-    api.followSystem.getFollowers.useQuery(
-      { accountId: profileUserId?.toString() || "" },
-      {
-        enabled: tabIndex === 0,
-      }
-    );
-
-  const { data: Follows, refetch: followsRefetch } =
-    api.followSystem.getFollows.useQuery(
-      { accountId: profileUserId?.toString() || "" },
-      {
-        enabled: tabIndex === 1,
-      }
-    );
-
   const followMutation = api.followSystem.followUser.useMutation();
   const unfollowMutation = api.followSystem.unfollowUser.useMutation();
-  const removeFollowerMutation = api.followSystem.removeFollower.useMutation();
-
-  useEffect(() => {
-    if (
-      followMutation.isSuccess ||
-      unfollowMutation.isSuccess ||
-      removeFollowerMutation.isSuccess
-    ) {
-      followerCountRefetch();
-      followingCountRefetch();
-      isFollowingRefetch();
-      followsRefetch();
-      followersRefetch();
-    }
-  }, [
-    followerCountRefetch,
-    followingCountRefetch,
-    isFollowingRefetch,
-    followsRefetch,
-    followersRefetch,
-    removeFollowerMutation.isSuccess,
-    unfollowMutation.isSuccess,
-    followMutation.isSuccess,
-  ]);
 
   useEffect(() => {
     if (profileData) {
@@ -144,26 +105,26 @@ const ProfileIndex: NextPage = () => {
             <p className="text-xl font-medium">{profileData?.name}</p>
           </div>
           <div className="hidden items-center gap-8 lg:flex">
-            <div
-              className="hover:cursor-pointer"
+            <button
+              className="rounded-lg px-4 py-2 font-semibold hover:cursor-pointer hover:bg-gray-100"
               onClick={() => {
                 setIsOpen(true);
-                setTabIndex(0);
+                setCurrentTab("followers");
               }}
             >
               <p className="text-center text-lg font-bold">{followerCount}</p>
               <p className="text-sm text-black/60">Followers</p>
-            </div>
-            <div
-              className="hover:cursor-pointer"
+            </button>
+            <button
+              className="rounded-lg px-4 py-2 font-semibold hover:bg-gray-100"
               onClick={() => {
                 setIsOpen(true);
-                setTabIndex(1);
+                setCurrentTab("follows");
               }}
             >
               <p className="text-center text-lg font-bold">{followingCount}</p>
               <p className="text-sm text-black/60">Follows</p>
-            </div>
+            </button>
             {currentUserData?.user.id !== profileUserId && (
               <button
                 className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg px-4 py-2 font-semibold ${
@@ -205,7 +166,7 @@ const ProfileIndex: NextPage = () => {
             className="hover:cursor-pointer"
             onClick={() => {
               setIsOpen(true);
-              setTabIndex(0);
+              setCurrentTab("followers");
             }}
           >
             <p className="text-center text-lg font-bold">{followerCount}</p>
@@ -215,7 +176,7 @@ const ProfileIndex: NextPage = () => {
             className="hover:cursor-pointer"
             onClick={() => {
               setIsOpen(true);
-              setTabIndex(1);
+              setCurrentTab("follows");
             }}
           >
             <p className="text-center text-lg font-bold">{followingCount}</p>
@@ -299,101 +260,14 @@ const ProfileIndex: NextPage = () => {
           </DragScrollContainer>
         </div>
       </div>
-      <Dialog
-        open={isOpen}
+      <FollowDialog
+        isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        className={
-          "absolute inset-0 flex items-center justify-center bg-black/70 py-8"
-        }
-      >
-        <Dialog.Panel className={"h-full w-full max-w-md bg-white"}>
-          <Tab.Group
-            selectedIndex={tabIndex}
-            onChange={(index) => {
-              setTabIndex(index as 0 | 1);
-            }}
-          >
-            <Tab.List className={"order-2 flex justify-evenly border-b p-3"}>
-              <Tab
-                className={`${tabIndex == 0 ? "border-b-2 border-black" : ""}`}
-              >
-                Followers
-              </Tab>
-              <Tab
-                className={`${tabIndex == 1 ? "border-b-2 border-black" : ""}`}
-              >
-                Follows
-              </Tab>
-            </Tab.List>
-            <Tab.Panels>
-              <Tab.Panel>
-                {Followers?.map((follower) => (
-                  <div className="m-4 flex justify-between" key={follower.id}>
-                    <div className="flex items-center justify-center gap-2">
-                      <Image
-                        className="rounded-full"
-                        src={follower.image ?? "/default_profile.jpg"}
-                        alt="profile"
-                        height={32}
-                        width={32}
-                      ></Image>
-                      <p>{follower.name}</p>
-                    </div>
-                    <div className="flex items-center justify-normal">
-                      <button
-                        className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg bg-indigo-500 px-4 py-2 text-white ${
-                          currentUserData?.user.id != profileUserId
-                            ? "hidden"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          removeFollowerMutation.mutate({
-                            accountId: follower.id as string,
-                          });
-                        }}
-                      >
-                        Remove
-                        {removeFollowerMutation.isLoading ? (
-                          <Loading className="h-5 w-5 border-2" />
-                        ) : (
-                          ""
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </Tab.Panel>
-              <Tab.Panel>
-                {Follows?.map((follower) => (
-                  <div className="m-4 flex justify-between" key={follower.id}>
-                    <div className="flex items-center justify-center gap-2">
-                      <Image
-                        className="rounded-full"
-                        src={follower.image ?? "/default_profile.jpg"}
-                        alt="profile"
-                        height={32}
-                        width={32}
-                      ></Image>
-                      <p>{follower.name}</p>
-                    </div>
-                    <div className="flex items-center justify-normal">
-                      <button
-                        className={`ml-auto flex flex-none items-center justify-center gap-x-2 rounded-lg bg-indigo-500 px-4 py-2 text-white ${
-                          currentUserData?.user.id != profileUserId
-                            ? "hidden"
-                            : ""
-                        }`}
-                      >
-                        Following
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </Tab.Panel>
-            </Tab.Panels>
-          </Tab.Group>
-        </Dialog.Panel>
-      </Dialog>
+        accountId={profileUserId as string}
+        isSameUser={currentUserData?.user.id === profileUserId}
+        currentTab={currentTab}
+        onTabChange={(tab) => setCurrentTab(tab)}
+      />
     </DashboardLayout>
   );
 };
