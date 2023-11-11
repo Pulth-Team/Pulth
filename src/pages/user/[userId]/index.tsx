@@ -24,6 +24,18 @@ const ProfileIndex: NextPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState<"follows" | "followers">(
     "followers"
+<<<<<<< HEAD
+=======
+  );
+
+  const { data: profileData, status } = api.user.getUserById.useQuery(
+    {
+      id: profileUserId?.toString() || "",
+    },
+    {
+      enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+    }
+>>>>>>> DashboardUI
   );
 
   const { data: profileData, status: profileDataStatus } =
@@ -66,7 +78,10 @@ const ProfileIndex: NextPage = () => {
       },
       {
         enabled: !!profileUserId, // if there is no profileUserId, don't fetch
+<<<<<<< HEAD
         retry: false,
+=======
+>>>>>>> DashboardUI
       }
     );
 
