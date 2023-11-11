@@ -49,7 +49,7 @@ const AccountBox = ({
           <Menu.Item>
             <div>
               <Link
-                href="/profile"
+                href={{ pathname: `/user/[userId]`, query: { userId: id } }}
                 className={`${
                   path === "/profile" ? "bg-gray-600" : "bg-gray-700"
                 } flex cursor-pointer flex-row items-center gap-2 rounded-md p-2  text-gray-100`}
@@ -86,12 +86,12 @@ const AccountBox = ({
       </Menu>
       <div className="ml-2 flex flex-col">
         <p className="font-semibold text-gray-200">{name}</p>
-        <Link href={{ pathname: `/user/[userId]`, query: { userId: id } }}>
+        <Link href="/profile">
           <button
             className="text-left text-sm text-gray-400 hover:text-gray-100"
             id="view-profile-btn"
           >
-            Inspect Profile
+            View Profile
           </button>
         </Link>
       </div>
