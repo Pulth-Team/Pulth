@@ -79,6 +79,20 @@ const ProfileIndex: NextPage = () => {
     }
   }, [profileData]);
 
+  useEffect(() => {
+    if (followMutation.isSuccess || unfollowMutation.isSuccess) {
+      followerCountRefetch();
+      followingCountRefetch();
+      isFollowingRefetch();
+    }
+  }, [
+    followMutation.isSuccess,
+    unfollowMutation.isSuccess,
+    followerCountRefetch,
+    followingCountRefetch,
+    isFollowingRefetch,
+  ]);
+
   if (profileDataStatus === "loading")
     return (
       <DashboardLayout>
@@ -181,11 +195,20 @@ const ProfileIndex: NextPage = () => {
                   }
                 }}
               >
-                {isFollowing ? (
+                {followMutation.isLoading || unfollowMutation.isLoading ? (
+                  <Loading
+                    className={`h-6 w-6 border-2  ${
+                      isFollowing
+                        ? "border-gray-200"
+                        : "border-gray-100 border-t-gray-400"
+                    }`}
+                  />
+                ) : isFollowing ? (
                   <UserMinusIcon className="h-6 w-6 stroke-indigo-500" />
                 ) : (
                   <UserPlusIcon className="h-6 w-6 stroke-white" />
                 )}
+
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
             )}
@@ -236,11 +259,20 @@ const ProfileIndex: NextPage = () => {
                 }
               }}
             >
-              {isFollowing ? (
+              {followMutation.isLoading || unfollowMutation.isLoading ? (
+                <Loading
+                  className={`h-6 w-6 border-2  ${
+                    isFollowing
+                      ? "border-gray-200"
+                      : "border-gray-100 border-t-gray-400"
+                  }`}
+                />
+              ) : isFollowing ? (
                 <UserMinusIcon className="h-6 w-6 stroke-indigo-500" />
               ) : (
                 <UserPlusIcon className="h-6 w-6 stroke-white" />
               )}
+
               {isFollowing ? "Unfollow" : "Follow"}
             </button>
           )}
