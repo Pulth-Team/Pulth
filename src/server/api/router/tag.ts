@@ -93,4 +93,28 @@ export const tagRouter = createTRPCRouter({
       // if the user is the author of the article, return all tags
       return article.tags;
     }),
+
+  searchTags: publicProcedure
+    .input(z.object({ query: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { prisma } = ctx;
+
+      // return all tags that includes the query
+      const tags = await prisma.tag.findMany({
+        where: {
+          name: {
+            contains: input.query,
+            mode: "insensitive",
+          },
+        },
+        select: {
+          name: true,
+          id: true,
+          color: true,
+        },
+        take: 5,
+      });
+
+      return tags;
+    }),
 });
