@@ -58,6 +58,9 @@ model User {
     followers Follow[] @relation("Follower")
     // list of users that this user follows
     following Follow[] @relation("Following")
+
+    // list of categories this user is subscribed to
+    assignedCategories CategoriesOnPosts[]
 }
 
 model VerificationToken {
@@ -94,7 +97,8 @@ model Article {
     // voteRank Int       @default(0)
     votes VotedBy[] @relation("ArticleVotes")
 
-    Comments Comment[]
+    Comments   Comment[]
+    categories CategoriesOnPosts[]
 }
 
 // recursive comment Model
@@ -123,6 +127,29 @@ model Comment {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Category {
+    id    String              @id @default(auto()) @map("_id") @db.ObjectId
+    name  String
+    posts CategoriesOnPosts[]
+}
+
+model CategoriesOnPosts {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    post   Article @relation(fields: [postId], references: [id])
+    postId String  @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+
+    category   Category @relation(fields: [categoryId], references: [id])
+    categoryId String   @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+
+    // the user that assigned the category to the post
+    assignedAt   DateTime @default(now())
+    assignedById String   @db.ObjectId
+    assignedBy   User     @relation(fields: [assignedById], references: [id])
+
+    @@unique([postId, categoryId])
 }
 
 model Image {
