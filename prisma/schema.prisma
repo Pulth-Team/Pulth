@@ -131,7 +131,7 @@ model Comment {
 
 model Tag {
     id       String        @id @default(auto()) @map("_id") @db.ObjectId
-    name     String
+    name     String        @unique
     color    String        @default("#000000")
     articles TagsOnPosts[]
 }
