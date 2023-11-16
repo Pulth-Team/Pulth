@@ -60,7 +60,7 @@ model User {
     following Follow[] @relation("Following")
 
     // list of categories this user is subscribed to
-    assignedCategories CategoriesOnPosts[]
+    assignedTags TagsOnPosts[]
 }
 
 model VerificationToken {
@@ -97,8 +97,8 @@ model Article {
     // voteRank Int       @default(0)
     votes VotedBy[] @relation("ArticleVotes")
 
-    Comments   Comment[]
-    categories CategoriesOnPosts[]
+    Comments Comment[]
+    tags     TagsOnPosts[]
 }
 
 // recursive comment Model
@@ -130,26 +130,27 @@ model Comment {
 }
 
 model Category {
-    id    String              @id @default(auto()) @map("_id") @db.ObjectId
-    name  String
-    posts CategoriesOnPosts[]
+    id       String        @id @default(auto()) @map("_id") @db.ObjectId
+    name     String
+    color    String        @default("#000000")
+    articles TagsOnPosts[]
 }
 
-model CategoriesOnPosts {
+model TagsOnPosts {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    post   Article @relation(fields: [postId], references: [id])
-    postId String  @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+    article   Article @relation(fields: [articleId], references: [id])
+    articleId String  @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
 
-    category   Category @relation(fields: [categoryId], references: [id])
-    categoryId String   @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+    tag   Category @relation(fields: [tagId], references: [id])
+    tagId String   @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
 
     // the user that assigned the category to the post
     assignedAt   DateTime @default(now())
     assignedById String   @db.ObjectId
     assignedBy   User     @relation(fields: [assignedById], references: [id])
 
-    @@unique([postId, categoryId])
+    @@unique([articleId, tagId])
 }
 
 model Image {
