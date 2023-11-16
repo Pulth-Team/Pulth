@@ -20,11 +20,11 @@ import { twMerge } from "tailwind-merge";
 
 import superjson from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import { GetStaticPropsContext } from "next";
-import { createInnerTRPCContext, createTRPCContext } from "~/server/api/trpc";
+import { createTRPCContext } from "~/server/api/trpc";
 import { appRouter } from "~/server/api/root";
 import { DehydratedState } from "@tanstack/react-query";
-import { getServerSession } from "next-auth";
+
+import TagTab from "~/components/Tabs/TagTab";
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -263,7 +263,7 @@ const Inspect: NextPage = () => {
                           relative flex w-full items-center justify-center px-4 py-2 focus:outline-none`
                       }
                     >
-                      <span>Stats</span>
+                      <span>Tags</span>
                     </Tab>
                   </Tab.List>
                   <Tab.Panels>
@@ -632,6 +632,9 @@ const Inspect: NextPage = () => {
                           </Disclosure>
                         </div>
                       </div>
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <TagTab />
                     </Tab.Panel>
                   </Tab.Panels>
                 </Tab.Group>
