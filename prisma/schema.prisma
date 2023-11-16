@@ -59,7 +59,7 @@ model User {
     // list of users that this user follows
     following Follow[] @relation("Following")
 
-    // list of categories this user is subscribed to
+    // list of tags this user is assigned
     assignedTags TagsOnPosts[]
 }
 
@@ -129,7 +129,7 @@ model Comment {
     updatedAt DateTime @updatedAt
 }
 
-model Category {
+model Tag {
     id       String        @id @default(auto()) @map("_id") @db.ObjectId
     name     String
     color    String        @default("#000000")
@@ -142,10 +142,10 @@ model TagsOnPosts {
     article   Article @relation(fields: [articleId], references: [id])
     articleId String  @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
 
-    tag   Category @relation(fields: [tagId], references: [id])
-    tagId String   @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+    tag   Tag    @relation(fields: [tagId], references: [id])
+    tagId String @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
 
-    // the user that assigned the category to the post
+    // the user that assigned the tag to the post
     assignedAt   DateTime @default(now())
     assignedById String   @db.ObjectId
     assignedBy   User     @relation(fields: [assignedById], references: [id])
