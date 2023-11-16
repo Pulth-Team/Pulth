@@ -47,6 +47,13 @@ function pickTextColorBasedOnBgColor(bgColor: string) {
     }
     return Math.pow((col + 0.055) / 1.055, 2.4);
   });
+
+  //check c[0] c[1] c[2]
+  // if they are undefined, return darkColor
+  if (c[0] === undefined || c[1] === undefined || c[2] === undefined) {
+    return darkColor;
+  }
+
   var L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   return L > 0.179 ? darkColor : lightColor;
 }
