@@ -36,6 +36,11 @@ const Inspect: NextPage = () => {
     retry: false,
   });
 
+  const { data: tagData, isLoading: isTagsLoading } =
+    api.tag.getTagsBySlug.useQuery({
+      slug: slug as string,
+    });
+
   const articleUpdateInfoMutation = api.article.updateInfo.useMutation();
   const articleDeleteMutation = api.article.delete.useMutation();
 
@@ -223,7 +228,13 @@ const Inspect: NextPage = () => {
 
                 <span className="text-black/70">Tags:</span>
 
-                <p>{articleInfo.data?.keywords.join(", ")}</p>
+                {isTagsLoading ? (
+                  <Loading className="h-7 w-7 border-2" />
+                ) : (
+                  <p>
+                    {tagData?.map((tagEntry) => tagEntry.tag.name).join(" ")}
+                  </p>
+                )}
               </div>
 
               <div className="mt-4">
