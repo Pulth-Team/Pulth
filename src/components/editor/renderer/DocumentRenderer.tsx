@@ -75,8 +75,9 @@ const DocumentRenderer: NextPage<{
       {blocks.map((block) => {
         switch (block.type) {
           case "paragraph":
+            // Maybe we should use a different component for paragraphs
             return (
-              <p key={keySeed + block.id}>
+              <p key={keySeed + block.id} className="py-3">
                 <InlineRenderer text={block.data.text} />
               </p>
             );
