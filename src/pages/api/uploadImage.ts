@@ -17,6 +17,12 @@ const s3config = {
 const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, nextAuthOptions);
 
+  if (req.method !== "POST") {
+    return res.send({
+      error: "Only POST requests are allowed.",
+    });
+  }
+
   if (!session) {
     return res.send({
       error: "You must be signed in to upload an image to the server.",
