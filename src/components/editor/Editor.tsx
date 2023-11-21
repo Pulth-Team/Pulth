@@ -100,7 +100,9 @@ const editorTools = {
           })
             .then((res) => {
               console.log(res);
-              return res.json();
+              return res.json().catch(() => {
+                return res.text();
+              });
             })
             .then((res) => {
               console.log(res);
