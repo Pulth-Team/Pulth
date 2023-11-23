@@ -52,20 +52,26 @@ const Articles: NextPage = () => {
   const isArticleExists = articleData.data?.id !== undefined;
 
   //query to get the comment data
-  const commentData = api.comment.getCountBySlug.useQuery(
-    (slug as string) || "",
-    {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-      refetchInterval: false,
-      refetchIntervalInBackground: false,
-    }
-  );
+  const commentData = api.comment.getCountBySlug.useQuery(slug as string, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+  });
 
   // query to get the vote rank
-  const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
-    articleData.data?.id as string,
+  const voteRankQuery = api.vote.getVoteRankBySlug.useQuery(slug as string, {
+    enabled: isArticleExists,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const tagQuery = api.tag.getTagsBySlug.useQuery(
+    { slug: slug as string },
     {
       enabled: isArticleExists,
       refetchIntervalInBackground: false,
@@ -123,16 +129,40 @@ const Articles: NextPage = () => {
 
       {RenderedDocument}
 
+      {/* Tags */}
+      {isArticleExists && tagQuery.isSuccess && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tagQuery.data.map((tagEntry) => (
+            <Link
+              key={tagEntry.tag.id}
+              href={{
+                pathname: `/tags/[tagId]`,
+                query: { tagId: tagEntry.tag.slug },
+              }}
+              className="rounded-md border-2 border-indigo-500 border-opacity-70 p-2 text-sm text-indigo-500 hover:bg-indigo-500 hover:bg-opacity-20 "
+            >
+              {tagEntry.tag.name}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Rank and action buttons */}
       {isArticleExists && (
         <div className="mb-6 mt-8 flex flex-row  justify-between">
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <SparklesIcon className="h-6 w-6 text-black" />
-              {!voteRankQuery.isFetching && !voteAddMutation.isLoading ? (
-                voteRankQuery.data
-              ) : (
+
+              {voteAddMutation.isLoading ? (
                 <Loading className="h-6 w-6 border-2" />
+              ) : (
+                voteRankQuery.isSuccess &&
+                (voteRankQuery.data instanceof Error ? (
+                  <p className="text-black">{voteRankQuery.data.message}</p>
+                ) : (
+                  <p className="text-black">{voteRankQuery.data}</p>
+                ))
               )}
             </div>
             <button
@@ -313,9 +343,30 @@ export async function getStaticProps(
 
   // prefetch `article.getBySlug`
   const articleBySlug = helpers.article.getBySlug.prefetch(slug);
+
+  //prefetch `comment.getCountBySlug`
+  const commentCountBySlug = helpers.comment.getCountBySlug.prefetch(slug);
+
+  // prefetch `vote.getVoteRankByArticleId`
+  const voteRank = helpers.vote.getVoteRankBySlug.prefetch(slug);
+
+  // prefetch `comment.getBySlug`
   const commentBySlug = helpers.comment.getBySlug.prefetch(slug);
 
-  await Promise.all([articleBySlug, commentBySlug]);
+  // prefetch `Tags`
+  const tagInfo = helpers.tag.getTagsBySlug.prefetch({ slug });
+
+  // prefetch `vote.checkMyVoteByArticleId`
+  const myVote = helpers.vote.checkMyVoteBySlug.prefetch(slug);
+
+  await Promise.all([
+    commentCountBySlug,
+    articleBySlug,
+    commentBySlug,
+    tagInfo,
+    voteRank,
+    myVote,
+  ]);
 
   return {
     props: {
