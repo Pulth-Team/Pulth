@@ -229,10 +229,10 @@ const Inspect: NextPage = () => {
                 <span className="text-black/70">Tags:</span>
 
                 {isTagsLoading ? (
-                  <Loading className="h-7 w-7 border-2" />
+                  <p>Loading...</p>
                 ) : (
                   <p>
-                    {tagData?.map((tagEntry) => tagEntry.tag.name).join(" ")}
+                    {tagData?.map((tagEntry) => tagEntry.tag.name).join(", ")}
                   </p>
                 )}
               </div>
@@ -801,7 +801,15 @@ export const getServerSideProps: GetServerSideProps<{
   const slug = query.slug as string;
 
   // prefetch `article.getBySlug`
-  await helpers.article.inspect.prefetch((slug as string) || "");
+  const inspectPre = helpers.article.inspect.prefetch(slug || "");
+
+  // prefetch `tag.getTagsBySlug`
+  const tagPre = helpers.tag.getTagsBySlug.prefetch({
+    slug,
+  });
+
+  // wait for both prefetches to finish
+  await Promise.all([inspectPre, tagPre]);
 
   return {
     props: {
