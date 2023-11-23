@@ -1,13 +1,19 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const tagRouter = createTRPCRouter({
-  addTagToSlug: publicProcedure
-    .input(z.object({ slug: z.string(), tag: z.string() }))
+  addTagToSlug: protectedProcedure
+    .input(z.object({ slug: z.string(), tagId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const { prisma } = ctx;
+      const { prisma, session } = ctx;
+      const { user } = session;
+
       // find the article
       const article = await prisma.article.findUnique({
         where: { slug: input.slug },
@@ -23,7 +29,7 @@ export const tagRouter = createTRPCRouter({
 
       // find the tag
       const tag = await prisma.tag.findUnique({
-        where: { name: input.tag },
+        where: { id: input.tagId },
         select: { id: true },
       });
 
@@ -34,15 +40,16 @@ export const tagRouter = createTRPCRouter({
           message: "Tag not found",
         });
 
-      // add the tag to the article
-      return await prisma.article.update({
-        where: { slug: input.slug },
+      // create tagsOnPosts
+      const tagsOnPosts = await prisma.tagsOnPosts.create({
         data: {
-          tags: {
-            connect: { id: tag.id },
-          },
+          articleId: article.id,
+          tagId: tag.id,
+          assignedById: user.id,
         },
       });
+
+      return tagsOnPosts;
     }),
 
   getTagsBySlug: publicProcedure
@@ -110,11 +117,96 @@ export const tagRouter = createTRPCRouter({
         select: {
           name: true,
           id: true,
-          color: true,
         },
         take: 5,
       });
 
       return tags;
+    }),
+
+  searchArticlesByTag: publicProcedure
+    .input(
+      z.intersection(
+        z.union([
+          z.object({ tagId: z.string() }),
+          z.object({ tagName: z.string() }),
+          z.object({ tagSlug: z.string() }),
+        ]),
+        z.object({ take: z.number().default(10), skip: z.number().default(0) })
+      )
+    )
+    .query(async ({ input, ctx }) => {
+      const { prisma } = ctx;
+
+      let tagWhereInput;
+      // if tagId is provided, search by tagId
+      if ("tagId" in input) {
+        tagWhereInput = {
+          id: input.tagId,
+        };
+      }
+
+      // if tagName is provided, search by tagName
+      if ("tagName" in input) {
+        tagWhereInput = {
+          name: input.tagName,
+        };
+      }
+
+      // if tagSlug is provided, search by tagSlug
+      if ("tagSlug" in input) {
+        tagWhereInput = {
+          slug: input.tagSlug,
+        };
+      }
+
+      if (!tagWhereInput)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You must provide either tagId, tagName, or tagSlug",
+        });
+
+      // find the tag
+      const articlesInTag = await prisma.article.findMany({
+        where: {
+          // only return published articles
+          isPublished: true,
+
+          // find all articles that have this tag
+          tags: {
+            some: {
+              tag: tagWhereInput,
+            },
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          description: true,
+
+          // return the createdAt date
+          createdAt: true,
+
+          // return the author of the article
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+
+        orderBy: {
+          // order by createdAt date
+          createdAt: "desc",
+        },
+
+        take: input.take,
+        skip: input.skip,
+      });
+
+      return articlesInTag;
     }),
 });
