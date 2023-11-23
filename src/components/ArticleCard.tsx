@@ -39,9 +39,9 @@ const ArticleCard: NextPage<
 
   return (
     <div
-      className={`${
+      className={`max-w-xs ${
         className || ""
-      } flex min-w-[256px]  max-w-xs flex-shrink-0 flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
+      } flex min-w-[256px] flex-shrink-0 flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
     >
       {isRecommended && (
         <div className="flex justify-between whitespace-nowrap  ">
@@ -99,7 +99,12 @@ const ArticleCard: NextPage<
                 query: { userId: Author?.UserId },
               }}
             >
-              <p className="cursor-pointer text-sm">{Author?.Name}</p>
+              <p
+                className="line-clamp-1 cursor-pointer text-sm"
+                title={Author?.Name}
+              >
+                {Author?.Name}
+              </p>
             </Link>
             <p className="text-xs text-black/70">
               {/* {Author?.Title} */}
