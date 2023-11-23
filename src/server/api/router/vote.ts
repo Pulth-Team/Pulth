@@ -6,6 +6,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const voteRouter = createTRPCRouter({
   voteByArticleId: protectedProcedure
@@ -141,6 +142,66 @@ export const voteRouter = createTRPCRouter({
           : undefined,
       };
     }),
+
+  checkMyVoteBySlug: protectedProcedure
+    .input(z.string())
+    .query(async ({ input: slug, ctx: { session, prisma } }) => {
+      const {
+        user: { id: userId },
+      } = session;
+
+      const article = await prisma.article.findUnique({
+        where: {
+          slug,
+        },
+      });
+      if (!article)
+        return new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
+
+      const vote = await prisma.votedBy.findFirst({
+        where: {
+          articleId: article.id,
+          userId,
+        },
+      });
+
+      let voteEnum: "up" | "down" | "none" = "none";
+
+      if (!vote) voteEnum = "none";
+      else voteEnum = vote.upVote ? "up" : "down";
+
+      return {
+        voteDirection: voteEnum,
+        details: vote
+          ? {
+              id: vote.id,
+              articleId: vote.articleId,
+              userId: vote.userId,
+            }
+          : undefined,
+      };
+    }),
+
+  getVoteRankBySlug: publicProcedure
+    .input(z.string())
+    .query(async ({ input: slug, ctx: { prisma } }) => {
+      const article = await prisma.article.findUnique({
+        where: {
+          slug,
+        },
+      });
+      if (!article)
+        return new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
+
+      return await article.voteRank;
+    }),
+
   getVoteRankByArticleId: publicProcedure
     .input(z.string().refine((id) => ObjectId.isValid(id), {}))
     .query(async ({ input: articleId, ctx: { prisma } }) => {
@@ -149,7 +210,11 @@ export const voteRouter = createTRPCRouter({
           id: articleId,
         },
       });
-      if (!article) return 0;
+      if (!article)
+        return new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
 
       return await article.voteRank;
     }),
