@@ -1,7 +1,7 @@
 import { Combobox, Listbox } from "@headlessui/react";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { api } from "~/utils/api";
 import Loading from "../Loading";
 
@@ -10,9 +10,15 @@ const TagTab = () => {
   const router = useRouter();
   const { slug } = router.query;
 
-  const { data: tagData, isLoading } = api.tag.getTagsBySlug.useQuery({
+  const {
+    data: tagData,
+    isLoading,
+    refetch: refetchTagData,
+  } = api.tag.getTagsBySlug.useQuery({
     slug: slug as string,
   });
+
+  const addTagMutation = api.tag.addTagToSlug.useMutation();
 
   const [query, setQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string>("");
@@ -52,21 +58,21 @@ const TagTab = () => {
     }
   );
 
+  useEffect(() => {
+    if (addTagMutation.isSuccess) {
+      setSelectedTag("");
+      refetchTagData();
+    }
+  }, [refetchTagData, addTagMutation.isSuccess]);
+
   return (
     <div className="">
-      <div className="flex gap-2">
+      <div className="my-2 flex gap-2">
         {isLoading ? (
           <div>Loading...</div>
         ) : (
           tagData?.map((tagEntry) => (
-            <div
-              key={tagEntry.tag.id}
-              style={{
-                backgroundColor: tagEntry.tag.color,
-                color: pickTextColorBasedOnBgColor(tagEntry.tag.color),
-              }}
-              className="rounded-md p-2"
-            >
+            <div key={tagEntry.tag.id} className="rounded-md border p-2 shadow">
               {tagEntry.tag.name}
             </div>
           ))
@@ -82,7 +88,7 @@ const TagTab = () => {
           nullable
         >
           <Combobox.Input
-            className={"h-full w-full px-2"}
+            className={"h-full w-full border px-2 shadow"}
             onChange={(event) => changeQuery(event.target.value)}
             autoComplete="off"
             placeholder="Search for tags..."
@@ -114,38 +120,30 @@ const TagTab = () => {
           </Combobox.Options>
         </Combobox>
 
-        <button className="flex-none rounded bg-indigo-500 p-2 text-white">
+        <button
+          className="flex-none rounded bg-indigo-500 p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => {
+            //check if tag exists
+            const tag = filteredTagOptions?.find(
+              (tag) => tag.name === selectedTag
+            );
+
+            // if tag doesnt exists, add tag to post
+            if (tag) {
+              addTagMutation.mutate({
+                slug: slug as string,
+                tagId: tag.id,
+              });
+            }
+          }}
+          disabled={addTagMutation.isLoading || !selectedTag}
+        >
+          {addTagMutation.isLoading && <Loading className="h-6 w-6 border-2" />}
           Add Tag
         </button>
       </div>
     </div>
   );
 };
-
-function pickTextColorBasedOnBgColor(bgColor: string) {
-  const lightColor = "#ffffff";
-  const darkColor = "#000000";
-
-  var color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;
-  var r = parseInt(color.substring(0, 2), 16); // hexToR
-  var g = parseInt(color.substring(2, 4), 16); // hexToG
-  var b = parseInt(color.substring(4, 6), 16); // hexToB
-  var uicolors = [r / 255, g / 255, b / 255];
-  var c = uicolors.map((col) => {
-    if (col <= 0.03928) {
-      return col / 12.92;
-    }
-    return Math.pow((col + 0.055) / 1.055, 2.4);
-  });
-
-  //check c[0] c[1] c[2]
-  // if they are undefined, return darkColor
-  if (c[0] === undefined || c[1] === undefined || c[2] === undefined) {
-    return darkColor;
-  }
-
-  var L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  return L > 0.179 ? darkColor : lightColor;
-}
 
 export default TagTab;
