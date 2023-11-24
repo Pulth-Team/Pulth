@@ -1,7 +1,7 @@
 import { Combobox, Listbox } from "@headlessui/react";
-import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import Loading from "../Loading";
 
@@ -12,16 +12,19 @@ const TagTab = () => {
 
   const {
     data: tagData,
-    isLoading,
+
+    isLoading: isTagDataLoading,
     refetch: refetchTagData,
   } = api.tag.getTagsBySlug.useQuery({
     slug: slug as string,
   });
 
   const addTagMutation = api.tag.addTagToSlug.useMutation();
+  const removeTagMutation = api.tag.removeTagFromSlug.useMutation();
 
   const [query, setQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [QuerySelectionTag, setQuerySelectionTag] = useState<string>("");
+  const [deleteTagId, setDeleteTagId] = useState<string>("");
 
   const [isInTimeout, setIsInTimeout] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -38,11 +41,9 @@ const TagTab = () => {
     const timeout = setTimeout(() => {
       setQuery(newQuery);
       setIsInTimeout(false);
-
       setTimeoutId(null);
       console.log("out of Timeout", isInTimeout);
     }, 500);
-
     setTimeoutId(timeout);
   };
 
@@ -60,31 +61,60 @@ const TagTab = () => {
 
   useEffect(() => {
     if (addTagMutation.isSuccess) {
-      setSelectedTag("");
+      setQuerySelectionTag("");
       refetchTagData();
     }
   }, [refetchTagData, addTagMutation.isSuccess]);
 
+  useEffect(() => {
+    if (removeTagMutation.isSuccess) {
+      setDeleteTagId("");
+      refetchTagData();
+    }
+  }, [refetchTagData, removeTagMutation.isSuccess]);
+
   return (
     <div className="">
       <div className="my-2 flex gap-2">
-        {isLoading ? (
-          <div>Loading...</div>
+        {isTagDataLoading ? (
+          <Loading className="h-6 w-6 border-2" />
         ) : (
           tagData?.map((tagEntry) => (
-            <div key={tagEntry.tag.id} className="rounded-md border p-2 shadow">
-              {tagEntry.tag.name}
-            </div>
+            <button
+              key={tagEntry.tag.id}
+              className="group flex items-center gap-2 rounded-md border-2 p-2 text-sm hover:border-gray-400 hover:bg-gray-100"
+              onClick={() => {
+                // call remove tag mutation
+                removeTagMutation.mutate({
+                  slug: slug as string,
+                  tagId: tagEntry.tag.id,
+                });
+
+                // set delete tag id
+                setDeleteTagId(tagEntry.tag.id);
+              }}
+            >
+              <p className="flex-shrink-0 flex-grow break-keep">
+                {tagEntry.tag.name}
+              </p>
+              <div className="rounded ">
+                {removeTagMutation.isLoading &&
+                deleteTagId == tagEntry.tag.id ? (
+                  <Loading className="h-6 w-6 border-2" />
+                ) : (
+                  <XMarkIcon className="h-6 w-6 stroke-gray-500 group-hover:stroke-gray-800" />
+                )}
+              </div>
+            </button>
           ))
         )}
       </div>
-
       <div className="flex gap-x-2">
         <Combobox
           as="div"
           className={"relative flex-grow"}
-          value={selectedTag}
-          onChange={setSelectedTag}
+          value={QuerySelectionTag}
+          onChange={setQuerySelectionTag}
           nullable
         >
           <Combobox.Input
@@ -119,13 +149,12 @@ const TagTab = () => {
             )}
           </Combobox.Options>
         </Combobox>
-
         <button
-          className="flex-none rounded bg-indigo-500 p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-non flex gap-2 rounded bg-indigo-500 p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => {
             //check if tag exists
             const tag = filteredTagOptions?.find(
-              (tag) => tag.name === selectedTag
+              (tag) => tag.name === QuerySelectionTag
             );
 
             // if tag doesnt exists, add tag to post
@@ -136,7 +165,7 @@ const TagTab = () => {
               });
             }
           }}
-          disabled={addTagMutation.isLoading || !selectedTag}
+          disabled={addTagMutation.isLoading || !QuerySelectionTag}
         >
           {addTagMutation.isLoading && <Loading className="h-6 w-6 border-2" />}
           Add Tag
