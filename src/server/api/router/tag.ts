@@ -40,12 +40,66 @@ export const tagRouter = createTRPCRouter({
           message: "Tag not found",
         });
 
-      // create tagsOnPosts
-      const tagsOnPosts = await prisma.tagsOnPosts.create({
-        data: {
+      //check if the tag is already assigned to the article
+      const tagsOnPosts = await prisma.tagsOnPosts.findFirst({
+        where: {
           articleId: article.id,
           tagId: tag.id,
+        },
+      });
+
+      // if the tag is already assigned to the article, return the tag
+      if (tagsOnPosts) return tagsOnPosts;
+
+      // if the tag is not assigned to the article, create the tag
+      const newTag = await prisma.tagsOnPosts.create({
+        data: {
+          tagId: tag.id,
+          articleId: article.id,
           assignedById: user.id,
+        },
+      });
+
+      return newTag;
+    }),
+
+  // remove a tag from an article
+  removeTagFromSlug: protectedProcedure
+    .input(z.object({ slug: z.string(), tagId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { prisma, session } = ctx;
+
+      // find the article
+      const article = await prisma.article.findUnique({
+        where: { slug: input.slug },
+        select: { id: true },
+      });
+
+      // check if the article exists
+      if (!article)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Article not found",
+        });
+
+      // find the tag
+      const tag = await prisma.tag.findUnique({
+        where: { id: input.tagId },
+        select: { id: true },
+      });
+
+      // check if the tag exists
+      if (!tag)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Tag not found",
+        });
+
+      // delete the tag
+      const tagsOnPosts = await prisma.tagsOnPosts.deleteMany({
+        where: {
+          articleId: article.id,
+          tagId: tag.id,
         },
       });
 
