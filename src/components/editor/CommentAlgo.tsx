@@ -112,8 +112,12 @@ const CommentAlgo: NextPage<{
           isActive: activity !== "none",
           activity,
           currentActiveCommentId,
-          isAuthed: authStatus === "authenticated",
+
+          AuthStatus: authStatus,
           user: authStatus === "authenticated" ? pureUser : undefined,
+
+          // AuthStatus: authStatus,
+          // user: authStatus === "authenticated" ? pureUser : undefined,
           articleId,
           revalidationStatus: (() => {
             if (!commentQuery.isFetching) return "success";
