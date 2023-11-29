@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import Loading from "../Loading";
+import CreateTagModal from "../Dialogs/CreateTagModal";
 
 const TagTab = () => {
   // get slug from url using useRouters
@@ -12,7 +13,6 @@ const TagTab = () => {
 
   const {
     data: tagData,
-
     isLoading: isTagDataLoading,
     refetch: refetchTagData,
   } = api.tag.getTagsBySlug.useQuery({
@@ -28,6 +28,7 @@ const TagTab = () => {
 
   const [isInTimeout, setIsInTimeout] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [createTagIsOpen, setCreateTagIsOpen] = useState(false);
 
   const changeQuery = (newQuery: string) => {
     // check if there is a timeout
@@ -63,8 +64,10 @@ const TagTab = () => {
     if (addTagMutation.isSuccess) {
       setQuerySelectionTag("");
       refetchTagData();
+    } else {
+      // TODO: Add Toast for error
     }
-  }, [refetchTagData, addTagMutation.isSuccess]);
+  }, [refetchTagData, addTagMutation.isSuccess, addTagMutation.error]);
 
   useEffect(() => {
     if (removeTagMutation.isSuccess) {
@@ -131,7 +134,18 @@ const TagTab = () => {
             {isSearchLoading ? (
               <Loading className="h-6 w-6 border-2" />
             ) : !filteredTagOptions || filteredTagOptions.length === 0 ? (
-              <div className="p-2">No results found</div>
+              <div className="flex items-center p-2">
+                <p> No results found.</p>
+                <button
+                  className="ml-2 rounded bg-indigo-500 p-2 text-white"
+                  onClick={() => {
+                    // open create tag modal
+                    setCreateTagIsOpen(true);
+                  }}
+                >
+                  Create Tag
+                </button>
+              </div>
             ) : (
               filteredTagOptions?.map((tag) => (
                 <Combobox.Option
@@ -170,6 +184,13 @@ const TagTab = () => {
           {addTagMutation.isLoading && <Loading className="h-6 w-6 border-2" />}
           Add Tag
         </button>
+
+        <CreateTagModal
+          isOpen={createTagIsOpen}
+          onClose={() => {
+            setCreateTagIsOpen(false);
+          }}
+        />
       </div>
     </div>
   );

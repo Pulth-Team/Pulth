@@ -48,8 +48,12 @@ export const tagRouter = createTRPCRouter({
         },
       });
 
-      // if the tag is already assigned to the article, return the tag
-      if (tagsOnPosts) return tagsOnPosts;
+      // if the tag is already assigned to the article, return an error
+      if (tagsOnPosts)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Tag is already assigned to the article",
+        });
 
       // if the tag is not assigned to the article, create the tag
       const newTag = await prisma.tagsOnPosts.create({
@@ -262,5 +266,21 @@ export const tagRouter = createTRPCRouter({
       });
 
       return articlesInTag;
+    }),
+
+  createTag: protectedProcedure
+    .input(z.object({ name: z.string(), slug: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { prisma } = ctx;
+
+      // create the tag
+      const tag = await prisma.tag.create({
+        data: {
+          name: input.name,
+          slug: input.slug,
+        },
+      });
+
+      return tag;
     }),
 });

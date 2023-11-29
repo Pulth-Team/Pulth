@@ -130,9 +130,10 @@ model Comment {
 }
 
 model Tag {
-    id       String        @id @default(auto()) @map("_id") @db.ObjectId
-    name     String        @unique
-    slug     String        @unique
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String @unique
+    slug String @unique
+
     articles TagsOnPosts[]
 }
 
