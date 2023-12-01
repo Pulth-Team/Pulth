@@ -92,14 +92,14 @@ const CommentAdd = ({
         {/* next-image with fill and square layout */}
         <div className="relative h-8 w-8 flex-shrink-0">
           <Image
-            src={user.image || "/default_profile.jpg"}
+            src={user!.image || "/default_profile.jpg"}
             alt="Current User's photo"
             layout="fill"
             className="absolute rounded-full"
           />
         </div>
         <div className="group flex flex-grow flex-col gap-1 ">
-          <div className="font-semibold leading-5">{user.name}</div>
+          <div className="font-semibold leading-5">{user!.name}</div>
           <textarea
             className="w-full resize-none overflow-y-hidden rounded-md border-2 border-gray-200 bg-[#fafafa] px-2 py-1 outline-gray-300"
             ref={textAreaRef}
