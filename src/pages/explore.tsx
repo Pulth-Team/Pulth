@@ -7,17 +7,23 @@ import { useSession } from "next-auth/react";
 
 import DragScrollContainer from "~/components/DragScrollContainer";
 import ArticleCard from "~/components/ArticleCard";
-import DashboardLayout from "~/components/layouts/gridDashboard";
-import Tour from "../components/Tour";
+import DashboardLayout from "~/components/layouts";
+
+import dynamic from "next/dynamic";
+const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
 const Explore: NextPage = () => {
   const { data } = useSession();
   const user = data?.user;
 
-  const { data: articles, isLoading } = api.article.getLatest.useQuery({
-    limit: 10,
-    skip: 0,
-  });
+  const { data: latestArticles, isLoading: isLatestLoading } =
+    api.article.getLatest.useQuery({
+      limit: 10,
+      skip: 0,
+    });
+
+  const { data: followedArticles } =
+    api.followSystem.getRecentActivity.useQuery();
 
   return (
     <DashboardLayout>
@@ -37,10 +43,10 @@ const Explore: NextPage = () => {
         </h1>
         <div className="flex flex-col gap-y-5">
           <p className="px-5 text-2xl font-semibold md:px-0">
-            {user ? "Selected for you..." : "Recent articles"}
+            Populer in Pulth
           </p>
           <DragScrollContainer id="recom-scroll">
-            {isLoading
+            {isLatestLoading
               ? [0, 1, 2, 3].map((val, index) => (
                   <div
                     className={`flex min-w-[256px] max-w-xs flex-shrink-0 animate-pulse flex-col gap-y-1 rounded-xl bg-gray-100 p-4`}
@@ -70,7 +76,7 @@ const Explore: NextPage = () => {
                     </div>
                   </div>
                 ))
-              : articles?.map((article) => (
+              : latestArticles?.map((article) => (
                   <ArticleCard
                     Title={article.title}
                     // Topics={article.topics}
@@ -88,46 +94,83 @@ const Explore: NextPage = () => {
                     {article.description}
                   </ArticleCard>
                 ))}
-
-            {/* <ArticleCard
-              Title="Next.js Auth Errors"
-              Topics={["Javascript", "Web", "React"]}
-              Author={{ Title: "Web Architect", Name: "Bekir Gulestan" }}
-              isRecommended={true}
-            >
-              Some article made for explaining Next Auth Errors deeply. That
-              cover nearly 4 (Four) error which is nearly all(102) of them.
-            </ArticleCard> */}
           </DragScrollContainer>
 
+          {followedArticles?.length === 0 || typeof user === "undefined" ? (
+            ""
+          ) : (
+            <>
+              <p className="px-5 text-2xl font-semibold md:px-0">
+                Recent articles from your follows
+              </p>
+              <DragScrollContainer>
+                {followedArticles?.map((article) => (
+                  <ArticleCard
+                    Title={article.title}
+                    createdAt={article.createdAt}
+                    isRecommended={false}
+                    slug={article.slug}
+                    Author={{
+                      Name: article.author.name!,
+                      Image: article.author.image!,
+                      UserId: article.author.id,
+                    }}
+                    //
+                    key={article.slug}
+                  >
+                    {article.description}
+                  </ArticleCard>
+                ))}
+              </DragScrollContainer>
+            </>
+          )}
           <Tour
             className="w-96"
             start={"redirect"}
-            onFinished={(e, message) => {
-              if (e === "error") console.error(message);
-            }}
+            redirect="/profile"
             tours={[
               {
-                targetQuery: "#recom-scroll",
                 message:
                   'This is a article recommendation for you. You can click "Go to Article" button to read the article.',
-                className: "my-2",
-                direction: "bottom",
+                default: {
+                  direction: "bottom",
+                  align: "center",
+                  targetQuery: "#recom-scroll",
+                  className: "my-2",
+                },
               },
               {
-                targetQuery: "#current-account-box",
-                message: "This is your current account's informations.",
-                direction: "top",
-                align: "center",
-                className: "-translate-y-2 w-64",
+                message:
+                  "This is your current account. you can click to it. It will open a menu. You can view your profile, settings and logout from there.",
+
+                default: {
+                  // targetQuery: "#current-account-box",
+                  targetQuery: "#mobile-account-box",
+                  direction: "bottom",
+                  align: "end",
+                  className: "w-64 mt-2",
+                },
+
+                mediaQueries: [
+                  {
+                    targetQuery: "#current-account-box",
+                    taildwindQuery: "md",
+                    direction: "right",
+                    align: "end",
+                    className: "ml-2 -translate-y-2",
+                  },
+                ],
               },
               {
-                targetQuery: "#view-profile-btn",
                 message: "You can view your profile by clicking this button.",
-                direction: "right",
-                align: "end",
-                className: "translate-y-2 w-64",
-                redirect: `/user/${user?.id}`,
+
+                showOn: ["md", "lg", "xl", "2xl"],
+                default: {
+                  targetQuery: "#view-profile-btn",
+                  direction: "right",
+                  align: "end",
+                  className: "translate-y-2 w-64",
+                },
               },
             ]}
           />

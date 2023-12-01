@@ -48,6 +48,7 @@ export default function Editor({
         holder: elmtRef.current,
         onChange: OnChange ?? (() => {}),
         onReady: OnInit ?? (() => {}),
+        placeholder: "Start writing your article here...",
       });
       await editorRef.current.isReady.then(() => {
         console.log("Editor.js is ready to work!");

@@ -14,7 +14,7 @@ import ArticleError from "~/components/responses/ArticleError";
 import Loading from "~/components/Loading";
 import EditorTopbar from "~/components/editor/EditorTopbar";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 
 // load editor only on client side
 import { useSession } from "next-auth/react";
@@ -100,10 +100,12 @@ const Articles: NextPage<
 
         break;
       case "undo-changes":
+        // TODO: Add a confirmation dialog
+        // TODO: Add a loading state
+        // TODO: Find Some way to show the user that the changes have been undone
+        // TODO: Find some better way to do this instead of reloading the page
         undoChangesArticleMutation.mutate(slug as string, {
           onSuccess: (data) => {
-            // setDraftBodyData(data.bodyData);
-            // setEditorData(data.bodyData);
             router.reload();
           },
         });

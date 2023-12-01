@@ -1,17 +1,8 @@
 import type { NextPage } from "next";
+import DashboardLayout from "~/components/layouts";
 
 import Head from "next/head";
-import Link from "next/link";
-
 import { useSession } from "next-auth/react";
-
-import DashboardLayout from "~/components/layouts/gridDashboard";
-
-// load editor only on client side
-import dynamic from "next/dynamic";
-const Editor = dynamic(() => import("~/components/editor/Editor"), {
-  ssr: false,
-});
 
 const Articles: NextPage = () => {
   const { data } = useSession();
@@ -32,7 +23,7 @@ const Articles: NextPage = () => {
       <div className="flex gap-2 ">
         {art.map((a, index) => (
           <div
-            className="w-32 h-32 flex-shrink-0 bg-gray-100"
+            className="h-32 w-32 flex-shrink-0 bg-gray-100"
             key={index}
           ></div>
         ))}

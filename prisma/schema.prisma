@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -56,6 +53,14 @@ model User {
     ratedComments   Comment[] @relation("RatedUser", fields: [ratedCommentsId], references: [id])
     images          Image[]
     votedTo         VotedBy[] @relation("ArticleVotes")
+
+    // list of users that follow this user
+    followers Follow[] @relation("Follower")
+    // list of users that this user follows
+    following Follow[] @relation("Following")
+
+    // list of tags this user is assigned
+    assignedTags TagsOnPosts[]
 }
 
 model VerificationToken {
@@ -93,6 +98,7 @@ model Article {
     votes VotedBy[] @relation("ArticleVotes")
 
     Comments Comment[]
+    tags     TagsOnPosts[]
 }
 
 // recursive comment Model
@@ -123,6 +129,31 @@ model Comment {
     updatedAt DateTime @updatedAt
 }
 
+model Tag {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String @unique
+    slug String @unique
+
+    articles TagsOnPosts[]
+}
+
+model TagsOnPosts {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    article   Article @relation(fields: [articleId], references: [id])
+    articleId String  @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+
+    tag   Tag    @relation(fields: [tagId], references: [id])
+    tagId String @db.ObjectId // relation scalar field (used in the `@relation` attribute above)
+
+    // the user that assigned the tag to the post
+    assignedAt   DateTime @default(now())
+    assignedById String   @db.ObjectId
+    assignedBy   User     @relation(fields: [assignedById], references: [id])
+
+    @@unique([articleId, tagId])
+}
+
 model Image {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
@@ -143,4 +174,17 @@ model VotedBy {
     article   Article @relation("ArticleVotes", fields: [articleId], references: [id], onDelete: Cascade)
 
     upVote Boolean
+}
+
+model Follow {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    followerId  String @db.ObjectId
+    follower    User   @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+    followingId String @db.ObjectId
+    following   User   @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([followerId, followingId])
 }

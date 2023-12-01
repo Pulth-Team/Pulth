@@ -7,9 +7,12 @@ module.exports = {
       spacing: {
         "safe-area": "env(safe-area-inset)",
       },
+      minHeight: {
+        "content-area": "calc(100vh - 56px)",
+      },
 
       gridTemplateColumns: {
-        "dashboard-desktop": "288px 1fr",
+        "dashboard-desktop": "clamp(256px,20vw,288px) 1fr",
         "dashboard-mobile": "56px 1fr",
       },
       gridTemplateRows: {

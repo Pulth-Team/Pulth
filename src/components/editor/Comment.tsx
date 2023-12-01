@@ -29,7 +29,6 @@ const Comment: NextPage<{
     activity,
     setActivity,
     currentActiveCommentId,
-    articleId,
     isAuthed,
     requestDelete,
     user,
@@ -45,7 +44,7 @@ const Comment: NextPage<{
   const isEditing = isItThisComment && activity === "edit";
   const isReplying = isItThisComment && activity === "reply";
 
-  const amITheAuthor = comment.author.id === user.id;
+  const amITheAuthor = user && comment.author.id === user.id;
 
   useEffect(() => {
     // doesnt look smooth
@@ -111,15 +110,15 @@ const Comment: NextPage<{
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
           <button
             onClick={() => {
-              if (isAuthed)
-                if (isReplying) setActivity({ isActive: false });
-                else
-                  setActivity({
-                    isActive: true,
-                    id: comment.id,
-                    activity: "reply",
-                  });
-              else signIn();
+              if (!isAuthed) return signIn();
+
+              if (isReplying) setActivity({ isActive: false });
+              else
+                setActivity({
+                  isActive: true,
+                  id: comment.id,
+                  activity: "reply",
+                });
             }}
           >
             {depth < 3 && (
@@ -147,25 +146,12 @@ const Comment: NextPage<{
 
           <button
             onClick={() => {
-              // If its already editing, then cancel editing
-              if (isEditing) setActivity({ isActive: false });
-              // else set it to editing
-              else
-                setActivity({
-                  isActive: true,
-                  id: comment.id,
-                  activity: "edit",
-                });
+              // send delete request ro parent CommentAlgo component
+              requestDelete(comment.id);
             }}
           >
             {amITheAuthor && (
-              <TrashIcon
-                className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline"
-                onClick={() => {
-                  // send delete request ro parent CommentAlgo component
-                  requestDelete(comment.id);
-                }}
-              />
+              <TrashIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
             )}
           </button>
         </div>
@@ -245,29 +231,7 @@ const Comment: NextPage<{
           (comment.children.length > 0 || isReplying) && "border-l-4 pt-4"
         )}
       >
-        {isReplying && isAuthed && (
-          <CommentAdd
-            user={{
-              name: user.name as string,
-              image: user.image || "/default_profile.jpg",
-            }}
-            OnComment={({ content }) => {
-              addCommentMutation.mutate({
-                content,
-                parentId: comment.id,
-                articleId,
-              });
-            }}
-            collapsable={false}
-            OnCancel={() => {
-              // set it to not doing anything
-              setActivity({ isActive: false });
-            }}
-            isLoading={
-              addCommentMutation.isLoading || revalidationStatus === "loading"
-            }
-          />
-        )}
+        {isReplying && isAuthed && <CommentAdd collapsable={false} />}
 
         {comment.children.map((child) => {
           return (

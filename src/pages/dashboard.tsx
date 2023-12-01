@@ -1,19 +1,14 @@
 import type { NextPage } from "next";
 
 import Head from "next/head";
-import Link from "next/link";
 
 import dynamic from "next/dynamic";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
-import { useSession } from "next-auth/react";
-
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 import { useState } from "react";
 
 const Dashboard: NextPage = () => {
-  const { data } = useSession();
-
   const [tour, setTour] = useState(false);
 
   const showTour = () => {
@@ -31,34 +26,45 @@ const Dashboard: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="p-4">
+      <div className="px-4">
         <button onClick={showTour}>start Tour</button>
         <br />
         <Tour
           start={tour}
-          onClosed={() => {
-            setTour(false);
-          }}
-          className="mx-4 my-2 w-64"
+          className="w-64"
+          redirect="/explore"
           tours={[
             {
-              targetQuery: "#search-button",
               message: "This is the dashboard. You can see your overall stats",
-              align: "end",
+              default: {
+                direction: "top",
+                align: "start",
+                targetQuery: "#dashboard-menu-item",
+                className: "-translate-y-2",
+              },
+              mediaQueries: [
+                {
+                  taildwindQuery: "md",
+                  direction: "right",
+                  align: "start",
+                  className: "ml-4",
+                },
+              ],
             },
             {
-              targetQuery: "#dashboard-menu-item",
-              direction: "right",
-              align: "start",
-              message: "This is the dashboard. You can see your overall stats",
-              skip: true,
-            },
-            {
-              targetQuery: "#explore-menu-item",
-              direction: "right",
-              align: "start",
               message: "This is the explore page. Let's go there !",
-              redirect: "/explore",
+              default: {
+                direction: "top",
+                align: "center",
+                targetQuery: "#explore-menu-item",
+              },
+              mediaQueries: [
+                {
+                  taildwindQuery: "md",
+                  direction: "right",
+                  align: "center",
+                },
+              ],
             },
           ]}
           onFinished={(e, message) => {

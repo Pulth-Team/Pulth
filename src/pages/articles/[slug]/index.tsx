@@ -19,9 +19,9 @@ import {
 
 import { api } from "~/utils/api";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
+
 import DocumentRenderer from "~/components/editor/renderer/DocumentRenderer";
-import CommentAdd, { AddCommentData } from "~/components/editor/addComment";
 import CommentAlgo from "~/components/editor/CommentAlgo";
 import Loading from "~/components/Loading";
 
@@ -41,43 +41,62 @@ const Articles: NextPage = () => {
   const { slug } = router.query;
 
   // query to get the article data
-  const articleData = api.article.getBySlug.useQuery((slug as string) || "");
+  const articleData = api.article.getBySlug.useQuery((slug as string) || "", {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+  });
+
+  const isArticleExists = articleData.data?.id !== undefined;
+
   //query to get the comment data
-  const commentData = api.comment.getBySlug.useQuery((slug as string) || "");
+  const commentData = api.comment.getCountBySlug.useQuery(slug as string, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+  });
 
   // query to get the vote rank
-  const voteRankQuery = api.vote.getVoteRankByArticleId.useQuery(
-    articleData.data?.id as string,
+  const voteRankQuery = api.vote.getVoteRankBySlug.useQuery(slug as string, {
+    enabled: isArticleExists,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const tagQuery = api.tag.getTagsBySlug.useQuery(
+    { slug: slug as string },
     {
-      enabled: articleData.data?.id !== null,
+      enabled: isArticleExists,
+      refetchIntervalInBackground: false,
+      refetchInterval: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     }
   );
-
-  // mutation to add a vote
-  const voteAddMutation = api.vote.voteByArticleId.useMutation();
 
   // query to get my vote automatically
   const myVoteQuery = api.vote.checkMyVoteByArticleId.useQuery(
     articleData.data?.id as string,
     {
-      enabled: authStatus === "authenticated" && articleData.data?.id !== null,
+      enabled: authStatus === "authenticated" && isArticleExists,
+      refetchIntervalInBackground: false,
+      refetchInterval: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     }
   );
 
-  // mutation to add a comment
-  const commentAddMutation = api.comment.create.useMutation();
-
-  const OnCommentAdd = (comment: AddCommentData) => {
-    // TODO: open a modal  for the comment
-    commentAddMutation.mutateAsync({
-      articleId: articleData.data?.id as string,
-      content: comment.content,
-      parentId: comment.parent,
-    });
-    // .then(() => {
-    //   commentData.refetch();
-    // });
-  };
+  // mutation to add a vote
+  const voteAddMutation = api.vote.voteByArticleId.useMutation();
 
   let userImage = userData?.user?.image;
   if (userImage === null) userImage = "/default_profile.jpg";
@@ -93,7 +112,7 @@ const Articles: NextPage = () => {
 
   let body = (
     <>
-      {!articleData.data?.id && (
+      {!isArticleExists && (
         <div>
           <p className="mb-4">
             Article not found. Maybe it&apos;s been deleted by the author.
@@ -110,44 +129,51 @@ const Articles: NextPage = () => {
 
       {RenderedDocument}
 
+      {/* Tags */}
+      {isArticleExists && tagQuery.isSuccess && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tagQuery.data.map((tagEntry) => (
+            <Link
+              key={tagEntry.tag.id}
+              href={{
+                pathname: `/tags/[tagId]`,
+                query: { tagId: tagEntry.tag.slug },
+              }}
+              className="rounded-md border-2 border-indigo-500 border-opacity-70 p-2 text-sm text-indigo-500 hover:bg-indigo-500 hover:bg-opacity-20 "
+            >
+              {tagEntry.tag.name}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Rank and action buttons */}
-      {articleData.data?.id && (
+      {isArticleExists && (
         <div className="mb-6 mt-8 flex flex-row  justify-between">
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <SparklesIcon className="h-6 w-6 text-black" />
-              {/* 
-              TODO: 
-                Loading icon is glithing but good enough for now
-                to Reproduce the glitch:
-                  1. go to an article
-                  2. minimize the window / go to another app
-                  3. come back to the article
-                  4. the loading icon will glitch
-                  - loading will show up then show the vote 
-                  - then loading will show up again and then show the vote
-                  - this will happen only once
 
-
-                  !voteRankQuery.isFetching &&
-                  !voteAddMutation.isLoading &&
-                  voteRankQuery.isSuccess 
-
-                  voteRankQuery.isSuccess this condition is might be removed
-              */}
-
-              {!voteRankQuery.isFetching && !voteAddMutation.isLoading ? (
-                voteRankQuery.data
-              ) : (
+              {voteAddMutation.isLoading ? (
                 <Loading className="h-6 w-6 border-2" />
+              ) : (
+                voteRankQuery.isSuccess &&
+                (voteRankQuery.data instanceof Error ? (
+                  <p className="text-black">{voteRankQuery.data.message}</p>
+                ) : (
+                  <p className="text-black">{voteRankQuery.data}</p>
+                ))
               )}
             </div>
             <button
+              disabled={voteAddMutation.isLoading}
               onClick={() => {
                 if (authStatus !== "authenticated") {
                   signIn();
                   return;
                 } else {
+                  // return if the mutation is already loading
+                  if (voteAddMutation.isLoading) return;
                   // FIXME: we might consider remove async mutation here
                   voteAddMutation
                     .mutateAsync({
@@ -160,21 +186,25 @@ const Articles: NextPage = () => {
                     });
                 }
               }}
+              className="group"
             >
               <ChevronUpIcon
-                className={`h-8 w-8 p-1 ${
+                className={`h-8 w-8 rounded-full p-1  ${
                   myVoteQuery.data?.voteDirection === "up"
-                    ? " rounded-full bg-gray-200 text-indigo-500"
-                    : " text-black"
+                    ? " bg-gray-200 text-indigo-500"
+                    : " text-black hover:bg-gray-100 group-disabled:bg-white"
                 }`}
               />
             </button>
             <button
+              disabled={voteAddMutation.isLoading}
               onClick={() => {
                 if (authStatus !== "authenticated") {
                   signIn();
                   return;
                 } else {
+                  // return if the mutation is already loading
+                  if (voteAddMutation.isLoading) return;
                   // FIXME: we might consider remove async mutation here
                   voteAddMutation
                     .mutateAsync({
@@ -187,12 +217,13 @@ const Articles: NextPage = () => {
                     });
                 }
               }}
+              className="group"
             >
               <ChevronDownIcon
-                className={`h-8 w-8 p-1 ${
+                className={`h-8 w-8 rounded-full p-1 ${
                   myVoteQuery.data?.voteDirection === "down"
-                    ? "rounded-full bg-gray-200 text-indigo-500"
-                    : " text-black"
+                    ? "bg-gray-200 text-indigo-500 "
+                    : " text-black hover:bg-gray-100 group-disabled:bg-white"
                 }`}
               />
             </button>
@@ -207,7 +238,7 @@ const Articles: NextPage = () => {
       )}
 
       {/* About the author */}
-      {articleData.data?.author && (
+      {isArticleExists && articleData.data?.author && (
         <div className="mt-4 flex items-center justify-between md:px-4">
           <div className="flex items-center gap-x-3">
             <div className="relative h-12 w-12 ">
@@ -252,7 +283,7 @@ const Articles: NextPage = () => {
       )}
 
       {/* Comments should have a separate api */}
-      {commentData.data?.rootCommentsCount !== 0 && (
+      {isArticleExists && (
         <div className="py-4">
           <p className="text-lg font-semibold">
             <span className="font-medium">
@@ -261,39 +292,11 @@ const Articles: NextPage = () => {
             Comments
           </p>
           <hr className="mb-2" />
-          <div className="flex flex-col ">
-            {authStatus == "authenticated" ? (
-              <CommentAdd
-                user={{
-                  name: userData?.user?.name as string,
-                  image: userImage || "default_profile.jpg",
-                }}
-                OnComment={OnCommentAdd}
-                isLoading={commentAddMutation.isLoading}
-                collapsable={true}
-              />
-            ) : (
-              <button
-                className="flex items-center justify-center rounded-lg bg-gray-600 py-4 text-white"
-                onClick={() => signIn()}
-              >
-                Login to comment
-              </button>
-            )}
 
-            <hr className="my-2" />
-
-            <CommentAlgo
-              user={{
-                id: userData?.user?.id as string,
-                name: userData?.user?.name as string,
-                image: userImage || "/default_profile.jpg",
-              }}
-              isAuthed={authStatus == "authenticated"}
-              articleId={articleData.data?.id as string}
-              slug={slug as string}
-            />
-          </div>
+          <CommentAlgo
+            articleId={articleData.data?.id as string}
+            slug={slug as string}
+          />
         </div>
       )}
     </>
@@ -340,9 +343,30 @@ export async function getStaticProps(
 
   // prefetch `article.getBySlug`
   const articleBySlug = helpers.article.getBySlug.prefetch(slug);
+
+  //prefetch `comment.getCountBySlug`
+  const commentCountBySlug = helpers.comment.getCountBySlug.prefetch(slug);
+
+  // prefetch `vote.getVoteRankByArticleId`
+  const voteRank = helpers.vote.getVoteRankBySlug.prefetch(slug);
+
+  // prefetch `comment.getBySlug`
   const commentBySlug = helpers.comment.getBySlug.prefetch(slug);
 
-  await Promise.all([articleBySlug, commentBySlug]);
+  // prefetch `Tags`
+  const tagInfo = helpers.tag.getTagsBySlug.prefetch({ slug });
+
+  // prefetch `vote.checkMyVoteByArticleId`
+  const myVote = helpers.vote.checkMyVoteBySlug.prefetch(slug);
+
+  await Promise.all([
+    commentCountBySlug,
+    articleBySlug,
+    commentBySlug,
+    tagInfo,
+    voteRank,
+    myVote,
+  ]);
 
   return {
     props: {

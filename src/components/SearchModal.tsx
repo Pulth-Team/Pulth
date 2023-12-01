@@ -1,10 +1,15 @@
-import { Dispatch, Fragment, SetStateAction } from "react";
+import React, { Children, Dispatch, Fragment, SetStateAction } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 
 import algoliasearch from "algoliasearch/lite";
-import { Hits, InstantSearch } from "react-instantsearch";
+import {
+  Hits,
+  InstantSearch,
+  Configure,
+  useInstantSearch,
+} from "react-instantsearch";
 
 import CustomSearchBox from "./CustomSearchBox";
 import { env } from "~/env.mjs";
@@ -13,6 +18,28 @@ interface searchModalProps {
   isOpen: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
+
+interface NoResultsBoundaryProps {
+  children: React.ReactNode;
+  fallback: React.ReactNode;
+}
+
+const NoResultsBoundary = ({ children, fallback }: NoResultsBoundaryProps) => {
+  const { results } = useInstantSearch();
+
+  // The `__isArtificial` flag makes sure not to display the No Results message
+  // when no hits have been returned.
+  if (!results.__isArtificial && results.nbHits === 0) {
+    return (
+      <>
+        {fallback}
+        <div hidden>{children}</div>
+      </>
+    );
+  }
+
+  return children;
+};
 
 const SearchModal = ({ isOpen, setOpen }: searchModalProps) => {
   const searchClient = algoliasearch(
@@ -56,7 +83,16 @@ const SearchModal = ({ isOpen, setOpen }: searchModalProps) => {
                   indexName={env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME}
                 >
                   <CustomSearchBox />
-                  <Hits hitComponent={Hit} />
+                  <NoResultsBoundary
+                    fallback={
+                      <div className="text-left text-white">
+                        No results have been found
+                      </div>
+                    }
+                  >
+                    <Hits hitComponent={Hit} />
+                  </NoResultsBoundary>
+                  <Configure hitsPerPage={5} />
                 </InstantSearch>
               </Dialog.Panel>
             </Transition.Child>

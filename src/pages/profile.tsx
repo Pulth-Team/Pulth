@@ -20,8 +20,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 import Loading from "~/components/Loading";
-import DashboardLayout from "~/components/layouts/gridDashboard";
-import MyArticleCard from "~/components/editor/MyArticleCard";
+import DashboardLayout from "~/components/layouts";
+import MyArticleCard from "~/components/MyArticleCard";
 import Trpc from "./api/trpc/[trpc]";
 import { Protocol } from "@aws-sdk/client-s3";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
@@ -169,12 +169,13 @@ const Articles: NextPage = () => {
                 <button
                   onClick={() => setIsOpen(true)}
                   className="flex h-12 items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                  id="create-article-button"
                 >
                   New Article
                   <PlusIcon className="h-6 w-6" />
                 </button>
 
-                <Popover className="relative">
+                <Popover className="relative" id="filter-button">
                   <Popover.Button>
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 ">
                       <AdjustmentsHorizontalIcon className="h-6 w-6" />
@@ -470,6 +471,7 @@ const Articles: NextPage = () => {
                             maxLength={100}
                             minLength={12}
                             required
+                            autoComplete="off"
                             // aria fields for accessibility
                             aria-invalid={
                               dialogTitle.length < 12 ||
@@ -605,12 +607,25 @@ const Articles: NextPage = () => {
         }}
         tours={[
           {
-            targetQuery: "#create-article-button",
             message:
-              "Click here to create a new article. You can also create a new article by clicking the 'New Article' button in the top right corner.",
-            direction: "bottom",
-            align: "start",
-            className: "my-5",
+              "You can click here to create article. A small dialog will appear where you can enter the title and description of your article.",
+
+            default: {
+              align: "end",
+              direction: "bottom",
+              targetQuery: "#create-article-button",
+              className: "mt-2 w-80",
+            },
+          },
+          {
+            message:
+              "You can filter your articles by clicking here. You can filter by order, date range and published status.",
+            default: {
+              align: "end",
+              direction: "bottom",
+              targetQuery: "#filter-button",
+              className: "mt-2 w-80",
+            },
           },
         ]}
       />

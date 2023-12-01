@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 
-import DashboardLayout from "~/components/layouts/gridDashboard";
+import DashboardLayout from "~/components/layouts";
 
 const Courses: NextPage = () => {
   const { data } = useSession();
