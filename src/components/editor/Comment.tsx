@@ -29,8 +29,8 @@ const Comment: NextPage<{
     activity,
     setActivity,
     currentActiveCommentId,
-    isAuthed,
     requestDelete,
+    AuthStatus,
     user,
     revalidate,
     revalidationStatus,
@@ -110,7 +110,7 @@ const Comment: NextPage<{
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
           <button
             onClick={() => {
-              if (!isAuthed) return signIn();
+              if (AuthStatus != "authenticated") return signIn();
 
               if (isReplying) setActivity({ isActive: false });
               else
@@ -231,7 +231,9 @@ const Comment: NextPage<{
           (comment.children.length > 0 || isReplying) && "border-l-4 pt-4"
         )}
       >
-        {isReplying && isAuthed && <CommentAdd collapsable={false} />}
+        {isReplying && AuthStatus == "authenticated" && (
+          <CommentAdd collapsable={false} />
+        )}
 
         {comment.children.map((child) => {
           return (
