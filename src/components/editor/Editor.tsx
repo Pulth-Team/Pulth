@@ -99,9 +99,11 @@ const editorTools = {
             method: "POST",
             body: fm,
           })
-            .then((res) => {
-              console.log(res);
-              return res.json();
+            .then(async (res) => {
+              const textData = await res.text();
+
+              console.log("Pure Text Data of upload Data", textData);
+              return JSON.parse(textData);
             })
             .then((res) => {
               console.log(res);

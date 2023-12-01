@@ -17,46 +17,76 @@ const s3config = {
 const UploadImage = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(req, res, nextAuthOptions);
 
+  if (req.method !== "POST") {
+    return res.send({
+      error: "Only POST requests are allowed.",
+    });
+  }
+
   if (!session) {
     return res.send({
       error: "You must be signed in to upload an image to the server.",
     });
   }
-  const form = formidable();
-
-  form.parse(req, async (err, fields, files) => {
-    if (!files.imageFile) {
-      return res.send({
-        error: "No file was provided.",
-      });
-    }
-
-    let file: formidable.File = Array.isArray(files.imageFile)
-      ? (files.imageFile[0] as formidable.File)
-      : files.imageFile;
-    const client = new S3Client(s3config);
-
-    const putObjectResponse = await client
-      .send(
-        new PutObjectCommand({
-          Bucket: env.AWS_S3_BUCKET,
-          Key: session.user?.id + "/" + file.newFilename,
-          ACL: "public-read",
-          Body: fs.createReadStream(file.filepath),
-        })
-      )
-      .catch((err) => {
-        console.log(err);
-        return res.send({
-          error: "There was an error uploading the file.",
-        });
-      });
-    return res.send({
-      url: `https://cdn.pulth.com/${session.user?.id + "/" + file.newFilename}`,
-    });
+  const form = formidable({
+    maxFileSize: 10 * 1024 * 1024, // 10 MB
+    keepExtensions: true,
+    multiples: false,
   });
 
-  // res.send({ hi: "hi" });
+  const parseResult: Error | formidable.File = await new Promise<
+    Error | formidable.File
+  >((resolve, reject) => {
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (!files.imageFile) {
+        return reject(new Error("No file was provided."));
+      }
+
+      let file: formidable.File = Array.isArray(files.imageFile)
+        ? (files.imageFile[0] as formidable.File)
+        : files.imageFile;
+
+      return resolve(file);
+    });
+  }).catch((err) => {
+    return err;
+  });
+
+  if (parseResult instanceof Error) {
+    return res.send({
+      error: "There was an error uploading the file.",
+      errorValue: parseResult,
+    });
+  }
+
+  const s3Client = new S3Client(s3config);
+
+  const putObjectResponse = await s3Client
+    .send(
+      new PutObjectCommand({
+        Bucket: env.AWS_S3_BUCKET,
+        Key: session.user?.id + "/" + parseResult.newFilename,
+        ACL: "public-read",
+        Body: fs.createReadStream(parseResult.filepath),
+      })
+    )
+    .catch((err) => {
+      console.log(err);
+      return res.send({
+        error: "There was an error uploading the file.",
+        errorValue: err,
+      });
+    });
+
+  return res.send({
+    url: `https://cdn.pulth.com/${
+      session.user?.id + "/" + parseResult.newFilename
+    }`,
+  });
 };
 
 export default UploadImage;
