@@ -21,6 +21,9 @@ const Home: NextPage<{ providers: Provider[] }> = ({ providers }) => {
 
   return (
     <div>
+      <Head>
+        <title>Login - PulthApp</title>
+      </Head>
       <nav className="fixed flex h-14 w-screen items-center gap-2 bg-gray-800 px-4 md:gap-4 md:px-6">
         <span className="mr-auto text-xl font-bold text-indigo-500">
           PulthApp
