@@ -116,8 +116,9 @@ const ArticleCard: NextPage<
           }}
           className="flex items-center rounded-lg bg-indigo-500 p-2"
         >
-          <p className="text-white">Go to Article</p>
-          <ArrowRightCircleIcon className="w-6 self-stretch stroke-white" />
+          <p className="mr-1 text-white">Read </p>
+          {/* <p className="mr-1 text-white">View </p> */}
+          <ArrowRightCircleIcon className=" w-6 self-stretch stroke-white" />
         </Link>
       </div>
     </div>
