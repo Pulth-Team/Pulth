@@ -15,6 +15,7 @@ import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -173,6 +174,9 @@ const Inspect: NextPage = () => {
 
   return (
     <Dashboard>
+      <Head>
+        <title>{articleInfo.data?.title}</title>
+      </Head>
       {articleInfo.isLoading ? (
         <div className="flex h-full w-full justify-center">
           <Loading className="my-auto h-20 w-20 border-4" />
