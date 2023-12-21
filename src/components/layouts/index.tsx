@@ -16,10 +16,9 @@ import { useSession } from "next-auth/react";
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import MobileAccountBox from "./components/MobileAccountBox";
-import Search from "./components/Search";
 import { useRouter } from "next/router";
 import AccountBox from "./components/AccountBox";
+import Topbar from "./Topbar";
 
 type DashboardProps = {
   children: ReactNode;
@@ -71,30 +70,7 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
 
   return (
     <div className=" bg-gray-800">
-      <header className="fixed inset-x-0 z-10 flex justify-between bg-gray-800 p-2">
-        <Link href="/" className="px-2 py-1">
-          <span className="text-xl font-bold text-indigo-500">PulthApp</span>
-        </Link>
-
-        <div className="ml-auto flex items-center gap-2">
-          {userStatus !== "authenticated" && (
-            <Link href="/api/auth/signin">
-              <button className="flex rounded-md bg-gray-700 p-2 md:hidden">
-                <p className="flex items-center justify-center text-center font-semibold text-gray-200 ">
-                  Login
-                </p>
-              </button>
-            </Link>
-          )}
-          <Search />
-          {userStatus == "authenticated" && (
-            <MobileAccountBox
-              image={userData?.user?.image ?? "/default_profile.jpg"}
-            />
-          )}
-        </div>
-      </header>
-
+      <Topbar inLayout />
       <div className="flex min-h-[calc(100dvh-72px)] flex-col md:min-h-[calc(100dvh)]">
         <main className="max-w-screen mb-[72px] mt-14 min-h-[calc(100dvh-128px)] flex-grow self-stretch overflow-x-auto bg-white md:mb-0 md:ml-[clamp(256px,20vw,288px)] md:min-h-[calc(100dvh-56px)] ">
           {children}
