@@ -76,7 +76,7 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
           {children}
         </main>
         <div className="fixed inset-x-0 bottom-0 md:right-[calc(100vw-clamp(256px,20vw,288px))] md:top-14 md:max-w-[clamp(256px,20vw,288px)]">
-          <nav className="flex justify-evenly bg-gray-800 px-2 py-1.5 md:h-full md:flex-col md:justify-start md:p-2">
+          <nav className="flex justify-evenly gap-1 bg-gray-800 px-2 py-1.5 md:h-full md:flex-col md:justify-start md:p-2">
             {menuItems.map((item) => {
               const Icon = item.icon.outline;
               const IconSolid = item.icon.solid;
@@ -88,8 +88,8 @@ const FixedDashboardLayout = ({ children }: DashboardProps) => {
                   href={item.path}
                   key={item.id}
                   id={item.id}
-                  className={`flex flex-col items-center justify-center rounded-md p-2 md:flex-row md:justify-start md:gap-2 ${
-                    isCurrentPath ? "bg-gray-700" : ""
+                  className={`flex flex-col items-center justify-center rounded-md p-2  md:flex-row md:justify-start md:gap-2 ${
+                    isCurrentPath ? "bg-gray-600" : "hover:bg-gray-700"
                   }`}
                   //md:self-stretch bg-gray-800 text-white md:bg-gray-700 flex-grow
                 >

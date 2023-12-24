@@ -23,7 +23,10 @@ const Explore: NextPage = () => {
     });
 
   const { data: followedArticles } =
-    api.followSystem.getRecentActivity.useQuery();
+    api.followSystem.getRecentActivity.useQuery(
+      {},
+      { enabled: typeof user !== "undefined" }
+    );
 
   return (
     <DashboardLayout>
