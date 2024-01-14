@@ -10,6 +10,7 @@ import ArticleCard from "~/components/ArticleCard";
 import DashboardLayout from "~/components/layouts";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 const Tour = dynamic(() => import("~/components/Tour"), { ssr: false });
 
 const Explore: NextPage = () => {
@@ -22,6 +23,8 @@ const Explore: NextPage = () => {
       skip: 0,
     });
 
+  const { data: popularTags, isLoading: isPopularTagsLoading } =
+    api.tag.getPopularTags.useQuery();
   const { data: followedArticles } =
     api.followSystem.getRecentActivity.useQuery(undefined, {
       enabled: typeof user !== "undefined",
@@ -47,6 +50,20 @@ const Explore: NextPage = () => {
           <p className="px-5 text-2xl font-semibold md:px-0">
             Populer in Pulth
           </p>
+          <DragScrollContainer id="tag-recom-scroll">
+            {!isPopularTagsLoading &&
+              popularTags?.map((val) => {
+                return (
+                  <Link
+                    className="shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-sm text-white"
+                    key={val.id}
+                    href={`/tags/${val.slug}`}
+                  >
+                    {val.name}
+                  </Link>
+                );
+              })}
+          </DragScrollContainer>
           <DragScrollContainer id="recom-scroll">
             {isLatestLoading
               ? [0, 1, 2, 3].map((val, index) => (
