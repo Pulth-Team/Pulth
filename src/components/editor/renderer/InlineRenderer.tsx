@@ -28,6 +28,9 @@ const InlineRenderer: NextPage<InlineRendererProps> = ({ text }) => {
                 <InlineRendererAST ast={node.children} />
               </span>
             );
+          case "br":
+            console.error(node);
+            return <br/>;
           case "i":
             return (
               <span key={index} className="italic">
