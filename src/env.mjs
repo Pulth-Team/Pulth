@@ -34,6 +34,8 @@ const server = z.object({
   SMTP_API_KEY: z.string(),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.string(),
+
+  REDIS_GROUP: z.string(),
 });
 
 /**
@@ -77,6 +79,8 @@ const processEnv = {
   SMTP_API_KEY: process.env.SMTP_API_KEY,
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: process.env.SMTP_PORT,
+
+  REDIS_GROUP: process.env.REDIS_GROUP,
 
   NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
   NEXT_PUBLIC_ALGOLIA_API_KEY: process.env.NEXT_PUBLIC_ALGOLIA_API_KEY,
