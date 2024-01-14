@@ -15,7 +15,10 @@ const Topbar = ({ inLayout = false }) => {
 
         <div className="ml-auto flex items-center gap-2">
           {userStatus !== "authenticated" && (
-            <Link href="/api/auth/signin">
+            <Link
+              href="/api/auth/signin" 
+              aria-label="Inspect the article"
+            >
               <button className="flex rounded-md bg-gray-700 p-2 md:hidden">
                 <p className="flex items-center justify-center text-center font-semibold text-gray-200 ">
                   Login

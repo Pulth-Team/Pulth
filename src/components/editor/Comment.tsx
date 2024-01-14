@@ -104,56 +104,60 @@ const Comment: NextPage<{
             {isEditedBefore ? "edited" : ""}
           </span>
 
-          {!isEditing && <p className="break-all">{comment.content}</p>}
+          {!isEditing && <p className="break-all" aria-label={"comment "+comment.id}>{comment.content}</p>}
         </div>
         <div className="flex  flex-row gap-1">
           {/* TODO: We dont show reply button but backend can handle more replies so this filter also should be added to backend */}
-          <button
-            onClick={() => {
-              if (AuthStatus != "authenticated") return signIn();
+            { depth < 3 && (<button
+              onClick={() => {
+                if (AuthStatus != "authenticated") return signIn();
 
-              if (isReplying) setActivity({ isActive: false });
-              else
-                setActivity({
-                  isActive: true,
-                  id: comment.id,
-                  activity: "reply",
-                });
-            }}
-          >
-            {depth < 3 && (
+                if (isReplying) setActivity({ isActive: false });
+                else
+                  setActivity({
+                    isActive: true,
+                    id: comment.id,
+                    activity: "reply",
+                  });
+              }}
+            
+              aria-label="Reply to Comment"
+              aria-labelledby={"comment "+comment.id}
+            >
               <ArrowUturnLeftIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
-            )}
-          </button>
-
-          <button
-            onClick={() => {
-              // If its already editing, then cancel editing
-              if (isEditing) setActivity({ isActive: false });
-              // else set it to editing
-              else
-                setActivity({
-                  isActive: true,
-                  id: comment.id,
-                  activity: "edit",
-                });
-            }}
-          >
-            {amITheAuthor && (
-              <PencilSquareIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
-            )}
-          </button>
-
-          <button
-            onClick={() => {
-              // send delete request ro parent CommentAlgo component
-              requestDelete(comment.id);
-            }}
-          >
-            {amITheAuthor && (
-              <TrashIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
-            )}
-          </button>
+            </button>)
+          }
+          {amITheAuthor && 
+            (<>
+              <button
+                onClick={() => {
+                  // If its already editing, then cancel editing
+                  if (isEditing) setActivity({ isActive: false });
+                  // else set it to editing
+                  else
+                    setActivity({
+                      isActive: true,
+                      id: comment.id,
+                      activity: "edit",
+                    });
+                }}
+                aria-label="Edit Comment"
+                aria-labelledby={"comment "+comment.id}
+              >
+                <PencilSquareIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />    
+              </button>
+              <button
+                onClick={() => {
+                  // send delete request ro parent CommentAlgo component
+                  requestDelete(comment.id);
+                }}
+                aria-label="Delete Comment"
+                aria-labelledby={"comment "+comment.id}
+              >
+                <TrashIcon className="h-5 w-5 rounded text-black/70 outline-1 outline-offset-2 outline-black/70 hover:text-black hover:outline" />
+              </button>
+            </>)
+          }
         </div>
       </div>
       {isEditing && (
