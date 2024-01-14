@@ -174,9 +174,16 @@ const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
               ) : (
                 voteRankQuery.isSuccess &&
                 (voteRankQuery.data instanceof Error ? (
-                  <p className="text-black">{voteRankQuery.data.message}</p>
+                  <p className="text-black" aria-label="Error: cant get data">
+                    {voteRankQuery.data.message}
+                  </p>
                 ) : (
-                  <p className="text-black">{voteRankQuery.data}</p>
+                  <p
+                    className="text-black"
+                    aria-label="Rank (Upvote,Downvote total)"
+                  >
+                    {voteRankQuery.data}
+                  </p>
                 ))
               )}
             </div>
@@ -202,8 +209,7 @@ const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
                 }
               }}
               className="group"
-              aria-label="Upvote"
-              aria-labelledby="article"
+              aria-label="Upvote to the article"
             >
               <ChevronUpIcon
                 className={`h-8 w-8 rounded-full p-1  ${
@@ -234,6 +240,7 @@ const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
                     });
                 }
               }}
+              aria-label="Downvote to the article"
               className="group"
             >
               <ChevronDownIcon
