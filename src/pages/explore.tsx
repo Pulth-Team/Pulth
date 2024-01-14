@@ -48,7 +48,7 @@ const Explore: NextPage = () => {
         </h1>
         <div className="flex flex-col gap-y-5">
           <p className="px-5 text-2xl font-semibold md:px-0">
-            Populer in Pulth
+            Popular in Pulth
           </p>
           <DragScrollContainer id="tag-recom-scroll">
             {!isPopularTagsLoading &&
