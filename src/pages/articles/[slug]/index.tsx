@@ -40,7 +40,11 @@ import { Redis } from "@upstash/redis";
 const redis = Redis.fromEnv();
 import { ReportView } from "~/components/ReportView";
 
-const Articles: NextPage = ({ viewCount }: { viewCount: number }) => {
+interface ArticleProps {
+  viewCount: number;
+}
+
+const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
   const router = useRouter();
   const { data: userData, status: authStatus } = useSession();
   const { slug } = router.query;
@@ -199,6 +203,7 @@ const Articles: NextPage = ({ viewCount }: { viewCount: number }) => {
               }}
               className="group"
               aria-label="Upvote"
+              aria-labelledby="article"
             >
               <ChevronUpIcon
                 className={`h-8 w-8 rounded-full p-1  ${
