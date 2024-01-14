@@ -283,4 +283,25 @@ export const tagRouter = createTRPCRouter({
 
       return tag;
     }),
+  getPopularTags: publicProcedure.query(async ({ ctx }) => {
+    //
+    const { prisma } = ctx;
+
+    const tagsWithUsageCount = await prisma.tag.findMany({
+      take: 10,
+      include: {
+        _count: true,
+      },
+    });
+
+    // sort the tags by usage count
+    // highest usage count first
+    const sortedTags = tagsWithUsageCount
+      .sort((a, b) => b._count.articles - a._count.articles)
+      .filter((tag) => tag._count.articles !== 0);
+
+    console.log(sortedTags);
+    // return the sorted tags
+    return sortedTags;
+  }),
 });

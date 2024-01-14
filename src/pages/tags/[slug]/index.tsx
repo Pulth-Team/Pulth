@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Head from "next/head";
 import ArticleCard from "~/components/ArticleCard";
 import Dashboard from "~/components/layouts";
 import { api } from "~/utils/api";
@@ -10,9 +11,17 @@ const TagSlugPage = () => {
     tagSlug: slug,
   });
 
+  const tagTitle = slug
+    ? slug.split("/").reduce(() => {
+        return " " + slug;
+      })
+    : "";
+
   return (
     <Dashboard>
-      <p>&quot;{slug}&quot; articles:</p>
+      <Head>
+        <title>{tagTitle}</title>
+      </Head>
 
       {articlesQuery.isLoading && <p>Loading...</p>}
       {articlesQuery.isError && <p>Error</p>}

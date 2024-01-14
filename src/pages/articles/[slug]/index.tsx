@@ -35,7 +35,16 @@ import superjson from "superjson";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 
-const Articles: NextPage = () => {
+import { env } from "~/env.mjs";
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
+import { ReportView } from "~/components/ReportView";
+
+interface ArticleProps {
+  viewCount: number;
+}
+
+const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
   const router = useRouter();
   const { data: userData, status: authStatus } = useSession();
   const { slug } = router.query;
@@ -156,19 +165,25 @@ const Articles: NextPage = () => {
 
       {/* Rank and action buttons */}
       {isArticleExists && (
-        <div className="mb-6 mt-8 flex flex-row  justify-between">
+        <div className="mb-6 mt-8 flex flex-row items-center justify-between md:px-4">
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <SparklesIcon className="h-6 w-6 text-black" />
-
               {voteAddMutation.isLoading ? (
                 <Loading className="h-6 w-6 border-2" />
               ) : (
                 voteRankQuery.isSuccess &&
                 (voteRankQuery.data instanceof Error ? (
-                  <p className="text-black">{voteRankQuery.data.message}</p>
+                  <p className="text-black" aria-label="Error: cant get data">
+                    {voteRankQuery.data.message}
+                  </p>
                 ) : (
-                  <p className="text-black">{voteRankQuery.data}</p>
+                  <p
+                    className="text-black"
+                    aria-label="Rank (Upvote,Downvote total)"
+                  >
+                    {voteRankQuery.data}
+                  </p>
                 ))
               )}
             </div>
@@ -194,6 +209,7 @@ const Articles: NextPage = () => {
                 }
               }}
               className="group"
+              aria-label="Upvote to the article"
             >
               <ChevronUpIcon
                 className={`h-8 w-8 rounded-full p-1  ${
@@ -224,6 +240,7 @@ const Articles: NextPage = () => {
                     });
                 }
               }}
+              aria-label="Downvote to the article"
               className="group"
             >
               <ChevronDownIcon
@@ -241,9 +258,11 @@ const Articles: NextPage = () => {
           <ArrowUpTrayIcon className="h-6 w-6 text-black" />
           <BookmarkIcon className="h-6 w-6 text-black" />
         </div> */}
+          <span className="ml-auto text-sm text-black/70">
+            {viewCount} views
+          </span>
         </div>
       )}
-
       {/* About the author */}
       {isArticleExists && articleData.data?.author && (
         <div className="mt-4 flex items-center justify-between md:px-4">
@@ -328,6 +347,7 @@ const Articles: NextPage = () => {
       </Head>
       {/* read article container for our article renderer with media queries */}
       <div className="container mx-auto max-w-2xl p-4">
+        <ReportView slug={slug as string} />
         {body}
         {/* Add Comments, Tags, AuthorBox, Action Button */}
       </div>
@@ -347,6 +367,10 @@ export async function getStaticProps(
   });
 
   const slug = context.params?.slug as string;
+
+  const views =
+    (await redis.get<number>([env.REDIS_GROUP, "pageviews", slug].join(":"))) ??
+    0;
 
   // prefetch `article.getBySlug`
   const articleBySlug = helpers.article.getBySlug.prefetch(slug);
@@ -376,8 +400,10 @@ export async function getStaticProps(
   ]);
 
   return {
+    revalidate: 60 * 60,
     props: {
       trpcState: helpers.dehydrate(),
+      viewCount: views,
     },
   };
 }
