@@ -1,12 +1,16 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 
+import KeywordManagement from "~/components/Tabs/KeywordManagement";
+
 interface SeoTabProps {
   title: string;
   description: string;
+  keywords: string[];
+  slug: string;
 }
 
-const SEOTab = ({ title, description }: SeoTabProps) => {
+const SEOTab = ({ title, description, keywords, slug }: SeoTabProps) => {
   type TitleChecks = "isLongerThan20" | "isLongerThan30" | "isLessThan50";
   const TitleScores: {
     [key in TitleChecks]: {
@@ -103,6 +107,9 @@ const SEOTab = ({ title, description }: SeoTabProps) => {
 
   return (
     <>
+      {/* TODO: We should REALAY use context in this case */}
+      <KeywordManagement keywords={keywords} slug={slug} />
+      <hr className="border" />
       <div className="grid grid-cols-3 gap-4 py-4">
         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
           <p className="text-xl">Overall Score</p>
@@ -126,7 +133,6 @@ const SEOTab = ({ title, description }: SeoTabProps) => {
           </p>
         </div>
       </div>
-      <hr className="border" />
       <div className="w-full py-4">
         <div className="mx-auto flex w-full flex-col gap-4 rounded-2xl bg-white">
           <Disclosure as={"div"}>

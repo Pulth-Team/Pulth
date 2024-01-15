@@ -320,6 +320,8 @@ const Inspect: NextPage = () => {
                       <SEOTab
                         title={title ?? ""}
                         description={description ?? ""}
+                        keywords={articleInfo.data.keywords}
+                        slug={slug as string}
                       />
                     </Tab.Panel>
                     <Tab.Panel>

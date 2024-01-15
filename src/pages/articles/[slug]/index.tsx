@@ -327,6 +327,7 @@ const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
       )}
     </>
   );
+  console.log(articleData.data);
 
   return (
     <DashboardLayout>
@@ -337,6 +338,12 @@ const Articles: NextPage<ArticleProps> = ({ viewCount }) => {
         <meta name="description" content={articleData.data?.description} />
         <meta name="author" content={articleData.data?.author?.name!} />
         <meta name="generator" content="Pulth Engine" />
+        <meta
+          name="keywords"
+          content={articleData.data?.keywords
+            .concat(tagQuery.data?.map((val) => val.tag.name) ?? [])
+            .join(", ")}
+        />
         <link
           rel="canonical"
           href={`https://${

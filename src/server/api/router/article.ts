@@ -35,7 +35,7 @@ export const articleRouter = createTRPCRouter({
             image: true,
           },
         },
-        keywords:true,
+        keywords: true,
         isPublished: true,
       },
     });
@@ -861,6 +861,29 @@ export const articleRouter = createTRPCRouter({
       await ctx.algolia.deleteObject(article.id);
 
       return deletedArticle;
+    }),
+
+  updateKeywords: protectedProcedure
+    .input(
+      z.object({
+        articleSlug: z.string(),
+        keywords: z.array(z.string().min(3)).nonempty(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const article = await ctx.prisma?.article.update({
+        where: {
+          slug: input.articleSlug,
+        },
+        data: {
+          keywords: input.keywords,
+        },
+        select: {
+          keywords: true,
+        },
+      });
+
+      return article;
     }),
 });
 
