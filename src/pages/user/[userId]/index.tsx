@@ -141,16 +141,33 @@ const ProfileIndex: NextPage = () => {
       <Head>
         <title>{profileData.name} - Pulth</title>
         <meta name="description" content={profileData.description ?? ""} />
+
+        {/* OG meta tags */}
         <meta property="og:title" content={profileData.name ?? "No Name"} />
+        <meta
+          property="twitter:title"
+          content={profileData.name ?? "No Name"}
+        />
+
         <meta
           property="og:description"
           content={profileData.description ?? ""}
         />
         <meta
+          property="twitter:description"
+          content={profileData.description ?? ""}
+        />
+
+        <meta
           property="og:image"
           content={profileData.image ?? "/default_profile.jpg"}
         />
+        <meta
+          property="twitter:image"
+          content={profileData.image ?? "/default_profile.jpg"}
+        />
         <meta property="og:url" content={window.location.href} />
+        <meta property="twitter:url" content={window.location.href} />
       </Head>
 
       <div className="flex flex-col gap-y-3 px-4 py-8 lg:p-16">
