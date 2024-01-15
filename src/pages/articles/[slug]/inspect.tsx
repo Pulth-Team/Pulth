@@ -15,8 +15,12 @@ import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+<<<<<<< HEAD
 import Head from "next/head";
 import { useEffect, useState } from "react";
+=======
+import { useEffect, useMemo, useState } from "react";
+>>>>>>> Article-Analysis
 import { twMerge } from "tailwind-merge";
 
 import superjson from "superjson";
@@ -24,8 +28,13 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { createTRPCContext } from "~/server/api/trpc";
 import { appRouter } from "~/server/api/root";
 import { DehydratedState } from "@tanstack/react-query";
+<<<<<<< HEAD
 
 import TagTab from "~/components/Tabs/TagTab";
+=======
+import { getServerSession } from "next-auth";
+import { analyzeMetadata } from "~/utils/analyzeArticle";
+>>>>>>> Article-Analysis
 
 const Inspect: NextPage = () => {
   dayjs.extend(relativeTime);
@@ -73,6 +82,7 @@ const Inspect: NextPage = () => {
   }, [articleInfo.data, articleInfo.isError, router, articleInfo.error]);
 
   useEffect(() => {
+<<<<<<< HEAD
     if (
       articleUpdateInfoMutation.isSuccess &&
       !articleUpdateInfoMutation.isLoading
@@ -184,6 +194,22 @@ const Inspect: NextPage = () => {
   const ArticleScore = 50;
 
   const OverallScore = Math.round((MetaScore + ArticleScore) / 2).toString();
+=======
+    const result = analyzeMetadata(title || " ", description || " ");
+    setAnalysisResult(result);
+  }, []);
+
+  // shoulde define with memo
+  // const analysisResult = analyzeMetadata(title || " ", description || " ");
+
+  useMemo(() => {
+    //analyze metadata
+    if (updateInfoIsLoading) {
+      const result = analyzeMetadata(title || " ", description || " ");
+      setAnalysisResult(result);
+    }
+  }, [title, description, updateInfoIsLoading]);
+>>>>>>> Article-Analysis
 
   return (
     <Dashboard>
@@ -236,15 +262,24 @@ const Inspect: NextPage = () => {
             </div>
           </div>
           <hr className="mt-1 border-black" />
+<<<<<<< HEAD
           <div className="flex flex-col justify-center gap-x-2 md:flex-row">
             <div className="max-w-screen-lg flex-grow">
               <div className="mt-4 w-full break-all">
                 <span className="text-black/70">Description:</span>
+=======
+          <div className="flex flex-col gap-x-2 md:flex-row">
+            <div className="flex-grow">
+              <div className="mt-4 grid grid-cols-3 justify-between gap-4">
+                <div className="col-span-2">
+                  <span className="text-black/70">Description:</span>
+>>>>>>> Article-Analysis
 
                   <p>{articleInfo.data?.description}</p>
 
                   <span className="text-black/70">Tags:</span>
 
+<<<<<<< HEAD
                 {isTagsLoading ? (
                   <p>Loading...</p>
                 ) : (
@@ -252,6 +287,29 @@ const Inspect: NextPage = () => {
                     {tagData?.map((tagEntry) => tagEntry.tag.name).join(", ")}
                   </p>
                 )}
+=======
+                  <p>{articleInfo.data?.keywords.join(", ")}</p>
+                </div>
+                <div className="flex flex-col gap-2 rounded-2xl bg-gray-100 p-2">
+                  <span className={` text-xl font-bold text-black/70`}>
+                    Score
+                  </span>
+
+                  <div
+                    className={`pie flex aspect-square h-24 w-24 self-center rounded-full bg-gray-200 font-bold before:m-2`}
+                    // style={"--p:40;--c:darkblue;--b:10px"}
+                    style={{
+                      ["--p" as any]: analysisResult.titleScore.toString(),
+                      ["--c" as any]: "#6b7280",
+                      ["--b" as any]: "10px",
+                      ["--w" as any]: "96px",
+                      ["--m" as any]: "8px",
+                    }}
+                  >
+                    {analysisResult.titleScore.toFixed(2)}%
+                  </div>
+                </div>
+>>>>>>> Article-Analysis
               </div>
 
               <div className="mt-4">
@@ -424,6 +482,7 @@ const Inspect: NextPage = () => {
                       </div>
                     </Tab.Panel>
                     <Tab.Panel>
+<<<<<<< HEAD
                       <div className="grid grid-cols-3 gap-4 py-4">
                         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">
                           <p className="text-xl">Overall Score</p>
@@ -663,13 +722,56 @@ const Inspect: NextPage = () => {
                     </Tab.Panel>
                     <Tab.Panel>
                       <TagTab />
+=======
+                      {/* Panel for SEO Analysis/Score */}
+                      <div className="flex justify-between">
+                        <div>
+                          <p>Title Score {analysisResult.titleScore}</p>
+                          {analysisResult.titleChecks.length > 0 && (
+                            <ul>
+                              {analysisResult.titleChecks.map(
+                                (check, index) => (
+                                  <li key={index} className="text-red-500">
+                                    {check}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p>
+                          Description Score {analysisResult.descriptionScore}
+                        </p>
+                        {analysisResult.descriptionChecks.length > 0 && (
+                          <ul>
+                            {analysisResult.descriptionChecks.map(
+                              (check, index) => (
+                                <li key={index} className="text-red-500">
+                                  {check}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        )}
+                      </div>
+                      <div>
+                        <p>Total Score</p>
+                        <p>{analysisResult.totalScore}</p>
+                      </div>
+>>>>>>> Article-Analysis
                     </Tab.Panel>
                   </Tab.Panels>
                 </Tab.Group>
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className="order-first mt-4 grid w-full gap-x-2 self-start rounded-xl border p-2 shadow-md md:order-last md:col-span-2 md:w-auto md:min-w-max md:max-w-md md:flex-shrink md:flex-grow-0 md:grid-cols-[min,min] lg:col-span-1 lg:flex-grow">
+=======
+            <div className="order-first mt-4 grid w-full grid-cols-2 gap-x-2 gap-y-1 self-start rounded-2xl bg-gray-100 px-4 pb-4 pt-6  md:order-last md:w-auto md:min-w-fit md:flex-shrink md:flex-grow-0">
+>>>>>>> Article-Analysis
               <span className="text-black/70">status:</span>
 
               <p>
