@@ -35,6 +35,7 @@ export const articleRouter = createTRPCRouter({
             image: true,
           },
         },
+        keywords:true,
         isPublished: true,
       },
     });
