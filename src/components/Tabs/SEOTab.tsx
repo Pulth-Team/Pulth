@@ -108,7 +108,7 @@ const SEOTab = ({ title, description, keywords, slug }: SeoTabProps) => {
   return (
     <>
       {/* TODO: We should REALAY use context in this case */}
-      <KeywordManagement keywords={keywords} slug={slug} />
+      <KeywordManagement />
       <hr className="border" />
       <div className="grid grid-cols-3 gap-4 py-4">
         <div className="flex w-full flex-col gap-y-2 rounded-lg border bg-white p-4 shadow-md">

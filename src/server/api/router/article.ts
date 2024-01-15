@@ -332,12 +332,12 @@ export const articleRouter = createTRPCRouter({
   // takes an article slug and returns the article
   // the article is only returned if the user is the author
   inspect: protectedProcedure
-    .input(z.string())
+    .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
       // find the article
       const article = await ctx.prisma?.article.findFirst({
         where: {
-          slug: input,
+          slug: input.slug,
           authorId: ctx.session?.user.id,
         },
         select: {
@@ -345,8 +345,19 @@ export const articleRouter = createTRPCRouter({
           description: true,
           keywords: true,
           isPublished: true,
+
           updatedAt: true,
           createdAt: true,
+          tags: {
+            select: {
+              tag: {
+                select: {
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -800,11 +811,13 @@ export const articleRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ input, ctx }) => {
+      const { prisma, session, algolia } = ctx;
+
       // find the article
-      const article = await ctx.prisma?.article.findFirst({
+      const article = await prisma?.article.findFirst({
         where: {
           slug: input,
-          authorId: ctx.session?.user.id,
+          authorId: session?.user.id,
         },
       });
 
@@ -815,15 +828,48 @@ export const articleRouter = createTRPCRouter({
           message: "Article not found in current user's articles",
         });
 
-      // delete the article
-      const deletedArticle = await ctx.prisma?.article.delete({
+      const deleteAllComments = prisma.comment.deleteMany({
+        where: {
+          articleId: article.id,
+        },
+      });
+
+      const deleteAllVotes = prisma.votedBy.deleteMany({
+        where: {
+          articleId: article.id,
+        },
+      });
+
+      const deleteAllTags = prisma.tagsOnPosts.deleteMany({
+        where: {
+          articleId: article.id,
+        },
+      });
+      const deleteArticle = prisma.article.delete({
         where: {
           id: article.id,
         },
       });
 
+      const [
+        resultDeletedComments,
+        resultDeletedVotes,
+        resultDeletedTags,
+        // resultDeletedArticle,
+      ] = await prisma.$transaction([
+        deleteAllComments,
+        deleteAllVotes,
+        deleteAllTags,
+        // deleteArticle,
+      ]);
+
+      let resultDeletedArticle;
+      if (resultDeletedTags && resultDeletedVotes && resultDeletedComments) {
+        resultDeletedArticle = await deleteArticle;
+      }
+
       //check if the article was deleted
-      if (!deletedArticle)
+      if (!resultDeletedArticle)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Something went wrong",
@@ -858,9 +904,9 @@ export const articleRouter = createTRPCRouter({
       );
 
       // delete the article from the algolia index
-      await ctx.algolia.deleteObject(article.id);
+      await algolia.deleteObject(article.id);
 
-      return deletedArticle;
+      return deleteArticle;
     }),
 
   updateKeywords: protectedProcedure
