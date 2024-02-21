@@ -3,6 +3,13 @@ import Head from "next/head";
 import ArticleCard from "~/components/ArticleCard";
 import Dashboard from "~/components/layouts";
 import { api } from "~/utils/api";
+import { GetStaticPaths, GetStaticPropsContext } from "next/types";
+import { prisma } from "~/server/db";
+import { appRouter } from "~/server/api/root";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { createInnerTRPCContext } from "~/server/api/trpc";
+
+import superjson from "superjson";
 
 const TagSlugPage = () => {
   const slug = useRouter().query.slug as string;
@@ -47,6 +54,64 @@ const TagSlugPage = () => {
       )}
     </Dashboard>
   );
+};
+
+export async function getStaticProps(
+  context: GetStaticPropsContext<{ slug: string }>
+) {
+  const slug = context.params?.slug;
+
+  if (!slug) {
+    return {
+      notFound: true,
+    };
+  }
+
+  console.log("slug", slug);
+
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: createInnerTRPCContext({ session: null, req: null, res: null }),
+    transformer: superjson, // optional - adds superjson serialization
+  });
+
+  // prefetch `tag.searchArticlesByTag`
+  const articles = await helpers.tag.searchArticlesByTag.fetch({
+    tagSlug: slug,
+  });
+
+  // prefetch `vote.checkMyVoteByArticleId`
+  // await Promise.all([]);
+
+  if (articles.length == 0)
+    return {
+      notFound: true,
+    };
+
+  return {
+    revalidate: 60 * 60,
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const tags = await prisma.tag.findMany({
+    select: {
+      slug: true,
+    },
+  });
+
+  const paths = tags.map((tag) => ({
+    params: { slug: tag.slug },
+  }));
+
+  return {
+    paths: paths,
+    // https://nextjs.org/docs/pages/api-reference/functions/get-static-paths#fallback-blocking
+    fallback: "blocking",
+  };
 };
 
 export default TagSlugPage;
