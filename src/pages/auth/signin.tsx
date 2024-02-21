@@ -16,6 +16,7 @@ const Home: NextPage<{ providers: Provider[] }> = ({ providers }) => {
   if (status == "authenticated") {
     router.push("/dashboard");
   }
+  
   const { error } = router.query;
   const [email, setEmail] = useState<string>("");
 
@@ -25,9 +26,11 @@ const Home: NextPage<{ providers: Provider[] }> = ({ providers }) => {
         <title>Login - PulthApp</title>
       </Head>
       <nav className="fixed flex h-14 w-screen items-center gap-2 bg-gray-800 px-4 md:gap-4 md:px-6">
-        <span className="mr-auto text-xl font-bold text-indigo-500">
-          PulthApp
-        </span>
+        <Link href="/" className="mr-auto text-xl font-bold text-indigo-500">
+          <span >
+            PulthApp
+          </span>
+        </Link>
         <div className="flex items-stretch gap-2">
           <Link href={"/api/auth/signin"}>
             <button className="h-full rounded-lg bg-gray-700 px-3 py-1 text-white">
