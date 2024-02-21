@@ -1,12 +1,14 @@
 import {
-  DocumentTextIcon as DocumentTextIconOutline,
+  //   DocumentTextIcon as DocumentTextIconOutline,
+  NewspaperIcon as NewspaperIconOutline,
   HomeIcon as HomeIconOutline,
   MapIcon as MapIconOutline,
   PhotoIcon as PhotoIconOutline,
 } from "@heroicons/react/24/outline";
 
 import {
-  DocumentTextIcon as DocumentTextIconSolid,
+  // DocumentTextIcon as DocumentTextIconSolid,
+  NewspaperIcon as NewspaperIconSolid,
   HomeIcon as HomeIconSolid,
   MapIcon as MapIconSolid,
   PhotoIcon as PhotoIconSolid,
@@ -45,23 +47,32 @@ const menuItems = [
     },
   },
   {
-    name: "Courses",
-    path: "/courses",
-    id: "courses-menu-item",
+    name: "Quizzes",
+    path: "/quizzes",
+    id: "quizzes-menu-item",
     icon: {
-      outline: PhotoIconOutline,
-      solid: PhotoIconSolid,
+      outline: NewspaperIconOutline,
+      solid: NewspaperIconSolid,
     },
   },
-  {
-    name: "Articles",
-    path: "/articles",
-    id: "articles-menu-item",
-    icon: {
-      outline: DocumentTextIconOutline,
-      solid: DocumentTextIconSolid,
-    },
-  },
+  // {
+  //   name: "Courses",
+  //   path: "/courses",
+  //   id: "courses-menu-item",
+  //   icon: {
+  //     outline: PhotoIconOutline,
+  //     solid: PhotoIconSolid,
+  //   },
+  // },
+  // {
+  //   name: "Articles",
+  //   path: "/articles",
+  //   id: "articles-menu-item",
+  //   icon: {
+  //     outline: DocumentTextIconOutline,
+  //     solid: DocumentTextIconSolid,
+  //   },
+  // },
 ];
 
 const FixedDashboardLayout = ({ children }: DashboardProps) => {

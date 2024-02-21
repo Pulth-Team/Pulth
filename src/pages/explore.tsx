@@ -40,30 +40,32 @@ const Explore: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex flex-col gap-y-4 px-0 md:px-5">
-        <h1
-          className={`${user ?? "hidden"} mb-4 px-5 text-4xl font-bold md:px-0`}
-        >
+      <div className="flex flex-col gap-y-4 px-2 md:p-5 ">
+        <h1 className={`${user ?? "hidden"} text-4xl font-bold md:px-0`}>
           Welcome back, <span className="text-indigo-700">{user?.name}</span>
         </h1>
-        <div className="flex flex-col gap-y-5">
-          <p className="px-5 text-2xl font-semibold md:px-0">
-            Popular in Pulth
-          </p>
-          <DragScrollContainer id="tag-recom-scroll">
-            {!isPopularTagsLoading &&
-              popularTags?.map((val) => {
-                return (
-                  <Link
-                    className="shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-sm text-white"
-                    key={val.id}
-                    href={`/tags/${val.slug}`}
-                  >
-                    {val.name}
-                  </Link>
-                );
-              })}
-          </DragScrollContainer>
+        <div className="flex flex-col gap-y-4">
+          <div className="">
+            <p className=" mb-2 text-2xl font-semibold md:px-0">
+              Popular in Pulth
+            </p>
+
+            <DragScrollContainer id="tag-recom-scroll">
+              {!isPopularTagsLoading &&
+                popularTags?.map((val) => {
+                  return (
+                    <Link
+                      className="shrink-0 rounded-lg bg-gray-800 px-2 py-1 text-sm text-white"
+                      key={val.id}
+                      href={`/tags/${val.slug}`}
+                    >
+                      {val.name}
+                    </Link>
+                  );
+                })}
+            </DragScrollContainer>
+          </div>
+
           <DragScrollContainer id="recom-scroll">
             {isLatestLoading
               ? [0, 1, 2, 3].map((val, index) => (
