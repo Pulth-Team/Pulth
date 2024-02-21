@@ -27,7 +27,7 @@ const TagSlugPage = () => {
   return (
     <Dashboard>
       <Head>
-        <title>{tagTitle}</title>
+        <title>&quot;{tagTitle}&quot; tag on Pulth </title>
       </Head>
 
       {articlesQuery.isLoading && <p>Loading...</p>}
@@ -79,9 +79,6 @@ export async function getStaticProps(
   const articles = await helpers.tag.searchArticlesByTag.fetch({
     tagSlug: slug,
   });
-
-  // prefetch `vote.checkMyVoteByArticleId`
-  // await Promise.all([]);
 
   if (articles.length == 0)
     return {
