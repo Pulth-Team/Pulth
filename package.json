@@ -33,7 +33,7 @@
     "bson": "^5.0.1",
     "dayjs": "^1.11.7",
     "eslint-config-next": "^13.3.0",
-    "formidable": "^2.1.1",
+    "formidable": "^3.2.4",
     "framer-motion": "^10.11.2",
     "heroicons": "^2.0.12",
     "next": "^13.4.3",
