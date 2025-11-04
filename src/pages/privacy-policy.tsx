@@ -5,313 +5,55 @@ const PrivacyPolicy = () => {
     <div>
       <Topbar />
       <main className="container mx-auto flex flex-col gap-4 px-4 pt-4 text-gray-700">
-        <h1 className="text-3xl font-semibold uppercase">Privacy Policy</h1>
-        <p className="mb-8">Last updated: December 03, 2023</p>
 
-        <p className="">
-          This privacy notice for Pulth.com (&quot;
-          <span className="font-bold">we,</span>
-          &quot; &quot;<span className="font-bold">us</span>,&quot; or &quot;
-          <span className="font-bold">our</span>&quot;), describes how and why
-          we might collect, store, use, and/or share (&quot;
-          <span className="font-bold">process</span>&quot;) your information
-          when you use our services (&quot;
-          <span className="font-bold">Services</span>&quot;), such as when you:
-        </p>
-
-        <ol className="list-disc pl-8">
-          <li className="">
-            Visit our website at{" "}
-            <a
-              href="https://www.pulth.com"
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              https://www.pulth.com
-            </a>
-            , or any website of ours that links to this privacy notice
-          </li>
-          <li className="">
-            Engage with us in other related ways — including any sales,
-            marketing, or events
-          </li>
-        </ol>
-
-        <p className="">
-          <strong>Questions or concerns?</strong>
-          &nbsp;Reading this privacy notice will help you understand your
-          privacy rights and choices. If you do not agree with our policies and
-          practices, please do not use our Services.
-          <br />
-          If you still have any questions or concerns, please contact us
-          at&nbsp;
-          <a
-            href="mailto:gulestanbekir@gmail.com"
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-          >
-            gulestanbekir@gmail.com
-          </a>
-        </p>
-
-        <h2 className="mt-8 text-2xl font-semibold uppercase">
-          Summary of key points
-        </h2>
-        <p className="font-medium italic">
-          This summary provides key points from our privacy notice, but you can
-          find out more details about any of these topics by clicking the link
-          following each key point or by using our&nbsp;
-          <a
-            href="#table-of-contents"
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-          >
-            table of contents
-          </a>
-          &nbsp;below to find the section you are looking for.
-        </p>
-
-        <p className="">
-          <strong>What personal information do we process?</strong>
-          &nbsp;When you visit, use, or navigate our Services, we may process
-          personal information depending on how you interact with us and the
-          Services, the choices you make, and the products and features you use.
-          Learn more about
-          <a href="#personal-info">personal information you disclose to us</a>
-        </p>
-
-        <p>
-          <strong>Do we process any sensitive personal information?</strong>
-          &nbsp;We do not process any sensitive personal information.
-        </p>
-
-        <p>
-          <strong>Do we receive any information from </strong>
-          We may use Google Analytics, a third-party service, to collect,
-          monitor, and analyze data about user interactions with our website.
-          Google Analytics may collect information such as your IP address,
-          device information, and browsing behavior. This information is used to
-          improve the functionality and user experience of our website. Please
-          refer to Google&apos;s privacy policy for more details on how they
-          handle your data:
-        </p>
-
-        <ul className="list-disc pl-8">
-          <li>
-            <a
-              href="https://policies.google.com/privacy"
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              Google Privacy Policy
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="https://support.google.com/analytics/answer/6004245"
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              Safeguarding your data
-            </a>
-          </li>
+        <h1>Privacy Policy - Pulth</h1>
+        <p className="effective-date">Effective Date: 11/4/2025</p>
+        <h2>1. Introduction</h2>
+        <p>This Privacy Policy describes how Pulth ("we," "us," or "our") collects, uses, and discloses your personal information when you use our software as a service (the "Service").</p><p>We are committed to protecting your personal information and your right to privacy. When you visit our software as a service and use our products, you trust us with your personal information. We take your privacy very seriously. In this Privacy Policy, we seek to explain to you in the clearest way possible what information we collect, how we use it, and what rights you have in relation to it.</p><p>This Privacy Policy applies to all information collected through our software as a service, as well as any related services, sales, marketing, or events.</p><p>Please read this Privacy Policy carefully as it will help you understand what we do with the information we collect.</p>
+        <h2>2. Definitions</h2>
+        <p>To help explain things as clearly as possible in this Privacy Policy, every time any of these terms are referenced, they are strictly defined as:</p>
+        <ul className="definitions-list">
+          <li><strong>Cookie</strong>: a small file placed on your device to enable certain features and functionality.</li>
+          <li><strong>Company</strong>: when this policy mentions "Company," "we," "us," or "our," it refers to Pulth.</li>
+          <li><strong>Country</strong>: where Pulth or the owners/founders of Pulth are based, in this case United States.</li>
+          <li><strong>Customer</strong>: refers to the company, organization, or person that signs up to use the Pulth Service.</li>
+          <li><strong>Device</strong>: any internet-connected device such as a phone, tablet, computer, or any other device that can be used to visit Pulth and use the services.</li>
+          <li><strong>Personal Data</strong>: any information that directly, indirectly, or in connection with other information allows for the identification of a natural person.</li>
+          <li><strong>Service</strong>: refers to the software as a service provided by Pulth as described in the relative terms and on this platform.</li>
+          <li><strong>Third-party service</strong>: refers to advertisers, contest sponsors, promotional and marketing partners, and others who provide our content or whose products or services we think may interest you.</li>
+          <li><strong>Website</strong>: Pulth's site, which can be accessed via https://pulth.com.</li>
+          <li><strong>You</strong>: a person or entity that is registered with Pulth to use the Services.</li>
         </ul>
+        <h2>3. Information We Collect</h2>
+        <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p><p>3.1 Personal Data</p><p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to:</p><p>- Email address</p><ul><li>First name and last name</li><li>Phone number</li><li>Address, State, Province, ZIP/Postal code, City</li><li>Cookies and Usage Data</li></ul><p>3.3 Usage Data</p><p>We may also collect information about how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p><p>3.5 Tracking Technologies and Cookies</p><p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.</p><p>Cookies are files with a small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. Tracking technologies also used are beacons, tags, and scripts to collect and track information and to improve and analyze our Service.</p><p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p><p>Examples of Cookies we use:</p><p>- <strong>Session Cookies</strong>: We use Session Cookies to operate our Service.</p><ul><li><strong>Preference Cookies</strong>: We use Preference Cookies to remember your preferences and various settings.</li><li><strong>Security Cookies</strong>: We use Security Cookies for security purposes.</li><li><strong>Advertising Cookies</strong>: Advertising Cookies are used to serve you with advertisements that may be relevant to you and your interests.</li></ul>
+        <h2>4. How We Use Your Information</h2>
+        <p>Pulth uses the collected data for various purposes:</p><p>- To provide and maintain our Service</p><ul><li>To notify you about changes to our Service</li><li>To allow you to participate in interactive features of our Service when you choose to do so</li><li>To provide customer support</li><li>To gather analysis or valuable information so that we can improve our Service</li><li>To monitor the usage of our Service</li><li>To detect, prevent and address technical issues</li><li>To fulfill any other purpose for which you provide it</li><li>To provide you with news, special offers and general information about other goods, services and events which we offer that are similar to those that you have already purchased or enquired about unless you have opted not to receive such information</li><li>In any other way we may describe when you provide the information</li><li>For any other purpose with your consent</li></ul>
+        <h2>5. Legal Basis for Processing Personal Data Under GDPR</h2>
+        <p>If you are from the European Economic Area (EEA), Pulth legal basis for collecting and using the personal information described in this Privacy Policy depends on the Personal Data we collect and the specific context in which we collect it.</p><p>Pulth may process your Personal Data because:</p><p>- We need to perform a contract with you</p><ul><li>You have given us permission to do so</li><li>The processing is in our legitimate interests and it's not overridden by your rights</li><li>To comply with the law</li></ul>
+        <h2>6. Retention of Your Personal Data</h2>
+        <p>Pulth will retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use your Personal Data to the extent necessary to comply with our legal obligations (for example, if we are required to retain your data to comply with applicable laws), resolve disputes, and enforce our legal agreements and policies.</p><p>Pulth will also retain Usage Data for internal analysis purposes. Usage Data is generally retained for a shorter period of time, except when this data is used to strengthen the security or to improve the functionality of our Service, or we are legally obligated to retain this data for longer time periods.</p><p>6.1 Data Retention for Physical Goods</p><p>For orders involving physical goods, we retain your shipping and billing information, including your name, address, and contact details, as necessary to fulfill your order, process returns, manage warranty claims, and comply with tax, legal, and regulatory obligations. This information may be retained for a longer period than other personal data to ensure proper delivery of goods and to handle any post-purchase issues that may arise.</p>
+        <h2>7. Transfer of Your Personal Data</h2>
+        <p>Your information, including Personal Data, may be transferred to — and maintained on — computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ from those of your jurisdiction.</p><p>If you are located outside United States and choose to provide information to us, please note that we transfer the data, including Personal Data, to United States and process it there.</p><p>Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.</p><p>Pulth will take all steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of your data and other personal information.</p>
+        <h2>8. Disclosure of Your Personal Data</h2>
+        <h3>Business Transactions</h3><p>If Pulth is involved in a merger, acquisition or asset sale, your Personal Data may be transferred. We will provide notice before your Personal Data is transferred and becomes subject to a different Privacy Policy.</p><h3>Disclosure for Law Enforcement</h3><p>Under certain circumstances, Pulth may be required to disclose your Personal Data if required to do so by law or in response to valid requests by public authorities (e.g. a court or a government agency).</p><h3>Legal Requirements</h3><p>Pulth may disclose your Personal Data in the good faith belief that such action is necessary to:</p><p>- Comply with a legal obligation</p><ul><li>Protect and defend the rights or property of Pulth</li><li>Prevent or investigate possible wrongdoing in connection with the Service</li><li>Protect the personal safety of users of the Service or the public</li><li>Protect against legal liability</li></ul>
+        <h2>9. Third-Party Disclosure</h2>
+        <p>9.1 Analytics</p><p>We may use third-party Service Providers to monitor and analyze the use of our Service.</p><p>- <strong>Google Analytics</strong>: Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualize and personalize the ads of its own advertising network. You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript from sharing information with Google Analytics about visits activity. For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: [https://policies.google.com/privacy](https://policies.google.com/privacy)</p><p>9.4 Cloud Services</p><p>We may use third-party cloud service providers to host our Service and store your data.</p><p>- <strong>Amazon Web Services (AWS)</strong>: Their Privacy Policy can be viewed at [https://aws.amazon.com/privacy/](https://aws.amazon.com/privacy/)</p><ul><li><strong>Microsoft Azure</strong>: Their Privacy Policy can be viewed at [https://privacy.microsoft.com/en-us/privacystatement](https://privacy.microsoft.com/en-us/privacystatement)</li><li><strong>Google Cloud Platform</strong>: Their Privacy Policy can be viewed at [https://cloud.google.com/terms/cloud-privacy-notice](https://cloud.google.com/terms/cloud-privacy-notice)</li></ul>
+        <h2>10. Security of Your Personal Data</h2>
+        <p>The security of your Personal Data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+        <h2>11. Children's Privacy</h2>
+        <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from anyone under the age of 13 without verification of parental consent, we take steps to remove that information from our servers.</p><p>If we need to rely on consent as a legal basis for processing your information and your country requires consent from a parent, we may require your parent's consent before we collect and use that information.</p>
+        <h2>12. Your Data Protection Rights</h2>
+        <p>Depending on your location and applicable laws, you may have certain rights regarding your personal information, including rights to access, correct, delete, or restrict use of your information. We honor these rights regardless of your location and are committed to providing reasonable access to the information that you have shared with us.</p><p>12.1 General Data Access &amp; Deletion Rights</p><p>Regardless of your location, you can make the following requests regarding your personal data:</p><p>- <strong>Access Your Data</strong>: You can request a copy of the personal information we have about you. We will provide this information in a structured, commonly used, and machine-readable format.</p><p>- <strong>Delete Your Data</strong>: You can request that we delete your personal information from our systems. We will comply with this request unless there is a legal requirement for us to keep certain information.</p><p>To submit a data access or deletion request, please contact us using the contact information provided at the end of this Privacy Policy. We will respond to your request within 30 days. We may need to verify your identity before processing your request.</p><p>12.6 Other Jurisdictions</p><p>Many countries around the world have adopted comprehensive data protection laws that provide various rights to individuals regarding their personal data. Even if we haven't specifically listed your country's laws, we're committed to respecting your rights to access and delete your personal information wherever you are located.</p><p>If you have any questions about exercising your data rights, please contact us using the information provided in the "Contact Us" section below.</p>
+        <h2>13. Service Providers</h2>
+        <p>We may employ third-party companies and individuals to facilitate our Service ("Service Providers"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used.</p><p>These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
+        <h2>14. Links to Other Sites</h2>
+        <p>Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p><p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p>
+        <h2>15. Changes to This Privacy Policy</h2>
+        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p><p>We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the "effective date" at the top of this Privacy Policy.</p><p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+        <h2>16. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us:</p><p>- By email: gulestanbekir@gmail.com</p><ul><li>By visiting this page on our website: https://pulth.com/privacy-policy</li><li>By phone number: 8722799491</li><li>By mail: 28 East Jackson Boulevard
+          unit 1102</li></ul>
 
-        <p>
-          <strong>How do we process your information?</strong>
-          We process your information to provide, improve, and administer our
-          Services, communicate with you, for security and fraud prevention, and
-          to comply with law. We may also process your information for other
-          purposes with your consent. We process your information only when we
-          have a valid legal reason to do so. Learn more about&nbsp;
-          <a
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            href="#how-we-process"
-          >
-            how we process your information
-          </a>
-        </p>
-
-        <p>
-          <strong>
-            In what situations and with which types of parties do we share
-            personal information?
-          </strong>
-          We may share information in specific situations and with specific
-          categories of third parties. Learn more about&nbsp;
-          <a
-            href="#who-share"
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-          >
-            when and with whom we share your personal information
-          </a>
-        </p>
-        <p>
-          <strong>How do we keep your information safe?</strong>
-          We have organizational and technical processes and procedures in place
-          to protect your personal information. However, no electronic
-          transmission over the internet or information storage technology can
-          be guaranteed to be 100% secure, so we cannot promise or guarantee
-          that hackers, cybercriminals, or other unauthorized third parties will
-          not be able to defeat our security and improperly collect, access,
-          steal, or modify your information. Learn more about&nbsp;
-          <a
-            href="#how-keep-information-safe"
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-          >
-            how we keep your information safe
-          </a>
-        </p>
-
-        <p>
-          <strong>
-            Want to learn more about what we do with any information we
-            collect?&nbsp;
-          </strong>
-          <a
-            href="#toc"
-            className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-          >
-            Review the privacy notice in full
-          </a>
-        </p>
-
-        <h2 className="mt-8 text-2xl font-semibold uppercase">
-          Table of Contents
-        </h2>
-        <ol className="list-decimal pl-8 uppercase">
-          <li>
-            <a
-              href="#what-info-collect"
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              What information do we collect?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              How do we process your information?
-            </a>
-          </li>
-
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              WHAT LEGAL BASES DO WE RELY ON TO PROCESS YOUR PERSONAL
-              INFORMATION?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              WHEN AND WITH WHOM DO WE SHARE YOUR PERSONAL INFORMATION?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              WHAT IS OUR STANCE ON THIRD-PARTY WEBSITES?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              DO WE USE COOKIES AND OTHER TRACKING TECHNOLOGIES?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              HOW DO WE HANDLE YOUR SOCIAL LOGINS?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              IS YOUR INFORMATION TRANSFERRED INTERNATIONALLY?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              HOW LONG DO WE KEEP YOUR INFORMATION?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              HOW DO WE KEEP YOUR INFORMATION SAFE?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              WHAT ARE YOUR PRIVACY RIGHTS?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              CONTROLS FOR DO-NOT-TRACK FEATURES
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              DO UNITED STATES RESIDENTS HAVE SPECIFIC PRIVACY RIGHTS?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              DO WE MAKE UPDATES TO THIS NOTICE?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              HOW CAN YOU CONTACT US ABOUT THIS NOTICE?
-            </a>
-          </li>
-          <li>
-            <a
-              href=""
-              className="text-indigo-700 underline visited:text-purple-700 hover:text-indigo-500"
-            >
-              HOW CAN YOU REVIEW, UPDATE, OR DELETE THE DATA WE COLLECT FROM
-              YOU?
-            </a>
-          </li>
-        </ol>
-        {/* 
-        <h2 id="what-info-collect" className="text-2xl">
-          What information do we collect?
-        </h2> */}
       </main>
     </div>
   );
